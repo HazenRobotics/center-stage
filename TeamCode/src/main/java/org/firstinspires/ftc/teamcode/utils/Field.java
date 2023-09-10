@@ -26,6 +26,7 @@ public class Field {
     enum Pixel {
         WHITE,YELLOW,PINK,GREEN
     }
+    //not offset
     static Pixel[][] pixels = new Pixel[PIXEL_COLUMN][PIXEL_ROW];
 
 
