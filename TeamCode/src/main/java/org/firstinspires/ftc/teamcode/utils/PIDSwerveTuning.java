@@ -6,17 +6,15 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.subsystems.AxonAbsolutePositionEncoder;
+import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
 
 @Config
 @TeleOp(group = "Test")
 public class PIDSwerveTuning extends LinearOpMode {
-
-	CRServo crServo;
-	AxonAbsolutePositionEncoder encoder;
-
-	SwervePIDController controller;
+	AxonSwervePod pod;
 
 	public static double p = 0, i = 0, d = 0;
 
@@ -26,10 +24,9 @@ public class PIDSwerveTuning extends LinearOpMode {
 
 	@Override
 	public void runOpMode( ) throws InterruptedException {
-		crServo = hardwareMap.get( CRServo.class, "servo" );
-		encoder = new AxonAbsolutePositionEncoder( hardwareMap, "encoder" );
 
-		controller = new SwervePIDController();
+		pod = new AxonSwervePod( hardwareMap, "FLM", true, "FLS", true,
+				"FLE", 1.962, 3.3, false, new double[]{0,0,0}, 0);
 
 		telemetry = new MultipleTelemetry( telemetry, FtcDashboard.getInstance( ).getTelemetry( ) );
 
@@ -37,15 +34,11 @@ public class PIDSwerveTuning extends LinearOpMode {
 
 		while( opModeIsActive() ) {
 
-			if(gamepad1.a) {
-				encoder.setOffset( 0 );
-				encoder.setOffset( encoder.getAngle() );
-			}
+			pod.setPID( p, i, d );
 
-			controller.setPID( p, i, d );
+			pod.setAngleTarget( Math.toRadians( angle ) );
 
-
-			crServo.setPower( -controller.update( Math.toRadians( angle ), encoder.getAngle() ));
+			pod.update( 0 );
 
 			updateTelemetry( );
 		}
@@ -53,13 +46,13 @@ public class PIDSwerveTuning extends LinearOpMode {
 	}
 
 	public void updateTelemetry( ) {
-		telemetry.addData( "rotate pos RAD", encoder.getAngle( ) );
+		telemetry.addData( "rotate pos RAD", pod.getAngle( ) );
 		telemetry.addData( "target angle RAD", Math.toRadians( angle ) );
-		telemetry.addData( "error RAD", controller.getError() );
-		telemetry.addData( "rotate pos DEG", Math.toDegrees( encoder.getAngle( ) ) );
+		telemetry.addData( "error RAD", pod.getPIDError() );
+		telemetry.addData( "rotate pos DEG", Math.toDegrees( pod.getAngle( ) ) );
 		telemetry.addData( "target angle DEG", angle );
-		telemetry.addData( "error DEG", Math.toDegrees( controller.getError( ) ) );
-		telemetry.addData( "offset", encoder.getOffset() );
+		telemetry.addData( "error DEG", Math.toDegrees( pod.getPIDError( ) ) );
+		telemetry.addData( "offset", pod.getOffset() );
 
 		double loop = System.nanoTime( );
 		telemetry.addData( "hz ", 1000000000 / (loop - loopTime) );

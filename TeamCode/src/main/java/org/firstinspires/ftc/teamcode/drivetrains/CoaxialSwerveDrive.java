@@ -10,8 +10,16 @@ public class CoaxialSwerveDrive implements Drive {
 	double wheelbase;
 	double trackwidth;
 
+
+	public CoaxialSwerveDrive (HardwareMap hw) {
+        this(hw, new String[]{"FLM", "BLM", "FRM", "BRM"}, new boolean[]{false, false, false, false},
+                new String[]{"FLS", "BLS", "FRS", "BRS"}, new boolean[]{true, true, true, true}, new String[]{"FLE", "BLE", "FRE", "BRE"},
+                new double[]{5.15, 4.32, 5.31, 6.18}, 3.3, new boolean[]{false, false, false, false}, 0, 0,
+                new double[]{0.5, 0, 0.015}, 28 * 8);
+    }
+
 	/**
-	 * @param hardwareMap         robot's hardware map
+	 * @param hw                  robot's hardware map
 	 * @param motorNames          motor names in order of FL, BL, FR, BR
 	 * @param motorReverse        true if motor reversed in order of FL, BL, FR, BR
 	 * @param servoNames          servo names in order of FL, BL, FR, BR
@@ -23,10 +31,12 @@ public class CoaxialSwerveDrive implements Drive {
 	 * @param wheelbase           length of base (distance from front wheels to back wheels)
 	 * @param trackwidth          width of track (distance from left wheels to right wheels)
 	 */
-	public CoaxialSwerveDrive(HardwareMap hardwareMap, String[] motorNames, boolean[] motorReverse, String[] servoNames, boolean[] servoReversed, String[] servoEncoderNames, double[] servoEncoderOffsets, double servoEncoderVoltage, boolean[] inverted, double wheelbase, double trackwidth ) {
+	public CoaxialSwerveDrive(HardwareMap hw, String[] motorNames, boolean[] motorReverse, String[] servoNames,
+							  boolean[] servoReversed, String[] servoEncoderNames, double[] servoEncoderOffsets,
+							  double servoEncoderVoltage, boolean[] inverted, double wheelbase, double trackwidth, double[] PID, double wheelPPR ) {
 		for( int i = 0; i < swervePods.length; i++ )
-			swervePods[i] = new AxonSwervePod( hardwareMap, motorNames[i], motorReverse[i], servoNames[i], servoReversed[i],
-					servoEncoderNames[i], servoEncoderOffsets[i], servoEncoderVoltage, inverted[i], new double[]{ 0, 0, 0 }, 28 * 8 );
+			swervePods[i] = new AxonSwervePod( hw, motorNames[i], motorReverse[i], servoNames[i], servoReversed[i],
+					servoEncoderNames[i], servoEncoderOffsets[i], servoEncoderVoltage, inverted[i], PID, wheelPPR );
 
 		this.wheelbase = wheelbase;
 		this.trackwidth = trackwidth;
@@ -84,10 +94,19 @@ public class CoaxialSwerveDrive implements Drive {
 
 			swervePods[i].setDrivePower( wheelSpeeds[i] );
 			swervePods[i].setAngleTarget( wheelAngles[i] );
-			swervePods[i].update();
+//			swervePods[i].update();
 		}
+	}
 
+	public void naiveDrive( double power, double angle ) {
+		for (int i = 0; i < 4; i++) {
+			swervePods[i].setAngleTarget( angle );
+			swervePods[i].update( power );
+		}
+	}
 
+	public void spinny( double power) {
+		
 	}
 
 	@Override

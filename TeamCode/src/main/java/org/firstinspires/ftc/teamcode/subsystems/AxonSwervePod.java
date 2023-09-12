@@ -74,6 +74,9 @@ public class AxonSwervePod {
 	public double getAngle( ) {
 		return encoder.getAngle( );
 	}
+	public double getPIDError( ) {
+		return controller.getError();
+	}
 	public double getDriveVelo( ) {
 		return motor.getVelocity( );
 	}
@@ -86,7 +89,10 @@ public class AxonSwervePod {
 		return motor.getCurrent( CurrentUnit.AMPS );
 	}
 
-	public void update( double motorPower, double servoPower ) {
+	public void setPID( double p, double i, double d) {
+		controller.setPID( p, i, d);
+	}
+	public void update( double motorPower ) {
 		setDrivePower( motorPower );
 		setRotatePower( controller.update( getAngle() ) );
 	}
