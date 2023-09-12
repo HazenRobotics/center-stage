@@ -23,7 +23,7 @@ public class Field {
     //April Tags ID
     final static int[] BLUEATID = new int[] {1,2,3};
     final static int[] REDATID = new int[] {4,5,6};
-    enum Pixel {
+    public enum Pixel {
         WHITE,YELLOW,PINK,GREEN
     }
     //not offset
