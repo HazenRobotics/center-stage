@@ -23,7 +23,7 @@ public class SpinnySwerve extends LinearOpMode {
 			joyY = -gamepad1.left_stick_y;
 			joyMag = Math.sqrt( joyY * joyY + joyX * joyX );
 
-			drive.spinny( joyMag );
+			drive.spinny( joyMag * Math.signum( joyX ) );
 		}
 	}
 }

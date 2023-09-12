@@ -12,25 +12,21 @@ public class AxonAbsolutePositionEncoder {
 
 	AnalogInput encoder;
 	double angularOffset, maxVoltage;
-	boolean inverted;
+	int inverted;
 
 	public AxonAbsolutePositionEncoder(HardwareMap hw ) {
 		this(hw, "absoluteEncoder");
 	}
 
 	public AxonAbsolutePositionEncoder(HardwareMap hw, String encoderName ) {
-		this(hw, encoderName, 0, 3.3, false);
+		this(hw, encoderName, 0, 3.3);
 	}
 
-	public AxonAbsolutePositionEncoder(HardwareMap hw, String encoderName, double offset, double volt, boolean invert ) {
+	public AxonAbsolutePositionEncoder(HardwareMap hw, String encoderName, double offset, double volt ) {
 		encoder = hw.analogInput.get( encoderName );
 		angularOffset = offset;
 		maxVoltage = volt;
-		inverted = invert;
-	}
 
-	public void invert() {
-		inverted = !inverted;
 	}
 
 	public void setOffset(double offset) {
@@ -45,9 +41,8 @@ public class AxonAbsolutePositionEncoder {
 		return encoder.getVoltage();
 	}
 
-
 	public double getAngle() {
-		return ((((encoder.getVoltage() / maxVoltage) * TWO_PI ) - angularOffset + TWO_PI) % TWO_PI);
+		return TWO_PI - ((((getVoltage() / maxVoltage) * TWO_PI ) + angularOffset + TWO_PI) % TWO_PI);
 	}
 
 }

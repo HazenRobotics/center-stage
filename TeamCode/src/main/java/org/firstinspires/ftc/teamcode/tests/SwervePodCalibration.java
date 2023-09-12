@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
+import org.firstinspires.ftc.teamcode.utils.Field;
 import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 
 @Config
@@ -38,7 +39,7 @@ public class SwervePodCalibration extends LinearOpMode {
         servoNames = new String[] {"FLS", "BLS", "FRS", "BRS"};
         servoReversed = new boolean[] {true, true, true, true };
         encoderNames = new String[] {"FLE", "BLE", "FRE", "BRE"};
-        encoderOffsets = new double[] {5.15, 4.265, 5.31, 6.18};
+        encoderOffsets = new double[] {0, 0, 0, 0};
         pods = new AxonSwervePod[4];
 
         for (int i = 0; i < 4; i++) {
@@ -60,6 +61,11 @@ public class SwervePodCalibration extends LinearOpMode {
                 selection--;
             else if (controller1.dpad_right.onPress())
                 selection++;
+            else if( controller1.b.onPress() )
+                pods[selection].setOffset(pods[selection].getAngle());
+            else if( controller1.y.onPress() )
+                pods[selection].setOffset(0);
+
 
             selection = clamp(selection, 0, 3);
 
@@ -78,6 +84,7 @@ public class SwervePodCalibration extends LinearOpMode {
             telemetry.addData("pod " + motorNames[i], pods[i].getDriveVelo());
             telemetry.addData(motorNames[i] + " motor speed", pods[i].getDriveVelo());
             telemetry.addData(motorNames[i] +" angle ", pods[i].getAngle());
+            telemetry.addData( motorNames[i] + " offset", pods[i].getOffset() );
             telemetry.addLine();
         }
 

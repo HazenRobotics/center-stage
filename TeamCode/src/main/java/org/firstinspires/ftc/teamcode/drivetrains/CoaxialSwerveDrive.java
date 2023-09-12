@@ -14,7 +14,11 @@ public class CoaxialSwerveDrive implements Drive {
 
 
 	public CoaxialSwerveDrive( HardwareMap hw ) {
-		this( hw, new String[]{ "FLM", "BLM", "FRM", "BRM" }, new boolean[]{ false, false, false, false }, new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ true, true, true, true }, new String[]{ "FLE", "BLE", "FRE", "BRE" }, new double[]{ 5.15, 4.32, 5.31, 6.18 }, 3.3, new boolean[]{ false, false, false, false }, 0, 0, new double[]{ 0.5, 0, 0.015 }, 28 * 8 );
+		this( hw, new String[]{ "FLM", "BLM", "FRM", "BRM" }, new boolean[]{ false, false, false, false },
+				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
+				new String[]{ "FLE", "BLE", "FRE", "BRE" }, new double[]{6.15, 4.14, 5.48, 4.85},
+				3.3, new boolean[]{ false, false, false, false },
+				11.3125, 11.3125, new double[]{ 0.5, 0, 0.015 }, 28 * 8 );
 	}
 
 	/**
@@ -32,7 +36,8 @@ public class CoaxialSwerveDrive implements Drive {
 	 */
 	public CoaxialSwerveDrive( HardwareMap hw, String[] motorNames, boolean[] motorReverse, String[] servoNames, boolean[] servoReversed, String[] servoEncoderNames, double[] servoEncoderOffsets, double servoEncoderVoltage, boolean[] inverted, double wheelbase, double trackwidth, double[] PID, double wheelPPR ) {
 		for( int i = 0; i < swervePods.length; i++ )
-			swervePods[i] = new AxonSwervePod( hw, motorNames[i], motorReverse[i], servoNames[i], servoReversed[i], servoEncoderNames[i], servoEncoderOffsets[i], servoEncoderVoltage, inverted[i], PID, wheelPPR );
+			swervePods[i] = new AxonSwervePod( hw, motorNames[i], motorReverse[i], servoNames[i], servoReversed[i],
+					servoEncoderNames[i], servoEncoderOffsets[i], servoEncoderVoltage, PID, wheelPPR );
 
 		this.wheelbase = wheelbase;
 		this.trackwidth = trackwidth;
@@ -82,15 +87,14 @@ public class CoaxialSwerveDrive implements Drive {
 
 		for( int i = 0; i < swervePods.length; i++ ) {
 			// if angle to turn to is greater than 180, negate power and reduce angle by 180
-			double distanceToTurn = wheelAngles[i] - swervePods[i].getAngle( );
-			if( distanceToTurn > PI ) {
-				wheelAngles[i] -= PI;
-				wheelSpeeds[i] *= -1;
-			}
+//			double distanceToTurn = wheelAngles[i] - swervePods[i].getAngle( );
+//			if( distanceToTurn > PI ) {
+//				wheelAngles[i] -= PI;
+//				wheelSpeeds[i] *= -1;
+//			}
 
-			swervePods[i].setDrivePower( wheelSpeeds[i] );
 			swervePods[i].setAngleTarget( wheelAngles[i] );
-//			swervePods[i].update();
+			swervePods[i].update( wheelSpeeds[i] );
 		}
 	}
 
@@ -102,10 +106,10 @@ public class CoaxialSwerveDrive implements Drive {
 	}
 
 	public void spinny( double power ) {
-		swervePods[0].setAngleTarget( PI/4 );
-		swervePods[1].setAngleTarget( 3 * PI/4 );
-		swervePods[3].setAngleTarget( 5 * PI/4 );
-		swervePods[4].setAngleTarget( 7 * PI/4 );
+		swervePods[0].setAngleTarget( PI / 4 );
+		swervePods[1].setAngleTarget( 3 * PI / 4 );
+		swervePods[2].setAngleTarget( 7 * PI / 4 );
+		swervePods[3].setAngleTarget( 5 * PI / 4 );
 
 		for( int i = 0; i < 4; i++ )
 			swervePods[i].update( power );

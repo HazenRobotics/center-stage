@@ -26,7 +26,7 @@ public class PIDSwerveTuning extends LinearOpMode {
 	public void runOpMode( ) throws InterruptedException {
 
 		pod = new AxonSwervePod( hardwareMap, "FLM", true, "FLS", true,
-				"FLE", 1.962, 3.3, false, new double[]{0,0,0}, 0);
+				"FLE", 1.962, 3.3, new double[]{0,0,0}, 0);
 
 		telemetry = new MultipleTelemetry( telemetry, FtcDashboard.getInstance( ).getTelemetry( ) );
 
