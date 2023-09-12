@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.drivetrains;
 
+import static java.lang.Math.PI;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
@@ -11,12 +13,9 @@ public class CoaxialSwerveDrive implements Drive {
 	double trackwidth;
 
 
-	public CoaxialSwerveDrive (HardwareMap hw) {
-        this(hw, new String[]{"FLM", "BLM", "FRM", "BRM"}, new boolean[]{false, false, false, false},
-                new String[]{"FLS", "BLS", "FRS", "BRS"}, new boolean[]{true, true, true, true}, new String[]{"FLE", "BLE", "FRE", "BRE"},
-                new double[]{5.15, 4.32, 5.31, 6.18}, 3.3, new boolean[]{false, false, false, false}, 0, 0,
-                new double[]{0.5, 0, 0.015}, 28 * 8);
-    }
+	public CoaxialSwerveDrive( HardwareMap hw ) {
+		this( hw, new String[]{ "FLM", "BLM", "FRM", "BRM" }, new boolean[]{ false, false, false, false }, new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ true, true, true, true }, new String[]{ "FLE", "BLE", "FRE", "BRE" }, new double[]{ 5.15, 4.32, 5.31, 6.18 }, 3.3, new boolean[]{ false, false, false, false }, 0, 0, new double[]{ 0.5, 0, 0.015 }, 28 * 8 );
+	}
 
 	/**
 	 * @param hw                  robot's hardware map
@@ -31,12 +30,9 @@ public class CoaxialSwerveDrive implements Drive {
 	 * @param wheelbase           length of base (distance from front wheels to back wheels)
 	 * @param trackwidth          width of track (distance from left wheels to right wheels)
 	 */
-	public CoaxialSwerveDrive(HardwareMap hw, String[] motorNames, boolean[] motorReverse, String[] servoNames,
-							  boolean[] servoReversed, String[] servoEncoderNames, double[] servoEncoderOffsets,
-							  double servoEncoderVoltage, boolean[] inverted, double wheelbase, double trackwidth, double[] PID, double wheelPPR ) {
+	public CoaxialSwerveDrive( HardwareMap hw, String[] motorNames, boolean[] motorReverse, String[] servoNames, boolean[] servoReversed, String[] servoEncoderNames, double[] servoEncoderOffsets, double servoEncoderVoltage, boolean[] inverted, double wheelbase, double trackwidth, double[] PID, double wheelPPR ) {
 		for( int i = 0; i < swervePods.length; i++ )
-			swervePods[i] = new AxonSwervePod( hw, motorNames[i], motorReverse[i], servoNames[i], servoReversed[i],
-					servoEncoderNames[i], servoEncoderOffsets[i], servoEncoderVoltage, inverted[i], PID, wheelPPR );
+			swervePods[i] = new AxonSwervePod( hw, motorNames[i], motorReverse[i], servoNames[i], servoReversed[i], servoEncoderNames[i], servoEncoderOffsets[i], servoEncoderVoltage, inverted[i], PID, wheelPPR );
 
 		this.wheelbase = wheelbase;
 		this.trackwidth = trackwidth;
@@ -87,8 +83,8 @@ public class CoaxialSwerveDrive implements Drive {
 		for( int i = 0; i < swervePods.length; i++ ) {
 			// if angle to turn to is greater than 180, negate power and reduce angle by 180
 			double distanceToTurn = wheelAngles[i] - swervePods[i].getAngle( );
-			if( distanceToTurn > Math.PI ) {
-				wheelAngles[i] -= Math.PI;
+			if( distanceToTurn > PI ) {
+				wheelAngles[i] -= PI;
 				wheelSpeeds[i] *= -1;
 			}
 
@@ -99,14 +95,20 @@ public class CoaxialSwerveDrive implements Drive {
 	}
 
 	public void naiveDrive( double power, double angle ) {
-		for (int i = 0; i < 4; i++) {
+		for( int i = 0; i < 4; i++ ) {
 			swervePods[i].setAngleTarget( angle );
 			swervePods[i].update( power );
 		}
 	}
 
-	public void spinny( double power) {
-		
+	public void spinny( double power ) {
+		swervePods[0].setAngleTarget( PI/4 );
+		swervePods[1].setAngleTarget( 3 * PI/4 );
+		swervePods[3].setAngleTarget( 5 * PI/4 );
+		swervePods[4].setAngleTarget( 7 * PI/4 );
+
+		for( int i = 0; i < 4; i++ )
+			swervePods[i].update( power );
 	}
 
 	@Override
