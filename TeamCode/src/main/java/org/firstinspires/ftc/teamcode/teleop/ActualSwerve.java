@@ -13,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.drivetrains.CoaxialSwerveDrive;
+import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 
 @TeleOp
 public class ActualSwerve extends LinearOpMode {
@@ -23,6 +24,7 @@ public class ActualSwerve extends LinearOpMode {
 	IMU imu;
 
 	boolean rotatePods;
+	GamepadEvents controller1;
 
 	@Override
 	public void runOpMode( ) throws InterruptedException {
@@ -30,6 +32,8 @@ public class ActualSwerve extends LinearOpMode {
 		drive = new CoaxialSwerveDrive( hardwareMap );
 
 		imu = hardwareMap.get( IMU.class, "imu" );
+
+		controller1 = new GamepadEvents( gamepad1 );
 
 		imu.initialize(
 				new IMU.Parameters(
@@ -40,7 +44,7 @@ public class ActualSwerve extends LinearOpMode {
 				)
 		);
 
-		imu.resetYaw();
+		imu.resetYaw( );
 
 		waitForStart( );
 
@@ -52,16 +56,19 @@ public class ActualSwerve extends LinearOpMode {
 					AngleUnit.RADIANS
 			);
 
-			rotatePods =(Math.pow( gamepad1.left_stick_x, 2 )
+			if( controller1.a.onPress( ) ) drive.toggleLock( );
+
+			rotatePods = (Math.pow( gamepad1.left_stick_x, 2 )
 					+ Math.pow( gamepad1.left_stick_y, 2 )
-					+ Math.abs( gamepad1.right_stick_x ) > 0.05 );
+					+ Math.abs( gamepad1.right_stick_x ) > 0.05);
 
 			drive.move( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, -orientation.thirdAngle, rotatePods );
 
-			telemetry.addData( "IMU X", orientation.firstAngle);
-			telemetry.addData( "IMU Y", orientation.secondAngle);
-			telemetry.addData( "IMU Z", orientation.thirdAngle);
-			telemetry.update();
+			telemetry.addData( "IMU X", orientation.firstAngle );
+			telemetry.addData( "IMU Y", orientation.secondAngle );
+			telemetry.addData( "IMU Z", orientation.thirdAngle );
+			telemetry.update( );
+			controller1.update( );
 		}
 	}
 }

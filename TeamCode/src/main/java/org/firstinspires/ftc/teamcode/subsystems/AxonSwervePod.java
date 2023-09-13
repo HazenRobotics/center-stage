@@ -29,7 +29,9 @@ public class AxonSwervePod {
                          String encoderName, double encoderOffset, double encoderVoltage, double[] pid, double PPR ) {
 		motor = hw.get( DcMotorEx.class, motorName );
 		if( motorReversed ) reverseMotor( );
+
 		motor.setMode( DcMotor.RunMode.RUN_WITHOUT_ENCODER );
+		motor.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.BRAKE );
 
 		crServo = hw.get( CRServo.class, servoName );
 		if( servoReversed ) crServo.setDirection( DcMotorSimple.Direction.REVERSE );
