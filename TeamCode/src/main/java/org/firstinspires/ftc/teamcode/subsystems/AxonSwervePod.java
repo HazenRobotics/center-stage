@@ -91,14 +91,14 @@ public class AxonSwervePod {
 		return motor.getCurrent( CurrentUnit.AMPS );
 	}
 
-
 	public void setPID( double p, double i, double d) {
 		controller.setPID( p, i, d);
 	}
 	public void update( double motorPower ) {
-		setDrivePower( motorPower );
+		double[] results = controller.update( getAngle() );
 
-		setRotatePower( controller.update( getAngle() ) );
+		setRotatePower( results[0] );
+		setDrivePower( results[1] * motorPower );
 	}
 
 

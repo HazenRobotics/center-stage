@@ -22,6 +22,8 @@ public class ActualSwerve extends LinearOpMode {
 	double joyX, joyY, joyMag, joyAngle;
 	IMU imu;
 
+	boolean rotatePods;
+
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 
@@ -38,6 +40,8 @@ public class ActualSwerve extends LinearOpMode {
 				)
 		);
 
+		imu.resetYaw();
+
 		waitForStart( );
 
 		while( opModeIsActive( ) ) {
@@ -48,7 +52,11 @@ public class ActualSwerve extends LinearOpMode {
 					AngleUnit.RADIANS
 			);
 
-			drive.move( -gamepad1.left_stick_y, -gamepad1.left_stick_x, gamepad1.right_stick_x, orientation.thirdAngle + PI/2  );
+			rotatePods =(Math.pow( gamepad1.left_stick_x, 2 )
+					+ Math.pow( gamepad1.left_stick_y, 2 )
+					+ Math.abs( gamepad1.right_stick_x ) > 0.05 );
+
+			drive.move( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, -orientation.thirdAngle, rotatePods );
 
 			telemetry.addData( "IMU X", orientation.firstAngle);
 			telemetry.addData( "IMU Y", orientation.secondAngle);

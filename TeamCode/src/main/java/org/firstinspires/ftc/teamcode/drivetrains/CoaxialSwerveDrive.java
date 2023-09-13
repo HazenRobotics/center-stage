@@ -12,11 +12,10 @@ public class CoaxialSwerveDrive implements Drive {
 	double wheelbase;
 	double trackwidth;
 
-
 	public CoaxialSwerveDrive( HardwareMap hw ) {
 		this( hw, new String[]{ "FLM", "BLM", "FRM", "BRM" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
-				new String[]{ "FLE", "BLE", "FRE", "BRE" }, new double[]{6.15, 4.14, 5.48, 4.85},
+				new String[]{ "FLE", "BLE", "FRE", "BRE" }, new double[]{ 6.15, 4.14, 5.48, 4.85 },
 				3.3, new boolean[]{ false, false, false, false },
 				11.3125, 11.3125, new double[]{ 0.5, 0, 0.015 }, 28 * 8 );
 	}
@@ -51,27 +50,27 @@ public class CoaxialSwerveDrive implements Drive {
 	 * @param rotatePower power to turn the robot (right)
 	 * @param heading     robot's heading (RAD)
 	 */
-	public void move( double drivePower, double strafePower, double rotatePower, double heading ) {
+	public void move( double drivePower, double strafePower, double rotatePower, double heading, boolean rotatePods ) {
 		double temp = drivePower * Math.cos( heading ) + strafePower * Math.sin( heading );
 		strafePower = -drivePower * Math.sin( heading ) + strafePower * Math.cos( heading );
-		drivePower = temp;
+		drivePower = -temp;
 
 		// distance between opposite wheels
 		double R = Math.sqrt( wheelbase * wheelbase + trackwidth * trackwidth );
 
 		double A = strafePower - rotatePower * (wheelbase / R);
 		double B = strafePower + rotatePower * (wheelbase / R);
-		double C = drivePower - rotatePower * (trackwidth / R);
-		double D = drivePower + rotatePower * (trackwidth / R);
+		double C = drivePower + rotatePower * (trackwidth / R);
+		double D = drivePower - rotatePower * (trackwidth / R);
 
-		double ws1 = Math.sqrt( B * B + C * C );
-		double wa1 = Math.atan2( B, C );
-		double ws2 = Math.sqrt( B * B + D * D );
-		double wa2 = Math.atan2( B, D );
-		double ws3 = Math.sqrt( A * A + D * D );
-		double wa3 = Math.atan2( A, D );
+		double ws1 = Math.sqrt( B * B + D * D );
+		double wa1 = Math.atan2( B, D ) - PI / 2;
+		double ws2 = Math.sqrt( A * A + D * D );
+		double wa2 = Math.atan2( A, D ) - PI / 2;
+		double ws3 = Math.sqrt( B * B + C * C );
+		double wa3 = Math.atan2( B, C ) - PI / 2;
 		double ws4 = Math.sqrt( A * A + C * C );
-		double wa4 = Math.atan2( A, C );
+		double wa4 = Math.atan2( A, C ) - PI / 2;
 
 		double max = Math.max( Math.max( ws1, ws2 ), Math.max( ws3, ws4 ) );
 
@@ -86,14 +85,8 @@ public class CoaxialSwerveDrive implements Drive {
 		double[] wheelAngles = new double[]{ wa1, wa2, wa3, wa4 };
 
 		for( int i = 0; i < swervePods.length; i++ ) {
-			// if angle to turn to is greater than 180, negate power and reduce angle by 180
-//			double distanceToTurn = wheelAngles[i] - swervePods[i].getAngle( );
-//			if( distanceToTurn > PI ) {
-//				wheelAngles[i] -= PI;
-//				wheelSpeeds[i] *= -1;
-//			}
-
-			swervePods[i].setAngleTarget( wheelAngles[i] );
+			if( rotatePods )
+				swervePods[i].setAngleTarget( wheelAngles[i] );
 			swervePods[i].update( wheelSpeeds[i] );
 		}
 	}
