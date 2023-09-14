@@ -20,9 +20,7 @@ public class ActualSwerve extends LinearOpMode {
 
 	CoaxialSwerveDrive drive;
 	Orientation orientation;
-	double joyX, joyY, joyMag, joyAngle;
 	IMU imu;
-
 	boolean rotatePods;
 	GamepadEvents controller1;
 
@@ -58,9 +56,9 @@ public class ActualSwerve extends LinearOpMode {
 
 			if( controller1.a.onPress( ) ) drive.toggleLock( );
 
-			rotatePods = (Math.pow( gamepad1.left_stick_x, 2 )
-					+ Math.pow( gamepad1.left_stick_y, 2 )
-					+ Math.abs( gamepad1.right_stick_x ) > 0.05);
+			rotatePods = (Math.abs(gamepad1.left_stick_x) > 0.02) ||
+					(Math.abs(-gamepad1.left_stick_y) > 0.02) ||
+					(Math.abs(gamepad1.right_stick_x) > 0.02);
 
 			drive.move( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, -orientation.thirdAngle, rotatePods );
 

@@ -16,11 +16,10 @@ public class CoaxialSwerveDrive implements Drive {
 
 	double[] wheelSpeeds;
 	double[] wheelAngles;
-
 	public CoaxialSwerveDrive( HardwareMap hw ) {
 		this( hw, new String[]{ "FLM", "BLM", "FRM", "BRM" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
-				new String[]{ "FLE", "BLE", "FRE", "BRE" }, new double[]{ 6.15, 4.14, 5.48, 4.85 },
+				new String[]{ "FLE", "BLE", "FRE", "BRE" }, new double[]{ 5.96, 0.92, 4.71, 4.84 },
 				3.3, new boolean[]{ false, false, false, false },
 				11.3125, 11.3125, new double[]{ 0.5, 0, 0.015 }, 28 * 8 );
 	}
