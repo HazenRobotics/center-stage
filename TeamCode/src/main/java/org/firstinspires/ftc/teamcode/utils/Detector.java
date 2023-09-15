@@ -8,10 +8,10 @@ public class Detector {
     ColorSensor secondColorSensor;
     double whiteThresh, greenThresh, purpleThresh, yellowThresh;
     boolean[] sensorDetectArray = {false, false};
-    double[] whiteVal = {220.0, 220.0, 220.0};
-    double[] greenVal = {R, G, B};
-    double[] purpleVal = {R, G, B};
-    double[] yellowVal = {(190, 190, 66};
+    double[] whiteVal = {255.0, 255.0, 255.0};
+    double[] greenVal = {0.0, 255.0, 0.0};
+    double[] purpleVal = {255.0, 0.0, 255.0};
+    double[] yellowVal = {255.0, 255.0, 0.0};
 
     public boolean isYellow( double R, double G, double B) {
         if( (R >= (0.3174 * B + 169)) && (G >= (0.3174 * B + 169)) && (R <= -B + 255) && (G <= -B + 255) && B <= 60 )
