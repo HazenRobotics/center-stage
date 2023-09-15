@@ -8,8 +8,7 @@ import java.sql.Array;
 
 public class Intake {
     DcMotor intakeMotor;
-    ColorSensor firstColorSensor;
-    ColorSensor secondColorSensor;
+
     boolean[] sensorDetectArray = {false, false};
 
     double[] whiteThreshold = [220, 220, 220];
@@ -29,8 +28,6 @@ public class Intake {
     }
     public Intake ( HardwareMap hw, String name ) {
         intakeMotor = hw.get(DcMotor.class, name);
-        firstColorSensor = hw.get(ColorSensor.class, name);
-        secondColorSensor = hw.get(ColorSensor.class, name);
     }
 
     public void loop( IntakeState state ) {
@@ -53,13 +50,4 @@ public class Intake {
         }
     }
 
-    public boolean[] firstColorSensorResponse ( ) {
-        double redPercent = firstColorSensor.red()/255;
-        double greenPercent = firstColorSensor.green()/255;
-        double bluePercent = firstColorSensor.blue()/255;
-
-        if(greenPercent > ) {
-
-        }
-    }
 }
