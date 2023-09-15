@@ -25,8 +25,8 @@ public class PIDSwerveTuning extends LinearOpMode {
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 
-		pod = new AxonSwervePod( hardwareMap, "FLM", true, "FLS", true,
-				"FLE", 1.962, 3.3, new double[]{0,0,0}, 0);
+		pod = new AxonSwervePod( hardwareMap, "FLM", false, "FLS", false,
+				"FLE", 5.96, 3.3, new double[]{0,0}, 0);
 
 		telemetry = new MultipleTelemetry( telemetry, FtcDashboard.getInstance( ).getTelemetry( ) );
 
@@ -34,7 +34,7 @@ public class PIDSwerveTuning extends LinearOpMode {
 
 		while( opModeIsActive() ) {
 
-			pod.setPID( p, i, d );
+			pod.setPID( p, d );
 
 			pod.setAngleTarget( Math.toRadians( angle ) );
 

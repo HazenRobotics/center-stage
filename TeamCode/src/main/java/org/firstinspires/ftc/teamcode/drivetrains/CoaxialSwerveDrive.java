@@ -8,20 +8,25 @@ import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
 
 public class CoaxialSwerveDrive implements Drive {
 
+	enum WheelState {
+		DRIVE,
+		DIAMOND,
+		X
+	}
+
+	WheelState wheelState;
 	AxonSwervePod[] swervePods = new AxonSwervePod[4];
 	double wheelbase;
 	double trackwidth;
-
 	boolean lockInPlace = false;
-
 	double[] wheelSpeeds;
 	double[] wheelAngles;
+
 	public CoaxialSwerveDrive( HardwareMap hw ) {
 		this( hw, new String[]{ "FLM", "BLM", "FRM", "BRM" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLE", "BLE", "FRE", "BRE" }, new double[]{ 5.96, 0.92, 4.71, 4.84 },
-				3.3, new boolean[]{ false, false, false, false },
-				11.3125, 11.3125, new double[]{ 0.5, 0, 0.015 }, 28 * 8 );
+				3.3, 11.3125, 11.3125, new double[]{ 0.6, 0.02 }, 28 * 8 );
 	}
 
 	/**
@@ -33,11 +38,10 @@ public class CoaxialSwerveDrive implements Drive {
 	 * @param servoEncoderNames   true if servo reversed in order of FL, BL, FR, BR
 	 * @param servoEncoderOffsets servo encoder offsets in order of FL, BL, FR, BR
 	 * @param servoEncoderVoltage maximum voltage of encoder used for servos
-	 * @param inverted            true if pods are inverted in order of FL, BL, FR, BR
 	 * @param wheelbase           length of base (distance from front wheels to back wheels)
 	 * @param trackwidth          width of track (distance from left wheels to right wheels)
 	 */
-	public CoaxialSwerveDrive( HardwareMap hw, String[] motorNames, boolean[] motorReverse, String[] servoNames, boolean[] servoReversed, String[] servoEncoderNames, double[] servoEncoderOffsets, double servoEncoderVoltage, boolean[] inverted, double wheelbase, double trackwidth, double[] PID, double wheelPPR ) {
+	public CoaxialSwerveDrive( HardwareMap hw, String[] motorNames, boolean[] motorReverse, String[] servoNames, boolean[] servoReversed, String[] servoEncoderNames, double[] servoEncoderOffsets, double servoEncoderVoltage, double wheelbase, double trackwidth, double[] PID, double wheelPPR ) {
 		for( int i = 0; i < swervePods.length; i++ )
 			swervePods[i] = new AxonSwervePod( hw, motorNames[i], motorReverse[i], servoNames[i], servoReversed[i],
 					servoEncoderNames[i], servoEncoderOffsets[i], servoEncoderVoltage, PID, wheelPPR );
@@ -55,7 +59,7 @@ public class CoaxialSwerveDrive implements Drive {
 	 * @param heading     robot's heading (RAD)
 	 */
 	public void move( double drivePower, double strafePower, double rotatePower, double heading, boolean rotatePods ) {
-		if (!lockInPlace) {
+		if( !lockInPlace ) {
 
 			double temp = drivePower * Math.cos( heading ) + strafePower * Math.sin( heading );
 			strafePower = -drivePower * Math.sin( heading ) + strafePower * Math.cos( heading );
@@ -91,7 +95,7 @@ public class CoaxialSwerveDrive implements Drive {
 			wheelAngles = new double[]{ wa1, wa2, wa3, wa4 };
 		} else {
 			wheelSpeeds = new double[]{ 0, 0, 0, 0 };
-			wheelAngles = new double[]{ PI/4, 3 * PI/4, 3 * PI/4, PI/4 };
+			wheelAngles = new double[]{ PI / 4, 3 * PI / 4, 3 * PI / 4, PI / 4 };
 			rotatePods = true;
 		}
 
@@ -138,17 +142,20 @@ public class CoaxialSwerveDrive implements Drive {
 	public void drive( double move, double turn ) {
 
 	}
-
 	@Override
 	public State getState( ) {
 		return null;
 	}
-
-	public void toggleLock() {
+	public void setWheelState( WheelState state ) {
+		wheelState = state;
+	}
+	public WheelState getWheelState( ) {
+		return wheelState;
+	}
+	public void toggleLock( ) {
 		lockInPlace = !lockInPlace;
 	}
-
-	public boolean locked() {
+	public boolean locked( ) {
 		return lockInPlace;
 	}
 }

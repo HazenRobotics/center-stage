@@ -7,28 +7,27 @@ import static java.lang.Math.signum;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class SwervePIDController {
+public class SwervePDController {
 
 
-	double Kp, Ki, Kd, integralSum, lastError, error;
+	double Kp, Kd, lastError, error;
 	ElapsedTime timer;
 
 	double targetAngle;
 	double motorDirection;
 
-	public SwervePIDController( ) {
-		this( 0, 0, 0 );
+	public SwervePDController( ) {
+		this( 0, 0 );
 	}
 
-	public SwervePIDController( double p, double i, double d ) {
-		setPID( p, i, d );
+	public SwervePDController( double p, double d ) {
+		setPD( p, d );
 		timer = new ElapsedTime( );
 		targetAngle = 0;
 	}
 
-	public void setPID( double p, double i, double d ) {
+	public void setPD( double p, double d ) {
 		Kp = p;
-		Ki = i;
 		Kd = d;
 	}
 
@@ -39,14 +38,12 @@ public class SwervePIDController {
 
 		if( motorDirection < 0 ) error = findShortestAngularTravel( targetAngle + PI, currentAngle );
 
-		integralSum += error * timer.seconds( );
-
 		double derivative = (error - lastError) / timer.seconds( );
 		lastError = error;
 
 		timer.reset( );
 
-		return new double[]{ (Kp * error) + (Ki * integralSum) + (Kd * derivative), motorDirection };
+		return new double[]{ (Kp * error) + (Kd * derivative), motorDirection };
 	}
 
 	public void setTargetAngle( double angle ) {

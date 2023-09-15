@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.teamcode.subsystems.AxonAbsolutePositionEncoder.TWO_PI;
-
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -9,20 +7,20 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.utils.SwervePIDController;
+import org.firstinspires.ftc.teamcode.utils.SwervePDController;
 
 public class AxonSwervePod {
 
 	DcMotorEx motor;
 	CRServo crServo;
 	AxonAbsolutePositionEncoder encoder;
-	SwervePIDController controller;
+	SwervePDController controller;
 
 	double motorPPR;
 
 	public AxonSwervePod(HardwareMap hw, String motorName, String servoName, String encoderName ) {
 		this(hw, motorName, false, servoName, false, encoderName,
-				0, 3.3, new double[]{0,0,0}, 28 * 8 );
+				0, 3.3, new double[]{0,0}, 28 * 8 );
 	}
 
 	public AxonSwervePod(HardwareMap hw, String motorName, boolean motorReversed, String servoName, boolean servoReversed,
@@ -37,7 +35,7 @@ public class AxonSwervePod {
 		if( servoReversed ) crServo.setDirection( DcMotorSimple.Direction.REVERSE );
 
 		encoder = new AxonAbsolutePositionEncoder( hw, encoderName, encoderOffset, encoderVoltage );
-		controller = new SwervePIDController( pid[0], pid[1], pid[2] );
+		controller = new SwervePDController( pid[0], pid[1] );
 
 		motorPPR = PPR;
 	}
@@ -93,8 +91,8 @@ public class AxonSwervePod {
 		return motor.getCurrent( CurrentUnit.AMPS );
 	}
 
-	public void setPID( double p, double i, double d) {
-		controller.setPID( p, i, d);
+	public void setPID( double p, double d) {
+		controller.setPD( p, d);
 	}
 	public void update( double motorPower ) {
 		double[] results = controller.update( getAngle() );
