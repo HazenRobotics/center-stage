@@ -24,7 +24,7 @@ public class Field {
     final static int[] BLUEATID = new int[] {1,2,3};
     final static int[] REDATID = new int[] {4,5,6};
     public enum Pixel {
-        WHITE,YELLOW,PINK,GREEN
+        WHITE,YELLOW,PURPLE,GREEN,NONE
     }
     //not offset
     static Pixel[][] pixels = new Pixel[PIXEL_COLUMN][PIXEL_ROW];
