@@ -48,7 +48,6 @@ public class ActualSwerve extends LinearOpMode {
 					AxesReference.INTRINSIC,
 					AxesOrder.XYZ,
 					AngleUnit.RADIANS
-					//sarah is god
 			);
 
 			if( controller1.a.onPress( ) ) drive.setWheelState( CoaxialSwerveDrive.WheelState.DIAMOND );
