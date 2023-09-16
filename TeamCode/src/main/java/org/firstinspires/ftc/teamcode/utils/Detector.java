@@ -16,6 +16,10 @@ public class Detector {
     int[] purpleValHSV = {281, 320};
     int[] yellowValHSV = {51, 60};
 
+    public Detector(HardwareMap hw, String colorSens) {
+        colorSensor = hw.get(ColorSensor.class, colorSens);
+    }
+
     //checks if ALL H, S, AND V are all in bound for white. All other colors only need H checked.
     public boolean isWhite(ColorSensor sniffer) {
         return (tenToHSV(sniffer.red(), sniffer.green(), sniffer.blue()))[0] > whiteValHSVLow[0]
@@ -45,10 +49,6 @@ public class Detector {
         float[] hsv = new float[3];
         Color.RGBToHSV(red / 4, green / 4, blue / 4, hsv);
         return hsv;
-    }
-
-    public Detector(HardwareMap hw, String colorSens) {
-        colorSensor = hw.get(ColorSensor.class, colorSens);
     }
 
     public Field.Pixel getColorResponse(ColorSensor c1) {
