@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.teamcode.utils;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Detector {
     ColorSensor firstColorSensor;
+    float[] rgb1 = new float[3];
     ColorSensor secondColorSensor;
+    float[] rgb2 = new float[3];
     double whiteThresh, greenThresh, purpleThresh, yellowThresh;
     boolean[] sensorDetectArray = {false, false};
     double[] whiteVal = {255.0, 255.0, 255.0};
@@ -13,11 +17,25 @@ public class Detector {
     double[] purpleVal = {255.0, 0.0, 255.0};
     double[] yellowVal = {255.0, 255.0, 0.0};
 
-    public boolean isYellow( double R, double G, double B) {
-        if( (R >= (0.3174 * B + 169)) && (G >= (0.3174 * B + 169)) && (R <= -B + 255) && (G <= -B + 255) && B <= 60 )
-            return true;
-        else
-            return false;
+    public boolean isWhite() {
+        return true;
+    }
+    public boolean isGreen() {
+        return true;
+    }
+
+    public boolean isYellow() {
+        return true;
+    }
+
+    public boolean isPurple() {
+        return true;
+    }
+
+    public float[] tenToHSV(int red, int green, int blue) {
+        float[] hsv = new float[3];
+        Color.RGBToHSV(red / 4, green / 4, blue / 4, hsv);
+        return hsv;
     }
 
     public Detector(HardwareMap hw, String name) {
@@ -25,17 +43,13 @@ public class Detector {
         secondColorSensor = hw.get(ColorSensor.class, name);
     }
 
-    public boolean[] firstColorSensorResponse() {
-        double redPercent = firstColorSensor.red() / 255;
-        double greenPercent = firstColorSensor.green() / 255;
-        double bluePercent = firstColorSensor.blue() / 255;
-
-        //yellow
-        /* Yellow	#FFFF00	(255,255,0)	(60°,100%,100%)
-        red-green: NO blue (tolerance +/- 10), high red, high green (190-255);
-        */
-        if (greenPercent * > 190 && redPercent > 190 && bluePercent < 10) {
-
+    public Field.Pixel[] getColorResponse( ColorSensor c1, ColorSensor c2 ) {
+        Field.Pixel[] response = new Field.Pixel[2];
+        if((tenToHSV(c1.red(), c1.green(), c1.blue())[0]) == 60) {
+            response[0] = Field.Pixel.GREEN;
         }
+        return response;
     }
+
 }
+
