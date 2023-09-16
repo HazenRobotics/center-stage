@@ -8,16 +8,6 @@ import java.sql.Array;
 
 public class Intake {
     DcMotor intakeMotor;
-
-    boolean[] sensorDetectArray = {false, false};
-
-    double[] whiteThreshold = [220, 220, 220];
-    double[] greenThreshold = [R, G, B];
-    double[] purpleThreshold = [R, G, B];
-    double[] yellowThreshold = [R, G, B];
-
-    //consider using weight sensors?
-
     IntakeState intakeState = IntakeState.NONE; //default state, nothing inside
 
     public enum IntakeState {
@@ -30,7 +20,11 @@ public class Intake {
         intakeMotor = hw.get(DcMotor.class, name);
     }
 
-    public void loop( IntakeState state ) {
+    public void run( IntakeState state ) {
+        //run intake motors here
+
+
+
         switch ( state ) {
             case OVERFLOW:
                 //reverse motors/dispose of pixels until !OVERFLOW
