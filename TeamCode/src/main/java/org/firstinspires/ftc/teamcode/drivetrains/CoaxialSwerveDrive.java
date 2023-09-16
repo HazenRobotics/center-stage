@@ -6,19 +6,18 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
 
-public class CoaxialSwerveDrive implements Drive {
+public class CoaxialSwerveDrive {
 
-	enum WheelState {
+	public enum WheelState {
 		DRIVE,
 		DIAMOND,
 		X
 	}
 
-	WheelState wheelState;
+	WheelState wheelState = WheelState.DRIVE;
 	AxonSwervePod[] swervePods = new AxonSwervePod[4];
 	double wheelbase;
 	double trackwidth;
-	boolean lockInPlace = false;
 	double[] wheelSpeeds;
 	double[] wheelAngles;
 
@@ -56,47 +55,53 @@ public class CoaxialSwerveDrive implements Drive {
 	 * @param drivePower  power to move in the y direction (relative to the field)
 	 * @param strafePower power to move in the x direction (relative to the field)
 	 * @param rotatePower power to turn the robot (right)
-	 * @param heading     robot's heading (RAD)
 	 */
-	public void move( double drivePower, double strafePower, double rotatePower, double heading, boolean rotatePods ) {
-		if( !lockInPlace ) {
+	public void drive( double drivePower, double strafePower, double rotatePower ) {
+		boolean rotatePods = Math.abs(drivePower) > 0.02 ||
+				Math.abs(strafePower) > 0.02 ||
+				Math.abs(rotatePower) > 0.02;
 
-			double temp = drivePower * Math.cos( heading ) + strafePower * Math.sin( heading );
-			strafePower = -drivePower * Math.sin( heading ) + strafePower * Math.cos( heading );
-			drivePower = -temp;
+		switch (wheelState) {
+			case DRIVE:
+				// distance between opposite wheels
+				double R = Math.sqrt( wheelbase * wheelbase + trackwidth * trackwidth );
 
-			// distance between opposite wheels
-			double R = Math.sqrt( wheelbase * wheelbase + trackwidth * trackwidth );
+				double A = strafePower - rotatePower * (wheelbase / R);
+				double B = strafePower + rotatePower * (wheelbase / R);
+				double C = drivePower + rotatePower * (trackwidth / R);
+				double D = drivePower - rotatePower * (trackwidth / R);
 
-			double A = strafePower - rotatePower * (wheelbase / R);
-			double B = strafePower + rotatePower * (wheelbase / R);
-			double C = drivePower + rotatePower * (trackwidth / R);
-			double D = drivePower - rotatePower * (trackwidth / R);
+				double ws1 = Math.sqrt( B * B + D * D );
+				double wa1 = Math.atan2( B, D ) - PI / 2;
+				double ws2 = Math.sqrt( A * A + D * D );
+				double wa2 = Math.atan2( A, D ) - PI / 2;
+				double ws3 = Math.sqrt( B * B + C * C );
+				double wa3 = Math.atan2( B, C ) - PI / 2;
+				double ws4 = Math.sqrt( A * A + C * C );
+				double wa4 = Math.atan2( A, C ) - PI / 2;
 
-			double ws1 = Math.sqrt( B * B + D * D );
-			double wa1 = Math.atan2( B, D ) - PI / 2;
-			double ws2 = Math.sqrt( A * A + D * D );
-			double wa2 = Math.atan2( A, D ) - PI / 2;
-			double ws3 = Math.sqrt( B * B + C * C );
-			double wa3 = Math.atan2( B, C ) - PI / 2;
-			double ws4 = Math.sqrt( A * A + C * C );
-			double wa4 = Math.atan2( A, C ) - PI / 2;
+				double max = Math.max( Math.max( ws1, ws2 ), Math.max( ws3, ws4 ) );
 
-			double max = Math.max( Math.max( ws1, ws2 ), Math.max( ws3, ws4 ) );
+				if( max > 1 ) {
+					ws1 /= max;
+					ws2 /= max;
+					ws3 /= max;
+					ws4 /= max;
+				}
 
-			if( max > 1 ) {
-				ws1 /= max;
-				ws2 /= max;
-				ws3 /= max;
-				ws4 /= max;
-			}
-
-			wheelSpeeds = new double[]{ ws1, ws2, ws3, ws4 };
-			wheelAngles = new double[]{ wa1, wa2, wa3, wa4 };
-		} else {
-			wheelSpeeds = new double[]{ 0, 0, 0, 0 };
-			wheelAngles = new double[]{ PI / 4, 3 * PI / 4, 3 * PI / 4, PI / 4 };
-			rotatePods = true;
+				wheelSpeeds = new double[]{ ws1, ws2, ws3, ws4 };
+				wheelAngles = new double[]{ wa1, wa2, wa3, wa4 };
+				break;
+			case DIAMOND:
+				wheelSpeeds = new double[]{ 0, 0, 0, 0 };
+				wheelAngles = new double[]{ PI / 4, 3 * PI / 4, 3 * PI / 4, PI / 4 };
+				rotatePods = true;
+				break;
+			case X:
+				wheelSpeeds = new double[]{ 0, 0, 0, 0 };
+				wheelAngles = new double[]{ 3 * PI / 4, PI / 4, PI / 4, 3 * PI / 4 };
+				rotatePods = true;
+				break;
 		}
 
 		for( int i = 0; i < swervePods.length; i++ ) {
@@ -106,56 +111,18 @@ public class CoaxialSwerveDrive implements Drive {
 		}
 	}
 
-	public void naiveDrive( double power, double angle ) {
-		for( int i = 0; i < 4; i++ ) {
-			swervePods[i].setAngleTarget( angle );
-			swervePods[i].update( power );
-		}
+	public void fieldCentricDrive ( double drivePower, double strafePower, double rotatePower, double heading ) {
+		double temp = drivePower * Math.cos( heading ) + strafePower * Math.sin( heading );
+		strafePower = -drivePower * Math.sin( heading ) + strafePower * Math.cos( heading );
+		drivePower = -temp;
+
+		drive(drivePower, strafePower, rotatePower);
 	}
 
-	public void spinny( double power ) {
-		swervePods[0].setAngleTarget( PI / 4 );
-		swervePods[1].setAngleTarget( 3 * PI / 4 );
-		swervePods[2].setAngleTarget( 7 * PI / 4 );
-		swervePods[3].setAngleTarget( 5 * PI / 4 );
-
-		for( int i = 0; i < 4; i++ )
-			swervePods[i].update( power );
-	}
-
-	@Override
-	public void move( double power ) {
-
-	}
-
-	@Override
-	public void turn( double power ) {
-
-	}
-
-	@Override
-	public void stop( ) {
-
-	}
-
-	@Override
-	public void drive( double move, double turn ) {
-
-	}
-	@Override
-	public State getState( ) {
-		return null;
-	}
 	public void setWheelState( WheelState state ) {
 		wheelState = state;
 	}
 	public WheelState getWheelState( ) {
 		return wheelState;
-	}
-	public void toggleLock( ) {
-		lockInPlace = !lockInPlace;
-	}
-	public boolean locked( ) {
-		return lockInPlace;
 	}
 }

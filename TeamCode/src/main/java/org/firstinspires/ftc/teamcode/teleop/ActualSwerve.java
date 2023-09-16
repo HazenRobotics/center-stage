@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import static java.lang.Math.PI;
-
-import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -21,7 +18,6 @@ public class ActualSwerve extends LinearOpMode {
 	CoaxialSwerveDrive drive;
 	Orientation orientation;
 	IMU imu;
-	boolean rotatePods;
 	GamepadEvents controller1;
 
 	@Override
@@ -52,19 +48,19 @@ public class ActualSwerve extends LinearOpMode {
 					AxesReference.INTRINSIC,
 					AxesOrder.XYZ,
 					AngleUnit.RADIANS
+					//sarah is god
 			);
 
-			if( controller1.a.onPress( ) ) drive.toggleLock( );
+			if( controller1.a.onPress( ) ) drive.setWheelState( CoaxialSwerveDrive.WheelState.DIAMOND );
+			else if ( controller1.x.onPress() ) drive.setWheelState( CoaxialSwerveDrive.WheelState.X );
+			else if ( controller1.y.onPress() ) drive.setWheelState( CoaxialSwerveDrive.WheelState.DRIVE );
 
-			rotatePods = (Math.abs(gamepad1.left_stick_x) > 0.02) ||
-					(Math.abs(-gamepad1.left_stick_y) > 0.02) ||
-					(Math.abs(gamepad1.right_stick_x) > 0.02);
-
-			drive.move( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, -orientation.thirdAngle, rotatePods );
+			drive.fieldCentricDrive( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, -orientation.thirdAngle );
 
 			telemetry.addData( "IMU X", orientation.firstAngle );
 			telemetry.addData( "IMU Y", orientation.secondAngle );
 			telemetry.addData( "IMU Z", orientation.thirdAngle );
+			telemetry.addData( "STATE", drive.getWheelState() );
 			telemetry.update( );
 			controller1.update( );
 		}
