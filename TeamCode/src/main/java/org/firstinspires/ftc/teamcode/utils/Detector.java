@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.utils;
 
 import android.graphics.Color;
-
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -12,14 +11,23 @@ public class Detector {
     float[] rgb2 = new float[3];
     double whiteThresh, greenThresh, purpleThresh, yellowThresh;
     boolean[] sensorDetectArray = {false, false};
-    double[] whiteVal = {255.0, 255.0, 255.0};
-    double[] greenVal = {0.0, 255.0, 0.0};
-    double[] purpleVal = {255.0, 0.0, 255.0};
-    double[] yellowVal = {255.0, 255.0, 0.0};
 
-    public boolean isWhite() {
+    //RGB Values
+//    double[] whiteVal = {255.0, 255.0, 255.0};
+//    double[] greenVal = {0.0, 255.0, 0.0};
+//    double[] purpleVal = {255.0, 0.0, 255.0};
+//    double[] yellowVal = {255.0, 255.0, 0.0};
+
+//    //HSV Values
+//    double[] whiteValHSV = {49-60, any, any};
+//    double[] greenValHSV = {85-140, any, any};
+//    double[] purpleValHSV = {255.0, 0.0, 255.0};
+//    double[] yellowValHSV = {255.0, 255.0, 0.0};
+
+    public boolean isWhite( ) {
         return true;
     }
+
     public boolean isGreen() {
         return true;
     }
@@ -38,15 +46,27 @@ public class Detector {
         return hsv;
     }
 
-    public Detector(HardwareMap hw, String name) {
-        firstColorSensor = hw.get(ColorSensor.class, name);
-        secondColorSensor = hw.get(ColorSensor.class, name);
+    public Detector(HardwareMap hw, String colorSens1, String colorSens2) {
+        firstColorSensor = hw.get(ColorSensor.class, colorSens1);
+        secondColorSensor = hw.get(ColorSensor.class, colorSens2);
     }
 
     public Field.Pixel[] getColorResponse( ColorSensor c1, ColorSensor c2 ) {
         Field.Pixel[] response = new Field.Pixel[2];
-        if((tenToHSV(c1.red(), c1.green(), c1.blue())[0]) == 60) {
+        if(isGreen()) {
             response[0] = Field.Pixel.GREEN;
+        }
+        else if(isPurple()) {
+
+        }
+        else if(isYellow()) {
+
+        }
+        else if(isWhite()) {
+
+        }
+        else {
+            return
         }
         return response;
     }
