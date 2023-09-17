@@ -31,12 +31,13 @@ public class Intake {
         intakeMotor = hw.get(DcMotor.class, name);
     }
 
-    public void run( IntakeState state ) {
+    public void runIntake( IntakeState state ) {
         //run intake motors here
 
         switch ( state ) {
             case OVERFLOW:
                 //reverse motors/dispose of pixels until !OVERFLOW
+                reverse();
                 //telemetry overflow
                 break;
             case TWOSLOT:
@@ -51,6 +52,16 @@ public class Intake {
                 //telemetry none
                 break;
         }
+    }
+
+    //reverse motors
+    public void reverse() {
+
+    }
+
+    //run motors forward
+    public void forward() {
+
     }
 
 }
