@@ -54,7 +54,7 @@ public class VisionUtil {
         } );
     }
 
-    public VisionTesting.PiecePosition getBarcodePosition( ) {
+    public VisionTesting.PiecePosition getPiecePosition( ) {
         return pipeline.getPiecePosition( );
     }
 

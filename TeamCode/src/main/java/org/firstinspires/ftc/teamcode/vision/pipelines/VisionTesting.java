@@ -50,7 +50,9 @@ public class VisionTesting extends OpenCvPipeline {
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
         Scalar redLowerBound = new Scalar(0, 100, 40);
-        Scalar redUpperBound = new Scalar(7, 255, 255);
+        Scalar redUpperBound = new Scalar(5, 255, 255);
+        Scalar redLowerBound2 = new Scalar(175, 100, 40);
+        Scalar redUpperBound2 = new Scalar(180, 255, 255);
 
         Scalar blueLowerBound = new Scalar(100, 60, 40);
         Scalar blueUpperBound = new Scalar(130, 255, 255);
@@ -59,14 +61,30 @@ public class VisionTesting extends OpenCvPipeline {
         final double percentColorThreshold = 0.02 * percentColorScalar; //Percent value on left
 
         Mat matRed = new Mat();
+        Mat matRed2 = new Mat();
         Mat matBlue = new Mat();
 
+
         Core.inRange(mat, redLowerBound, redUpperBound, matRed);
+        Core.inRange(mat, redLowerBound2, redUpperBound2, matRed2);
+        Core.add(matRed, matRed2, matRed);
+
         Core.inRange(mat, blueLowerBound, blueUpperBound, matBlue);
 
-        Mat left = mat.submat(leftPos);
-        Mat middle = mat.submat(midPos);
-        Mat right = mat.submat(rightPos);
+        Mat left;
+        Mat middle;
+        Mat right;
+
+        if (pieceColor == PieceColor.BLUE /* && pieceColor != null */) {
+            left = matBlue.submat(leftPos);
+            middle = matBlue.submat(midPos);
+            right = matBlue.submat(rightPos);
+        } else {
+            left = matRed.submat(leftPos);
+            middle = matRed.submat(midPos);
+            right = matRed.submat(rightPos);
+        }
+
 
         double leftValue = Core.sumElems(left).val[0] / leftPos.area();
 
@@ -108,13 +126,17 @@ public class VisionTesting extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
 
         Mat[] Image = processFrame(input, 1);
-        double redValue = Core.sumElems(Image[0]).val[0] / (Image[0].rows() * Image[0].cols());
-        double blueValue = Core.sumElems(Image[1]).val[0] / (Image[1].rows() * Image[1].cols());
+        double redValue = Core.sumElems(Image[0]).val[0];
+        double blueValue = Core.sumElems(Image[1]).val[0];
         telemetry.update();
         if (redValue < blueValue) {
+            pieceColor = PieceColor.BLUE;
             return Image[1]; //blue
+        } else {
+            pieceColor = PieceColor.RED;
+            return Image[0]; //red
         }
-        return Image[0]; //red
+
 
     }
 }
