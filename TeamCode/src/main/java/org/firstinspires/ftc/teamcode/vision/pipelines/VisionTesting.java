@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vision;
+package org.firstinspires.ftc.teamcode.vision.pipelines;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
@@ -23,6 +23,13 @@ public class VisionTesting extends OpenCvPipeline {
         NOT_FOUND
     }
 
+    public enum PieceColor {
+        RED,
+        BLUE
+    }
+
+    PieceColor pieceColor;
+
     static final Rect leftPos = new Rect(
             new Point(0, 0),
             new Point(426, 720));
@@ -38,39 +45,42 @@ public class VisionTesting extends OpenCvPipeline {
     }
 
 
-    public Mat processFrame(Mat input, String type) {
-
-        Scalar colorLowerBound;
-        Scalar colorUpperBound;
+    public Mat[] processFrame(Mat input, int a) {
 
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
-        if (type.equals("Red")) {
-            colorLowerBound = new Scalar(0, 40, 40);
-            colorUpperBound = new Scalar(10, 255, 255);
-        } else {
-            colorLowerBound = new Scalar(100, 40, 40);
-            colorUpperBound = new Scalar(105, 255, 255);
-        }
-        final double percentColorThreshold = 0.02;
-        Core.inRange(mat, colorLowerBound, colorUpperBound, mat);
+
+        Scalar redLowerBound = new Scalar(0, 60, 40);
+        Scalar redUpperBound = new Scalar(7, 255, 255);
+
+        Scalar blueLowerBound = new Scalar(100, 60, 40);
+        Scalar blueUpperBound = new Scalar(130, 255, 255);
+
+        final double percentColorScalar = 255;
+        final double percentColorThreshold = 0.02 * percentColorScalar; //Percent value on left
+
+        Mat matRed = new Mat();
+        Mat matBlue = new Mat();
+
+        Core.inRange(mat, redLowerBound, redUpperBound, matRed);
+        Core.inRange(mat, blueLowerBound, blueUpperBound, matBlue);
 
         Mat left = mat.submat(leftPos);
         Mat middle = mat.submat(midPos);
         Mat right = mat.submat(rightPos);
 
-        double leftValue = Core.sumElems(left).val[0] / leftPos.area() / 255;
+        double leftValue = Core.sumElems(left).val[0] / leftPos.area();
 
 
         if (leftValue > percentColorThreshold) {
             piecePosition = PiecePosition.LEFT;
         } else {
 
-            double middleValue = Core.sumElems(middle).val[0] / midPos.area() / 255;
+            double middleValue = Core.sumElems(middle).val[0] / midPos.area();
             if (middleValue > percentColorThreshold) {
                 piecePosition = PiecePosition.MIDDLE;
             } else {
 
-                double rightValue = Core.sumElems(right).val[0] / rightPos.area() / 255;
+                double rightValue = Core.sumElems(right).val[0] / rightPos.area();
                 if (rightValue > percentColorThreshold) {
 
                     piecePosition = PiecePosition.RIGHT;
@@ -84,7 +94,10 @@ public class VisionTesting extends OpenCvPipeline {
         middle.release();
         right.release();
 
-        return null;
+        Mat[] newMat = new Mat[2];
+        newMat[0] = matRed;
+        newMat[1] = matBlue;
+        return newMat;
     }
 
     public PiecePosition getPiecePosition() {
@@ -94,14 +107,14 @@ public class VisionTesting extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
 
-        Mat redImage = processFrame( input, "Red" );
-        Mat blueImage = processFrame( input, "Blue" );
-        double elementValue = Core.sumElems( redImage ).val[0] / (redImage.rows( ) * redImage.cols( )) / 255;
-        double duckValue = Core.sumElems( blueImage ).val[0] / (blueImage.rows( ) * blueImage.cols( )) / 255;
-        telemetry.update( );
-        if( elementValue < duckValue )
-            return blueImage;
-        return redImage;
+        Mat[] Image = processFrame(input, 1);
+        double redValue = Core.sumElems(Image[0]).val[0] / (Image[0].rows() * Image[0].cols());
+        double blueValue = Core.sumElems(Image[1]).val[0] / (Image[1].rows() * Image[1].cols());
+        telemetry.update();
+        if (redValue < blueValue) {
+            return Image[1]; //blue
+        }
+        return Image[0]; //red
 
     }
 }
