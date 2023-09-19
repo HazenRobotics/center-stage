@@ -60,23 +60,20 @@ public class VisionTesting extends OpenCvPipeline {
         Mat right = mat.submat(rightPos);
 
         double leftValue = Core.sumElems(left).val[0] / leftPos.area() / 255;
-        left.release();
+
 
         if (leftValue > percentColorThreshold) {
             piecePosition = PiecePosition.LEFT;
         } else {
 
             double middleValue = Core.sumElems(middle).val[0] / midPos.area() / 255;
-            middle.release();
-
             if (middleValue > percentColorThreshold) {
                 piecePosition = PiecePosition.MIDDLE;
             } else {
 
                 double rightValue = Core.sumElems(right).val[0] / rightPos.area() / 255;
-                right.release();
-
                 if (rightValue > percentColorThreshold) {
+
                     piecePosition = PiecePosition.RIGHT;
                 } else {
                     piecePosition = PiecePosition.NOT_FOUND;
@@ -84,11 +81,15 @@ public class VisionTesting extends OpenCvPipeline {
             }
         }
 
+        left.release();
+        middle.release();
+        right.release();
 
         return null;
     }
+
     @Override
     public Mat processFrame(Mat input) {
         return null;
     }
-    }
+}
