@@ -48,8 +48,8 @@ public class VisionTesting extends OpenCvPipeline {
             colorLowerBound = new Scalar(0, 40, 40);
             colorUpperBound = new Scalar(20, 255, 255);
         } else {
-            colorLowerBound = new Scalar(200, 40, 40);
-            colorUpperBound = new Scalar(210, 255, 255);
+            colorLowerBound = new Scalar(100, 40, 40);
+            colorUpperBound = new Scalar(105, 255, 255);
         }
         final double percentColorThreshold = 0.02;
         Core.inRange(mat, colorLowerBound, colorUpperBound, mat);
@@ -93,6 +93,15 @@ public class VisionTesting extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-        return null;
+
+        Mat redImage = processFrame( input, "Red" );
+        Mat blueImage = processFrame( input, "Blue" );
+        double elementValue = Core.sumElems( redImage ).val[0] / (redImage.rows( ) * redImage.cols( )) / 255;
+        double duckValue = Core.sumElems( blueImage ).val[0] / (blueImage.rows( ) * blueImage.cols( )) / 255;
+        telemetry.update( );
+        if( elementValue < duckValue )
+            return blueImage;
+        return redImage;
+
     }
 }
