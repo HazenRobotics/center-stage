@@ -16,7 +16,6 @@ public class VisionTesting extends OpenCvPipeline {
 
     PiecePosition piecePosition;
 
-
     public enum PiecePosition {
         LEFT,
         RIGHT,
@@ -86,6 +85,10 @@ public class VisionTesting extends OpenCvPipeline {
         right.release();
 
         return null;
+    }
+
+    public PiecePosition getPiecePosition() {
+        return piecePosition;
     }
 
     @Override
