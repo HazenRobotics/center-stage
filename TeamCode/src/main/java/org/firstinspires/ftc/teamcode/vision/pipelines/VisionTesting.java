@@ -49,7 +49,7 @@ public class VisionTesting extends OpenCvPipeline {
 
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
-        Scalar redLowerBound = new Scalar(0, 60, 40);
+        Scalar redLowerBound = new Scalar(0, 100, 40);
         Scalar redUpperBound = new Scalar(7, 255, 255);
 
         Scalar blueLowerBound = new Scalar(100, 60, 40);
