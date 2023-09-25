@@ -20,13 +20,27 @@ public class PropProcessor implements VisionProcessor {
 	public enum PropColor {
 		RED, BLUE
 	}
-
-	PropColor propColor;
+	PropColor propColor = PropColor.BLUE;
 	PropPosition propPosition;
 
 	private final Rect leftPos = new Rect( 0, 0, 420, 720 );
 	private final Rect midPos = new Rect( 424, 0, 420, 720 );
 	private final Rect rightPos = new Rect( 848, 0, 420, 720 );
+
+	final Scalar redLowerBound = new Scalar( 0, 100, 40 );
+	final Scalar redUpperBound = new Scalar( 5, 255, 255 );
+	final Scalar redLowerBound2 = new Scalar( 175, 100, 40 );
+	final Scalar redUpperBound2 = new Scalar( 180, 255, 255 );
+	final Scalar blueLowerBound = new Scalar( 100, 60, 40 );
+	final Scalar blueUpperBound = new Scalar( 130, 255, 255 );
+
+	Mat matRed = new Mat( );
+	Mat matRed2 = new Mat( );
+	Mat matBlue = new Mat( );
+
+	Mat left;
+	Mat middle;
+	Mat right;
 
 	@Override
 	public void init( int width, int height, CameraCalibration calibration ) {
@@ -36,39 +50,17 @@ public class PropProcessor implements VisionProcessor {
 	public Object processFrame( Mat frame, long captureTimeNanos ) {
 		Imgproc.cvtColor( frame, frame, Imgproc.COLOR_RGB2HSV );
 
-		Scalar redLowerBound = new Scalar( 0, 100, 40 );
-		Scalar redUpperBound = new Scalar( 5, 255, 255 );
-		Scalar redLowerBound2 = new Scalar( 175, 100, 40 );
-		Scalar redUpperBound2 = new Scalar( 180, 255, 255 );
-
-		Scalar blueLowerBound = new Scalar( 100, 60, 40 );
-		Scalar blueUpperBound = new Scalar( 130, 255, 255 );
+		if (propColor == PropColor.BLUE) {
+			Core.inRange( frame, blueLowerBound, blueUpperBound, matBlue );
+			matBlue.copyTo(frame);
+		} else if( propColor == PropColor.RED ) {
+			Core.inRange( frame, redLowerBound, redUpperBound, matRed );
+			Core.inRange( frame, redLowerBound2, redUpperBound2, matRed2 );
+			Core.bitwise_or( matRed, matRed2, matRed );
+			matRed.copyTo(frame);
+		}
 
 		final double percentColorThreshold = 0.02 * 255; //Percent value on left, 255 for max amount of color
-
-		Mat matRed = new Mat( );
-		Mat matRed2 = new Mat( );
-		Mat matBlue = new Mat( );
-
-		Core.inRange( frame, redLowerBound, redUpperBound, matRed );
-		Core.inRange( frame, redLowerBound2, redUpperBound2, matRed2 );
-		Core.bitwise_or( matRed, matRed2, matRed );
-
-		Core.inRange( frame, blueLowerBound, blueUpperBound, matBlue );
-
-		if (Core.sumElems( matRed ).val[0] > Core.sumElems( matBlue ).val[0]) {
-			matRed.copyTo(frame);
-			propColor = PropColor.RED;
-		} else {
-			matBlue.copyTo(frame);
-			propColor = PropColor.BLUE;
-		}
-		matRed.release();
-		matBlue.release();
-
-		Mat left;
-		Mat middle;
-		Mat right;
 
 		left = frame.submat( leftPos );
 		middle = frame.submat( midPos );
@@ -97,6 +89,7 @@ public class PropProcessor implements VisionProcessor {
 			right.release( );
 			return PropPosition.RIGHT;
 		}
+
 		left.release( );
 		middle.release( );
 		right.release( );
