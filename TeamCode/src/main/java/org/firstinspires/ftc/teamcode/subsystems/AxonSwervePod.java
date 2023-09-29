@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.utils.SwervePDController;
 
 public class AxonSwervePod {
 
-	DcMotorEx motor;
+	public DcMotorEx motor;
 	CRServo crServo;
 	AxonAbsolutePositionEncoder encoder;
 	SwervePDController controller;
