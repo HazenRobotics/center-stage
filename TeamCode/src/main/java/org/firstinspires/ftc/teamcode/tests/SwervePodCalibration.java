@@ -34,10 +34,10 @@ public class SwervePodCalibration extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         controller1 = new GamepadEvents(gamepad1);
 
-        motorNames = new String[] {"FLM", "BLM", "FRM", "BRM"};
+        motorNames = new String[] {"FLM/perp", "BLM", "FRM", "BRM/para"};
         motorReversed = new boolean[] {false, false, false, false };
         servoNames = new String[] {"FLS", "BLS", "FRS", "BRS"};
-        servoReversed = new boolean[] {true, true, true, true };
+        servoReversed = new boolean[] {false, false, false, false };
         encoderNames = new String[] {"FLE", "BLE", "FRE", "BRE"};
         encoderOffsets = new double[] {0, 0, 0, 0};
         pods = new AxonSwervePod[4];

@@ -4,6 +4,7 @@ import static java.lang.Math.PI;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
 
 public class CoaxialSwerveDrive {
@@ -16,7 +17,7 @@ public class CoaxialSwerveDrive {
 
 	WheelState wheelState = WheelState.DRIVE;
 	AxonSwervePod[] swervePods = new AxonSwervePod[4];
-	public static final double[] encoderOffsets = { 3.47, 4.24, 0.94, 0.04 };
+	public static final double[] encoderOffsets = { 0.25, 1.13, 4.04, 3.18 };
 	double wheelbase;
 	double trackwidth;
 	double[] wheelSpeeds;
@@ -26,7 +27,7 @@ public class CoaxialSwerveDrive {
 		this( hw, new String[]{ "FLM/perp", "BLM", "FRM", "BRM/para" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLE", "BLE", "FRE", "BRE" }, encoderOffsets,
-				3.3, 11.3125, 11.3125, new double[]{ 0.6, 0.02 }, 28 * 8 );
+				3.3, 11.3125, 11.3125, new double[]{ 0.6, 0.03 }, 28 * 8 );
 	}
 
 	/**
@@ -126,5 +127,12 @@ public class CoaxialSwerveDrive {
 
 	public WheelState getWheelState( ) {
 		return wheelState;
+	}
+
+	public void displayWheelAngles( Telemetry t ) {
+		t.addData( "FL", wheelAngles[0] );
+		t.addData( "BL", wheelAngles[1] );
+		t.addData( "FR", wheelAngles[2] );
+		t.addData( "BR", wheelAngles[3] );
 	}
 }

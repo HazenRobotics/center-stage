@@ -20,6 +20,8 @@ public class ActualSwerve extends LinearOpMode {
 	IMU imu;
 	GamepadEvents controller1;
 
+	boolean fieldCentric = true;
+
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 
@@ -32,8 +34,8 @@ public class ActualSwerve extends LinearOpMode {
 		imu.initialize(
 				new IMU.Parameters(
 						new RevHubOrientationOnRobot(
-								RevHubOrientationOnRobot.LogoFacingDirection.UP,
-								RevHubOrientationOnRobot.UsbFacingDirection.RIGHT
+								RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
+								RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
 						)
 				)
 		);
@@ -53,13 +55,20 @@ public class ActualSwerve extends LinearOpMode {
 			if( controller1.a.onPress( ) ) drive.setWheelState( CoaxialSwerveDrive.WheelState.DIAMOND );
 			else if ( controller1.x.onPress() ) drive.setWheelState( CoaxialSwerveDrive.WheelState.X );
 			else if ( controller1.y.onPress() ) drive.setWheelState( CoaxialSwerveDrive.WheelState.DRIVE );
+			else if ( controller1.b.onPress() ) fieldCentric = !fieldCentric;
 
-			drive.fieldCentricDrive( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, -orientation.thirdAngle );
+			if (fieldCentric) drive.fieldCentricDrive( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, -orientation.thirdAngle );
+			else drive.drive( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x );
+
+
 
 			telemetry.addData( "IMU X", orientation.firstAngle );
 			telemetry.addData( "IMU Y", orientation.secondAngle );
 			telemetry.addData( "IMU Z", orientation.thirdAngle );
 			telemetry.addData( "STATE", drive.getWheelState() );
+			telemetry.addData( "field centric?", fieldCentric );
+			drive.displayWheelAngles( telemetry );
+
 			telemetry.update( );
 			controller1.update( );
 		}
