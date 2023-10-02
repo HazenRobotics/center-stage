@@ -123,7 +123,7 @@ abstract class SwerveDrive @JvmOverloads constructor(
         val powers = SwerveKinematics.robotToWheelVelocities(drivePower, trackWidth / avg, wheelBase / avg)
         val orientations = SwerveKinematics.robotToModuleOrientations(drivePower, trackWidth / avg, wheelBase / avg)
         setMotorPowers(powers[0], powers[1], powers[2], powers[3])
-        setModuleOrientations(orientations[0] - PI / 2, orientations[1] - PI / 2, orientations[2] - PI / 2, orientations[3] - PI / 2)
+        setModuleOrientations(orientations[0] + PI / 2, orientations[1] + PI / 2, orientations[2] + PI / 2, orientations[3] + PI / 2)
     }
 
     /**
