@@ -17,9 +17,9 @@ public class MecDrive extends OpMode {
         backLeft = hardwareMap.dcMotor.get("backLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backRight = hardwareMap.dcMotor.get("backRight");
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-//        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override
