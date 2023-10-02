@@ -16,15 +16,16 @@ public class CoaxialSwerveDrive {
 
 	WheelState wheelState = WheelState.DRIVE;
 	AxonSwervePod[] swervePods = new AxonSwervePod[4];
+	public static final double[] encoderOffsets = { 3.47, 4.24, 0.94, 0.04 };
 	double wheelbase;
 	double trackwidth;
 	double[] wheelSpeeds;
 	double[] wheelAngles;
 
 	public CoaxialSwerveDrive( HardwareMap hw ) {
-		this( hw, new String[]{ "FLM", "BLM", "FRM", "BRM" }, new boolean[]{ false, false, false, false },
+		this( hw, new String[]{ "FLM/perp", "BLM", "FRM", "BRM/para" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
-				new String[]{ "FLE", "BLE", "FRE", "BRE" }, new double[]{ 5.96, 0.92, 4.71, 4.84 },
+				new String[]{ "FLE", "BLE", "FRE", "BRE" }, encoderOffsets,
 				3.3, 11.3125, 11.3125, new double[]{ 0.6, 0.02 }, 28 * 8 );
 	}
 
@@ -57,11 +58,11 @@ public class CoaxialSwerveDrive {
 	 * @param rotatePower power to turn the robot (right)
 	 */
 	public void drive( double drivePower, double strafePower, double rotatePower ) {
-		boolean rotatePods = Math.abs(drivePower) > 0.02 ||
-				Math.abs(strafePower) > 0.02 ||
-				Math.abs(rotatePower) > 0.02;
+		boolean rotatePods = Math.abs( drivePower ) > 0.02 ||
+				Math.abs( strafePower ) > 0.02 ||
+				Math.abs( rotatePower ) > 0.02;
 
-		switch (wheelState) {
+		switch( wheelState ) {
 			case DRIVE:
 				// distance between opposite wheels
 				double R = Math.sqrt( wheelbase * wheelbase + trackwidth * trackwidth );
@@ -111,17 +112,18 @@ public class CoaxialSwerveDrive {
 		}
 	}
 
-	public void fieldCentricDrive ( double drivePower, double strafePower, double rotatePower, double heading ) {
+	public void fieldCentricDrive( double drivePower, double strafePower, double rotatePower, double heading ) {
 		double temp = drivePower * Math.cos( heading ) + strafePower * Math.sin( heading );
 		strafePower = -drivePower * Math.sin( heading ) + strafePower * Math.cos( heading );
 		drivePower = -temp;
 
-		drive(drivePower, strafePower, rotatePower);
+		drive( drivePower, strafePower, rotatePower );
 	}
 
 	public void setWheelState( WheelState state ) {
 		wheelState = state;
 	}
+
 	public WheelState getWheelState( ) {
 		return wheelState;
 	}

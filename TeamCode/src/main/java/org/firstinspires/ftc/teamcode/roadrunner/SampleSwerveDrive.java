@@ -9,12 +9,12 @@ import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.encoderTi
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.kV;
+import static org.firstinspires.ftc.teamcode.drivetrains.CoaxialSwerveDrive.encoderOffsets;
 
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
-import com.acmerobotics.roadrunner.drive.SwerveDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -29,7 +29,6 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityCons
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -41,6 +40,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner;
 import org.firstinspires.ftc.teamcode.roadrunner.util.LynxModuleUtil;
 import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
+import org.firstinspires.ftc.teamcode.roadrunner.kinematics.SwerveDrive;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,13 +91,13 @@ public class SampleSwerveDrive extends SwerveDrive {
 		imu.initialize( parameters );
 
 		frontLeft = new AxonSwervePod( hardwareMap,"FLM/perp", false, "FLS", false,
-				"FLE", 3.47, 3.3, new double[]{ 0.6, 0.02 }, 28 * 8 );
+				"FLE", encoderOffsets[0], 3.3, new double[]{ 0.6, 0.02 }, 28 * 8 );
 		backLeft = new AxonSwervePod( hardwareMap,"BLM", false, "BLS", false,
-				"BlE", 4.24, 3.3, new double[]{ 0.6, 0.02 }, 28 * 8 );
+				"BLE", encoderOffsets[1], 3.3, new double[]{ 0.6, 0.02 }, 28 * 8 );
 		frontRight = new AxonSwervePod( hardwareMap,"FRM", false, "FRS", false,
-				"FRE", 0.94, 3.3, new double[]{ 0.6, 0.02 }, 28 * 8 );
+				"FRE", encoderOffsets[2], 3.3, new double[]{ 0.6, 0.02 }, 28 * 8 );
 		backRight = new AxonSwervePod( hardwareMap,"BRM/para", false, "BRS", false,
-				"BRE", 0.04, 3.3, new double[]{ 0.6, 0.02 }, 28 * 8 );
+				"BRE", encoderOffsets[3], 3.3, new double[]{ 0.6, 0.02 }, 28 * 8 );
 
 		pods = Arrays.asList( frontLeft, backLeft, frontRight, backRight );
 
