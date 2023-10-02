@@ -57,7 +57,7 @@ public class ActualSwerve extends LinearOpMode {
 			else if ( controller1.y.onPress() ) drive.setWheelState( CoaxialSwerveDrive.WheelState.DRIVE );
 			else if ( controller1.b.onPress() ) fieldCentric = !fieldCentric;
 
-			if (fieldCentric) drive.fieldCentricDrive( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, -orientation.thirdAngle );
+			if (fieldCentric) drive.fieldCentricDrive( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, orientation.thirdAngle );
 			else drive.drive( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x );
 
 

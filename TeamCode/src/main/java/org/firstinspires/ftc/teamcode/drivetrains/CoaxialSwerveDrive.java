@@ -70,8 +70,8 @@ public class CoaxialSwerveDrive {
 
 				double A = strafePower - rotatePower * (wheelbase / R);
 				double B = strafePower + rotatePower * (wheelbase / R);
-				double C = drivePower + rotatePower * (trackwidth / R);
-				double D = drivePower - rotatePower * (trackwidth / R);
+				double C = -drivePower + rotatePower * (trackwidth / R);
+				double D = -drivePower - rotatePower * (trackwidth / R);
 
 				double ws1 = Math.sqrt( B * B + D * D );
 				double wa1 = Math.atan2( B, D ) - PI / 2;
@@ -114,11 +114,11 @@ public class CoaxialSwerveDrive {
 	}
 
 	public void fieldCentricDrive( double drivePower, double strafePower, double rotatePower, double heading ) {
-		double temp = drivePower * Math.cos( heading ) + strafePower * Math.sin( heading );
-		strafePower = -drivePower * Math.sin( heading ) + strafePower * Math.cos( heading );
-		drivePower = -temp;
+		double strafe = strafePower * Math.cos( -heading ) - drivePower * Math.sin( -heading );
+		double drive = strafePower * Math.sin( -heading ) + drivePower * Math.cos( -heading );
 
-		drive( drivePower, strafePower, rotatePower );
+		drive(drive, strafe, rotatePower);
+
 	}
 
 	public void setWheelState( WheelState state ) {
