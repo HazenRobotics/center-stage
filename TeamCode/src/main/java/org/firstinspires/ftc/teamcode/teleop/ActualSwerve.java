@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import static org.firstinspires.ftc.teamcode.utils.SwervePDController.findShortestAngularTravel;
 
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -13,6 +14,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.drivetrains.CoaxialSwerveDrive;
 import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
+import org.firstinspires.ftc.teamcode.utils.HeadingPDController;
+
+import java.util.List;
 
 @TeleOp
 public class ActualSwerve extends LinearOpMode {
@@ -21,16 +25,16 @@ public class ActualSwerve extends LinearOpMode {
 	Orientation orientation;
 	IMU imu;
 	GamepadEvents controller1;
+	HeadingPDController headingController;
 	boolean fieldCentric = true;
-	boolean isRotating;
-	boolean wasRotating;
-	boolean headingLock = true;
-	double lastHeading;
+	boolean headingLock = false;
 	double heading;
-	double rotationPowerAdjustment;
-
 	@Override
 	public void runOpMode( ) throws InterruptedException {
+
+		List<LynxModule> hubs = hardwareMap.getAll( LynxModule.class);
+
+		for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 
 		drive = new CoaxialSwerveDrive( hardwareMap );
 
@@ -38,16 +42,23 @@ public class ActualSwerve extends LinearOpMode {
 
 		controller1 = new GamepadEvents( gamepad1 );
 
-		imu.initialize( new IMU.Parameters( new RevHubOrientationOnRobot( RevHubOrientationOnRobot.LogoFacingDirection.DOWN, RevHubOrientationOnRobot.UsbFacingDirection.FORWARD ) ) );
+		imu.initialize( new IMU.Parameters( new RevHubOrientationOnRobot(
+				RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
+				RevHubOrientationOnRobot.UsbFacingDirection.FORWARD ) ) );
 
 		imu.resetYaw( );
+
+		headingController = new HeadingPDController( );
+		headingController.setPD( 0.4, 0.038 );
 
 		waitForStart( );
 
 		while( opModeIsActive( ) ) {
-			isRotating = gamepad1.right_stick_x > 0;
 
-			orientation = imu.getRobotOrientation( AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS );
+			orientation = imu.getRobotOrientation(
+					AxesReference.INTRINSIC,
+					AxesOrder.XYZ,
+					AngleUnit.RADIANS );
 			heading = orientation.thirdAngle;
 
 			if( controller1.a.onPress( ) )
@@ -56,31 +67,27 @@ public class ActualSwerve extends LinearOpMode {
 				drive.setWheelState( CoaxialSwerveDrive.WheelState.X );
 			else if( controller1.y.onPress( ) )
 				drive.setWheelState( CoaxialSwerveDrive.WheelState.DRIVE );
-			else if( controller1.b.onPress( ) ) fieldCentric = !fieldCentric;
+			else if( controller1.b.onPress( ) ) {
+				headingLock = true;
+				headingController.setTargetHeading( heading );
+			}
 
-			if (!isRotating && wasRotating)
-				lastHeading = heading;
-
-			rotationPowerAdjustment = headingLock ? -0.3 * Math.signum( findShortestAngularTravel( lastHeading, heading ) ) : 0;
+			if (Math.abs(gamepad1.right_stick_x) > 0)
+				headingLock = false;
 
 			if( fieldCentric ) {
 				drive.fieldCentricDrive( -gamepad1.left_stick_y,
 						gamepad1.left_stick_x,
-						gamepad1.right_stick_x + rotationPowerAdjustment,
+						gamepad1.right_stick_x + (headingLock ? headingController.update( -heading ) : 0),
 						orientation.thirdAngle );
 			} else {
 				drive.drive( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x );
 			}
 
 			telemetry.addData( "heading", heading );
-			telemetry.addData( "lastHeading", lastHeading );
 			telemetry.addData( "STATE", drive.getWheelState( ) );
-			telemetry.addData( "isRotating", isRotating );
-			telemetry.addData( "wasRotating", wasRotating );
 			telemetry.addData( "field centric?", fieldCentric );
 			drive.displayWheelAngles( telemetry );
-
-			wasRotating = isRotating;
 
 			telemetry.update( );
 			controller1.update( );
