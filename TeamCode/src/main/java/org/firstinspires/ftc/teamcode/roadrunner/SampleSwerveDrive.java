@@ -128,13 +128,12 @@ public class SampleSwerveDrive extends SwerveDrive {
 	public Double getExternalHeadingVelocity() {
 		return (double) imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
 	}
-
+	
 	@NonNull
 	@Override
 	public List<Double> getModuleOrientations( ) {
 		return Arrays.asList( frontLeft.getAngle( ), backLeft.getAngle( ),
 				frontRight.getAngle(), backRight.getAngle() );
-
 	}
 
 	@NonNull
