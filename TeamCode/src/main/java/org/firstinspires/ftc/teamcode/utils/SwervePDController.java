@@ -11,7 +11,7 @@ public class SwervePDController {
 
 
 	double Kp, Kd, lastError, error;
-	final double Ks = 0.1;
+	final double Ks = 0.03;
 	ElapsedTime timer;
 
 	double targetAngle;
