@@ -129,6 +129,12 @@ public class CoaxialSwerveDrive {
 		return wheelState;
 	}
 
+	public void setPDs( int p, int d ) {
+		for( int i = 0; i < swervePods.length; i++ ) {
+			swervePods[i].setPID( p, d );
+		}
+	}
+
 	public void displayWheelAngles( Telemetry t ) {
 		t.addData( "FL", wheelAngles[0] );
 		t.addData( "BL", wheelAngles[1] );

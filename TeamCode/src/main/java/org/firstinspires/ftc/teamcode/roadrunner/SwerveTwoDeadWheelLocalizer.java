@@ -45,6 +45,9 @@ public class SwerveTwoDeadWheelLocalizer extends TwoTrackingWheelLocalizer {
 	public static double PERPENDICULAR_X = 0.23;
 	public static double PERPENDICULAR_Y = -6.65;
 
+	public static double X_MULTIPLIER = 0.9974141123; // Multiplier in the X direction
+	public static double Y_MULTIPLIER = 0.9988642543; // Multiplier in the Y direction
+
 	// Parallel/Perpendicular to the forward axis
 	// Parallel wheel is parallel to the forward axis
 	// Perpendicular is perpendicular to the forward axis
@@ -64,6 +67,7 @@ public class SwerveTwoDeadWheelLocalizer extends TwoTrackingWheelLocalizer {
 		perpendicularEncoder = new Encoder(hardwareMap.get( DcMotorEx.class, "FLM/perp"));
 
 		// TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
+		parallelEncoder.setDirection( Encoder.Direction.REVERSE );
 	}
 
 	public static double encoderTicksToInches( double ticks ) {
@@ -84,8 +88,8 @@ public class SwerveTwoDeadWheelLocalizer extends TwoTrackingWheelLocalizer {
 	@Override
 	public List<Double> getWheelPositions( ) {
 		return Arrays.asList(
-				encoderTicksToInches( parallelEncoder.getCurrentPosition( ) ),
-				encoderTicksToInches( perpendicularEncoder.getCurrentPosition( ) )
+				encoderTicksToInches( parallelEncoder.getCurrentPosition( ) * X_MULTIPLIER ),
+				encoderTicksToInches( perpendicularEncoder.getCurrentPosition( ) * Y_MULTIPLIER )
 		);
 	}
 
@@ -97,8 +101,8 @@ public class SwerveTwoDeadWheelLocalizer extends TwoTrackingWheelLocalizer {
 		//  compensation method
 
 		return Arrays.asList(
-				encoderTicksToInches( parallelEncoder.getCorrectedVelocity( ) ),
-				encoderTicksToInches( perpendicularEncoder.getCorrectedVelocity( ) )
+				encoderTicksToInches( parallelEncoder.getCorrectedVelocity( ) * X_MULTIPLIER ),
+				encoderTicksToInches( perpendicularEncoder.getCorrectedVelocity( ) * Y_MULTIPLIER )
 		);
 	}
 }
