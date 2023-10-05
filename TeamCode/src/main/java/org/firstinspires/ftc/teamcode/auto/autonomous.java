@@ -45,7 +45,7 @@ public class autonomous extends LinearOpMode {
         backLeft.setPower(drive + rotate - strafe);
         frontRight.setPower(drive - rotate - strafe);
         backRight.setPower(drive - rotate + strafe);
-    }//
+    }
 
 
 
