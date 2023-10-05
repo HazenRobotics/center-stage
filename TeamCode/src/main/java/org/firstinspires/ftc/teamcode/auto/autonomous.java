@@ -23,14 +23,18 @@ public class autonomous extends LinearOpMode {
         waitForStart();
         //stuff after pressing start
 
-        move(0.6, 0, 0);
-        sleep(5000);
-        move(0, 0.6, 0);
-        sleep(6000);
-        move(0.6, 0, 0.6);
+        move(0.5, 0, 0);
         sleep(2000);
         move(0, 0, 1);
-        sleep(10000);
+        sleep(5000);
+        move(0, 0.2, 0);
+        sleep(1000);
+        move(0, 0, 0.3);
+        sleep(3000);
+        move(0, 0, 0.6);
+        sleep(3000);
+        move(0, 0, 0.9);
+        sleep(3000);
 
 
 
