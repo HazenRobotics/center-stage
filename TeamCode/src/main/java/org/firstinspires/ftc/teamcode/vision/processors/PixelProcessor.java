@@ -18,6 +18,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PixelProcessor implements VisionProcessor {
@@ -26,7 +27,7 @@ public class PixelProcessor implements VisionProcessor {
 		GREEN, PURPLE, YELLOW, WHITE
 	}
 
-	PixelColor color = PixelColor.WHITE;
+	PixelColor color = PixelColor.GREEN;
 	Scalar greenLowerBound = new Scalar( 42.5, 85, 40 );
 	Scalar greenUpperBound = new Scalar( 55, 255, 255 );
 	Scalar purpleLowerBound = new Scalar( 122, 33, 142 );
@@ -38,11 +39,11 @@ public class PixelProcessor implements VisionProcessor {
 	public Scalar lowerBound;
 	public Scalar upperBound;
 
-	Mat matRed = new Mat( );
-	Mat matRed2 = new Mat( );
-	Mat matBlue = new Mat( );
+	Mat temp = new Mat( );
 
 	Mat kernel = Mat.ones(3,3, CvType.CV_32F);
+
+	double minRow = 0, maxRow = 0, minCol = 0, maxCol = 0;
 
 	@Override
 	public void init( int width, int height, CameraCalibration calibration ) {
@@ -50,7 +51,7 @@ public class PixelProcessor implements VisionProcessor {
 
 	@Override
 	public Object processFrame( Mat frame, long captureTimeNanos ) {
-		Imgproc.cvtColor( frame, frame, Imgproc.COLOR_RGB2HSV );
+		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2HSV );
 
 		switch( color ) {
 			case GREEN:
@@ -71,10 +72,29 @@ public class PixelProcessor implements VisionProcessor {
 				break;
 		}
 
-		Core.inRange( frame, lowerBound, upperBound, frame );
+		Core.inRange( temp, lowerBound, upperBound, frame );
 
-		Imgproc.morphologyEx( frame, frame, Imgproc.MORPH_ERODE, kernel, new Point(0,0), 2  );
+		Imgproc.morphologyEx( frame, frame, Imgproc.MORPH_ERODE, kernel, new Point(0,0), 3  );
 		Imgproc.morphologyEx( frame, frame, Imgproc.MORPH_DILATE, kernel, new Point(0,0), 3  );
+
+//		minRow = frame.rows();
+//		minCol = frame.cols();
+//
+//		for( int i = 0; i < frame.rows(); i++ ) {
+//			for( int j = 0; j < frame.cols(); j++ ) {
+//				if (frame.get(i, j)[0] != 0) {
+//					if (i < minRow)
+//						minRow = i;
+//					if (j < minCol)
+//						minRow = j;
+//					if (i > maxRow)
+//						maxRow = i;
+//					if (j > maxCol)
+//						maxRow = j;
+//				}
+//			}
+//		}
+
 
 		return frame;
 	}
@@ -87,10 +107,8 @@ public class PixelProcessor implements VisionProcessor {
 		selectedPaint.setStyle( Paint.Style.STROKE );
 		selectedPaint.setStrokeWidth( scaleCanvasDensity * 4 );
 
-		Paint nonSelectedPaint = new Paint( );
-		nonSelectedPaint.setColor( Color.RED );
-		nonSelectedPaint.setStyle( Paint.Style.STROKE );
-		nonSelectedPaint.setStrokeWidth( scaleCanvasDensity * 4 );
+		android.graphics.Rect rect = makeGraphicsRect( new Rect( new Point(minRow, minCol), new Point(maxRow, maxCol) ), scaleBmpPxToCanvasPx );
+		canvas.drawRect( rect, selectedPaint );
 
 	}
 
