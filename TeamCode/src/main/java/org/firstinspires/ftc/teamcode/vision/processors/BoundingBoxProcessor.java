@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BoundingBoxProcessor implements VisionProcessor {
-	public Scalar lowerBound = new Scalar( 13,119,0 );
-	public Scalar upperBound = new Scalar( 29,255,255 );;
+	public Scalar lowerBound = new Scalar( 50, 85, 40 );
+	public Scalar upperBound = new Scalar( 66, 255, 255 );
 
 	Mat kernel = Mat.ones(3,3, CvType.CV_32F);
 	Mat temp = new Mat();
@@ -61,10 +61,13 @@ public class BoundingBoxProcessor implements VisionProcessor {
 		selectedPaint.setStyle( Paint.Style.STROKE );
 		selectedPaint.setStrokeWidth( scaleCanvasDensity * 4 );
 
+		int initialSize = rects.size();
+
 		if( rects.size() > 0 ) {
 			for( int i = 0; i < rects.size( ); i++ ) {
 				android.graphics.Rect rect = makeGraphicsRect( rects.get( i ), scaleBmpPxToCanvasPx );
-				canvas.drawRect( rect, selectedPaint );
+				if (initialSize == 1 || rect.height() * rect.width() > 10000)
+					canvas.drawRect( rect, selectedPaint );
 				rects.remove( i-- );
 			}
 		}
