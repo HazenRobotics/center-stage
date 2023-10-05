@@ -1,9 +1,12 @@
-package org.firstinspires.ftc.teamcode.tests;
+package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+
 
 @TeleOp(name = "armaan", group = "TeleOp")
 
@@ -11,13 +14,22 @@ public class MecDrive extends OpMode {
 
     DcMotor frontLeft, frontRight, backLeft, backRight;
 
+    Servo armServo, gripServo;
+    CRServo contServo;
+    float   leftY, rightY;
+    double  armPosition, gripPosition, contPower;
+    double  MIN_POSITION = 0, MAX_POSITION = 1;
     @Override
     public void init() {
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         backLeft = hardwareMap.dcMotor.get("backLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backRight = hardwareMap.dcMotor.get("backRight");
-        //welcome
+
+        armServo = hardwareMap.servo.get("arm_servo");
+        gripServo = hardwareMap.servo.get("grip_servo");
+        contServo = hardwareMap.crservo.get("cont_servo");
+
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
     }
