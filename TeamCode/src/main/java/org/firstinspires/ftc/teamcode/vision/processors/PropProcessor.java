@@ -82,7 +82,7 @@ public class PropProcessor implements VisionProcessor {
 			return PropPosition.MIDDLE;
 		}
 
-		double rightValue = Core.sumElems( right ).val[0] / midPos.area( );
+		double rightValue = Core.sumElems( right ).val[0] / rightPos.area( );
 		if( rightValue > percentColorThreshold ) {
 			left.release( );
 			middle.release( );

@@ -29,7 +29,7 @@ public class PixelProcessor implements VisionProcessor {
 	public Scalar greenUpperBound = new Scalar( 50, 255, 255 );
 	public Scalar purpleLowerBound = new Scalar( 122, 23, 102 );
 	public Scalar purpleUpperBound = new Scalar( 157, 111, 255 );
-	public Scalar yellowLowerBound = new Scalar( 8.5, 135, 179 );
+	public Scalar yellowLowerBound = new Scalar( 8, 135, 179 );
 	public Scalar yellowUpperBound = new Scalar( 45, 255, 255 );
 	public Scalar whiteLowerBound = new Scalar( 0, 0, 181 );
 	public Scalar whiteUpperBound = new Scalar( 76, 14, 255 );
@@ -55,25 +55,6 @@ public class PixelProcessor implements VisionProcessor {
 	public Object processFrame( Mat frame, long captureTimeNanos ) {
 		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2HSV );
 
-//		switch( color ) {
-//			case GREEN:
-//				lowerBound = greenLowerBound;
-//				upperBound = greenUpperBound;
-//				break;
-//			case PURPLE:
-//				lowerBound = purpleLowerBound;
-//				upperBound = purpleUpperBound;
-//				break;
-//			case YELLOW:
-//				lowerBound = yellowLowerBound;
-//				upperBound = yellowUpperBound;
-//				break;
-//			case WHITE:
-//				lowerBound = whiteLowerBound;
-//				upperBound = whiteUpperBound;
-//				break;
-//		}
-
 		Imgproc.morphologyEx( temp, temp, Imgproc.MORPH_ERODE, kernel, new Point( 0, 0 ), 3 );
 		Imgproc.morphologyEx( temp, temp, Imgproc.MORPH_DILATE, kernel, new Point( 0, 0 ), 4 );
 
@@ -84,47 +65,11 @@ public class PixelProcessor implements VisionProcessor {
 
 		List<MatOfPoint> contours = new ArrayList<>( );
 		Mat hierarchy = new Mat( );
-		Imgproc.findContours( green, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE );
 
-		greenRects.clear();
-		for( int i = 0; i < contours.size( ); i++ ) {
-			MatOfPoint point = contours.get( i );
-			Rect boundingRect = Imgproc.boundingRect( point );
-			greenRects.add( boundingRect );
-		}
-
-		contours.clear();
-
-		Imgproc.findContours( purple, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE );
-
-		purpleRects.clear();
-		for( int i = 0; i < contours.size( ); i++ ) {
-			MatOfPoint point = contours.get( i );
-			Rect boundingRect = Imgproc.boundingRect( point );
-			purpleRects.add( boundingRect );
-		}
-
-		contours.clear();
-
-		Imgproc.findContours( yellow, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE );
-
-		yellowRects.clear();
-		for( int i = 0; i < contours.size( ); i++ ) {
-			MatOfPoint point = contours.get( i );
-			Rect boundingRect = Imgproc.boundingRect( point );
-			yellowRects.add( boundingRect );
-		}
-
-		contours.clear();
-
-		Imgproc.findContours( white, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE );
-
-		whiteRects.clear();
-		for( int i = 0; i < contours.size( ); i++ ) {
-			MatOfPoint point = contours.get( i );
-			Rect boundingRect = Imgproc.boundingRect( point );
-			whiteRects.add( boundingRect );
-		}
+		findBoundingBoxes( green, greenRects, contours, hierarchy );
+		findBoundingBoxes( purple, purpleRects, contours, hierarchy );
+		findBoundingBoxes( yellow, yellowRects, contours, hierarchy );
+		findBoundingBoxes( white, whiteRects, contours, hierarchy );
 
 		return frame;
 	}
@@ -132,50 +77,23 @@ public class PixelProcessor implements VisionProcessor {
 	@Override
 	public void onDrawFrame( Canvas canvas, int onscreenWidth, int onscreenHeight,
 							 float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext ) {
-		Paint paint = new Paint( );
+		Paint paint = new Paint();
 		paint.setColor( Color.GREEN );
 		paint.setStyle( Paint.Style.STROKE );
 		paint.setStrokeWidth( scaleCanvasDensity * 4 );
 
-		int minSize = 2500;
+		int minSize = 2000;
 
-		for( int i = 0; i < greenRects.size( ); i++ ) {
-			if (greenRects.get(i) != null) {
-				android.graphics.Rect rect = makeGraphicsRect( greenRects.get( i ), scaleBmpPxToCanvasPx );
-				if (rect.width() * rect.height() > minSize)
-					canvas.drawRect( rect, paint );
-			}
-		}
+		drawBoundingBoxes( canvas, paint, scaleBmpPxToCanvasPx, greenRects, minSize );
 
 		paint.setColor( Color.MAGENTA );
-
-		for( int i = 0; i < purpleRects.size( ); i++ ) {
-			if (purpleRects.get(i) != null) {
-				android.graphics.Rect rect = makeGraphicsRect( purpleRects.get( i ), scaleBmpPxToCanvasPx );
-				if (rect.width() * rect.height() > minSize)
-					canvas.drawRect( rect, paint );
-			}
-		}
+		drawBoundingBoxes( canvas, paint, scaleBmpPxToCanvasPx, purpleRects, minSize );
 
 		paint.setColor( Color.YELLOW );
-
-		for( int i = 0; i < yellowRects.size( ); i++ ) {
-			if (yellowRects.get(i) != null) {
-				android.graphics.Rect rect = makeGraphicsRect( yellowRects.get( i ), scaleBmpPxToCanvasPx );
-				if (rect.width() * rect.height() > minSize)
-					canvas.drawRect( rect, paint );
-			}
-		}
+		drawBoundingBoxes( canvas, paint, scaleBmpPxToCanvasPx, yellowRects, minSize );
 
 		paint.setColor( Color.WHITE );
-
-		for( int i = 0; i < whiteRects.size( ); i++ ) {
-			if (whiteRects.get(i) != null) {
-				android.graphics.Rect rect = makeGraphicsRect( whiteRects.get( i ), scaleBmpPxToCanvasPx );
-				if (rect.width() * rect.height() > minSize )
-					canvas.drawRect( rect, paint );
-			}
-		}
+		drawBoundingBoxes( canvas, paint, scaleBmpPxToCanvasPx, whiteRects, minSize );
 
 	}
 
@@ -186,6 +104,36 @@ public class PixelProcessor implements VisionProcessor {
 		int bottom = top + Math.round( rect.height * scaleBmpPxToCanvasPx );
 
 		return new android.graphics.Rect( left, top, right, bottom );
+	}
+
+	/**
+	 * Converts a masked matrix to contours and finds bounding boxes from contours, putting them in a provided array list
+	 * @param mat masked matrix
+	 * @param rects array list to store rectangles
+	 * @param contourList empty list to store contours
+	 * @param hierarchy honestly don't know, but it's necessary for something
+	 */
+	private void findBoundingBoxes( Mat mat, ArrayList<Rect> rects, List<MatOfPoint> contourList, Mat hierarchy ) {
+		Imgproc.findContours( mat, contourList, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE );
+
+		rects.clear();
+		for( int i = 0; i < contourList.size( ); i++ ) {
+			MatOfPoint point = contourList.get( i );
+			Rect boundingRect = Imgproc.boundingRect( point );
+			rects.add( boundingRect );
+		}
+		contourList.clear();
+	}
+
+	private void drawBoundingBoxes( Canvas canvas, Paint paint, float scaleBmpPxToCanvasPx,
+									ArrayList<Rect> rects, int minSize) {
+		for( int i = 0; i < rects.size( ); i++ ) {
+			if (rects.get(i) != null) {
+				android.graphics.Rect rect = makeGraphicsRect( rects.get( i ), scaleBmpPxToCanvasPx );
+				if (rect.width() * rect.height() > minSize)
+					canvas.drawRect( rect, paint );
+			}
+		}
 	}
 
 
