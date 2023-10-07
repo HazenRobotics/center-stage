@@ -25,14 +25,16 @@ public class PixelProcessor implements VisionProcessor {
 	}
 
 	PixelColor color = PixelColor.GREEN;
-	public Scalar greenLowerBound = new Scalar( 40, 85, 40 );
-	public Scalar greenUpperBound = new Scalar( 50, 255, 255 );
-	public Scalar purpleLowerBound = new Scalar( 122, 23, 102 );
-	public Scalar purpleUpperBound = new Scalar( 157, 111, 255 );
-	public Scalar yellowLowerBound = new Scalar( 8, 135, 179 );
-	public Scalar yellowUpperBound = new Scalar( 45, 255, 255 );
-	public Scalar whiteLowerBound = new Scalar( 0, 0, 181 );
-	public Scalar whiteUpperBound = new Scalar( 76, 14, 255 );
+	Scalar greenLowerBoundHSV = new Scalar( 40, 85, 40 );
+	Scalar greenUpperBoundHSV = new Scalar( 50, 255, 255 );
+	public Scalar greenLowerBoundLAB = new Scalar( 0, 74, 149 );
+	public Scalar greenUpperBoundLAB = new Scalar( 255, 118, 255 );
+	Scalar purpleLowerBound = new Scalar( 122, 23, 102 );
+	Scalar purpleUpperBound = new Scalar( 157, 111, 255 );
+	Scalar yellowLowerBound = new Scalar( 8, 135, 179 );
+	Scalar yellowUpperBound = new Scalar( 45, 255, 255 );
+	Scalar whiteLowerBound = new Scalar( 0, 0, 181 );
+	Scalar whiteUpperBound = new Scalar( 76, 14, 255 );
 
 	Mat temp = new Mat( );
 	Mat green = new Mat( );
@@ -53,23 +55,23 @@ public class PixelProcessor implements VisionProcessor {
 
 	@Override
 	public Object processFrame( Mat frame, long captureTimeNanos ) {
-		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2HSV );
+		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2Lab );
 
 		Imgproc.morphologyEx( temp, temp, Imgproc.MORPH_ERODE, kernel, new Point( 0, 0 ), 3 );
 		Imgproc.morphologyEx( temp, temp, Imgproc.MORPH_DILATE, kernel, new Point( 0, 0 ), 4 );
 
-		Core.inRange( temp, greenLowerBound, greenUpperBound, green );
-		Core.inRange( temp, purpleLowerBound, purpleUpperBound, purple );
-		Core.inRange( temp, yellowLowerBound, yellowUpperBound, yellow );
-		Core.inRange( temp, whiteLowerBound, whiteUpperBound, white );
+		Core.inRange( temp, greenLowerBoundLAB, greenUpperBoundLAB, green );
+//		Core.inRange( temp, purpleLowerBound, purpleUpperBound, purple );
+//		Core.inRange( temp, yellowLowerBound, yellowUpperBound, yellow );
+//		Core.inRange( temp, whiteLowerBound, whiteUpperBound, white );
 
 		List<MatOfPoint> contours = new ArrayList<>( );
 		Mat hierarchy = new Mat( );
 
 		findBoundingBoxes( green, greenRects, contours, hierarchy );
-		findBoundingBoxes( purple, purpleRects, contours, hierarchy );
-		findBoundingBoxes( yellow, yellowRects, contours, hierarchy );
-		findBoundingBoxes( white, whiteRects, contours, hierarchy );
+//		findBoundingBoxes( purple, purpleRects, contours, hierarchy );
+//		findBoundingBoxes( yellow, yellowRects, contours, hierarchy );
+//		findBoundingBoxes( white, whiteRects, contours, hierarchy );
 
 		return frame;
 	}
