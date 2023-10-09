@@ -12,13 +12,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 
 
-@TeleOp(name = "armaan", group = "TeleOp")
+@TeleOp
 
 public class MecDrive extends OpMode {
 
     DcMotor frontLeft, frontRight, backLeft, backRight;
-
-    Servo  clawServo;
     Claw claw;
 
     double  armPosition, gripPosition, contPower;
