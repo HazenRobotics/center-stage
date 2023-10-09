@@ -25,10 +25,11 @@ public class BackdropProcessor implements VisionProcessor {
 	}
 
 	PixelColor color = PixelColor.GREEN;
-	public Scalar holeLowerBound = new Scalar( 0, 0, 0 );
-	public Scalar holeUpperBound = new Scalar( 130, 200, 95 );
+	public Scalar holeLowerBound = new Scalar( 0, 116, 119 );
+	public Scalar holeUpperBound = new Scalar( 146, 255, 136 );
+	public Rect rect = new Rect(140, 0, 920, 730);
 
-	Mat temp = new Mat( );
+	Mat temp = new Mat();
 
 	Mat kernel = Mat.ones( 3, 3, CvType.CV_32F );
 
@@ -40,24 +41,25 @@ public class BackdropProcessor implements VisionProcessor {
 
 	@Override
 	public Object processFrame( Mat frame, long captureTimeNanos ) {
-		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2HSV );
-
-		Core.inRange( temp, holeLowerBound, holeUpperBound, temp );
+//		Imgproc.cvtColor( frame.submat( rect ), temp, Imgproc.COLOR_RGB2Lab );
+		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2Lab );
 
 		Imgproc.morphologyEx( temp, temp, Imgproc.MORPH_ERODE, kernel, new Point( 0, 0 ), 3 );
-		Imgproc.morphologyEx( temp, temp, Imgproc.MORPH_DILATE, kernel, new Point( 0, 0 ), 3 );
+		Imgproc.morphologyEx( temp, temp, Imgproc.MORPH_DILATE, kernel, new Point( 0, 0 ), 4 );
 
+		Core.inRange( temp, holeLowerBound, holeUpperBound, frame );
 
-		List<MatOfPoint> contours = new ArrayList<>( );
-		Mat hierarchy = new Mat( );
-		Imgproc.findContours( temp, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE );
-
-		holeRects.clear();
-		for( int i = 0; i < contours.size( ); i++ ) {
-			MatOfPoint point = contours.get( i );
-			Rect boundingRect = Imgproc.boundingRect( point );
-			holeRects.add( boundingRect );
-		}
+//		List<MatOfPoint> contours = new ArrayList<>( );
+//		Mat hierarchy = new Mat( );
+//		Imgproc.findContours( temp, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE );
+//
+//		holeRects.clear();
+//		for( int i = 0; i < contours.size( ); i++ ) {
+//			MatOfPoint point = contours.get( i );
+//			Rect boundingRect = Imgproc.boundingRect( point );
+//			holeRects.add( new Rect(boundingRect.x + rect.x, boundingRect.y + rect.y,
+//					boundingRect.width, boundingRect.height ) );
+//		}
 
 		return frame;
 	}
@@ -70,8 +72,11 @@ public class BackdropProcessor implements VisionProcessor {
 		paint.setStyle( Paint.Style.STROKE );
 		paint.setStrokeWidth( scaleCanvasDensity * 4 );
 
-		int minSize = 500;
-		int maxSize = 5000;
+		android.graphics.Rect rectangle = makeGraphicsRect( rect, scaleBmpPxToCanvasPx );
+		canvas.drawRect( rectangle, paint );
+
+		int minSize = 0;
+		int maxSize = 2000;
 
 		for( int i = 0; i < holeRects.size( ); i++ ) {
 			if (holeRects.get(i) != null) {
@@ -79,7 +84,7 @@ public class BackdropProcessor implements VisionProcessor {
 				int height = rect.height();
 				int width = rect.width();
 				int area = height * width;
-				if (area < maxSize && area > minSize/* && Math.abs( 1 - (double)height / width) < 0.23*/  )
+				if (area < maxSize && area > minSize/* && Math.abs( 1 - (double)height / width) < 0.5 */ )
 					canvas.drawRect( rect, paint );
 			}
 		}
