@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Claw;
 
 public class MecDrive extends OpMode {
 
-    DcMotor frontLeft, frontRight, backLeft, backRight;
+    DcMotor frontLeft, frontRight, backLeft, backRight, lift;
     Claw claw;
 
     double  armPosition, gripPosition, contPower;
@@ -27,6 +27,7 @@ public class MecDrive extends OpMode {
         backLeft = hardwareMap.dcMotor.get("backLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backRight = hardwareMap.dcMotor.get("backRight");
+        lift = hardwareMap.dcMotor.get("lift");
 
        claw = new Claw();
 
