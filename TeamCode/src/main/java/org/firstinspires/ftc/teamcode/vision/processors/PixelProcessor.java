@@ -66,12 +66,11 @@ public class PixelProcessor implements VisionProcessor {
 //		Core.inRange( temp, whiteLowerBound, whiteUpperBound, white );
 
 		List<MatOfPoint> contours = new ArrayList<>( );
-		Mat hierarchy = new Mat( );
 
-		findBoundingBoxes( green, greenRects, contours, hierarchy );
-//		findBoundingBoxes( purple, purpleRects, contours, hierarchy );
-//		findBoundingBoxes( yellow, yellowRects, contours, hierarchy );
-//		findBoundingBoxes( white, whiteRects, contours, hierarchy );
+		findBoundingBoxes( green, greenRects, contours );
+//		findBoundingBoxes( purple, purpleRects, contours );
+//		findBoundingBoxes( yellow, yellowRects, contours );
+//		findBoundingBoxes( white, whiteRects, contours );
 
 		return frame;
 	}
@@ -113,10 +112,9 @@ public class PixelProcessor implements VisionProcessor {
 	 * @param mat masked matrix
 	 * @param rects array list to store rectangles
 	 * @param contourList empty list to store contours
-	 * @param hierarchy honestly don't know, but it's necessary for something
 	 */
-	private void findBoundingBoxes( Mat mat, ArrayList<Rect> rects, List<MatOfPoint> contourList, Mat hierarchy ) {
-		Imgproc.findContours( mat, contourList, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE );
+	private void findBoundingBoxes( Mat mat, ArrayList<Rect> rects, List<MatOfPoint> contourList ) {
+		Imgproc.findContours( mat, contourList, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE );
 
 		rects.clear();
 		for( int i = 0; i < contourList.size( ); i++ ) {
