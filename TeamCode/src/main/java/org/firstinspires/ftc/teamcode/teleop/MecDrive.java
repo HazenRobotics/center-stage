@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.subsystems.Claw;
 
 
 @TeleOp(name = "armaan", group = "TeleOp")
@@ -14,9 +18,9 @@ public class MecDrive extends OpMode {
 
     DcMotor frontLeft, frontRight, backLeft, backRight;
 
-    Servo armServo, gripServo;
-    CRServo contServo;
-    float   leftY, rightY;
+    Servo  clawServo;
+    Claw claw;
+
     double  armPosition, gripPosition, contPower;
     double  MIN_POSITION = 0, MAX_POSITION = 1;
     @Override
@@ -26,9 +30,8 @@ public class MecDrive extends OpMode {
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backRight = hardwareMap.dcMotor.get("backRight");
 
-        armServo = hardwareMap.servo.get("arm_servo");
-        gripServo = hardwareMap.servo.get("grip_servo");
-        contServo = hardwareMap.crservo.get("cont_servo");
+       claw = new Claw();
+
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -36,6 +39,14 @@ public class MecDrive extends OpMode {
 
     @Override
     public void loop() {
+
+
+         if(gamepad1.dpad_up) {
+             claw.openClaw();
+         } else if(gamepad1.dpad_down)
+         {
+             claw.closeClaw();
+         }
         double drive = -gamepad1.right_stick_y;
         double strafe = gamepad1.right_stick_x;
         double rotate = gamepad1.left_stick_x;
