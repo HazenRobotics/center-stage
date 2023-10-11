@@ -16,4 +16,16 @@ public class lift {
     public void armDown(){
         liftMotor.setDirection(DcMotor.Direction.REVERSE);
     }
+    public void teach() {
+        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        liftMotor.setTargetPosition(69);
+        while(liftMotor.getCurrentPosition() < ticksToIN(69)) {
+            liftMotor.setPower(1);
+        }
+
+
+    }
+    public double ticksToIN(double ticks) {
+        return (3.5*Math.PI)*(ticks*28);
+    }
 }

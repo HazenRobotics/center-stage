@@ -19,8 +19,7 @@ public class Claw {
         public void openClaw()
         {
            clawServo.setPosition(0.6);
-
-            telemetry.addData("ClawStatus: ","Open");
+           telemetry.addData("ClawStatus: ","Open");
         }
 
         public void closeClaw()
