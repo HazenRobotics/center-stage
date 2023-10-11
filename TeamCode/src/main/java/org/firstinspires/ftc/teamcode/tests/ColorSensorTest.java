@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.view.View;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
 @TeleOp
+@Config
 public class ColorSensorTest extends LinearOpMode {
 	ColorSensor color;
 
@@ -20,9 +22,9 @@ public class ColorSensorTest extends LinearOpMode {
 		waitForStart();
 
 		while(opModeIsActive()) {
-			telemetry.addData( "red", (double) color.red( ) );
-			telemetry.addData( "green", (double) color.green( ) );
-			telemetry.addData( "blue", (double) color.blue( ) );
+			telemetry.addData( "red", (double) color.red( ) / 256 );
+			telemetry.addData( "green", (double) color.green( ) / 256 );
+			telemetry.addData( "blue", (double) color.blue( ) / 256 );
 			telemetry.update( );
 		}
 	}
