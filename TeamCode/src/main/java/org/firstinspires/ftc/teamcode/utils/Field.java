@@ -18,13 +18,13 @@ public class Field {
     final static double PIXEL_OUTSIDE_LEN = 3;
     final static double PIXEL_INSIDE_LEN = 1.25;
     //count
-    final static int  PIXEL_ROW = 7;
+    final static int PIXEL_ROW = 7;
     final static int PIXEL_COLUMN = 11;
     //April Tags ID
     final static int[] BLUEATID = new int[] {1,2,3};
     final static int[] REDATID = new int[] {4,5,6};
     enum Pixel {
-        WHITE,YELLOW,PINK,GREEN
+        WHITE,YELLOW,PURPLE,GREEN
     }
     //not offset
     static Pixel[][] pixels = new Pixel[PIXEL_COLUMN][PIXEL_ROW];
