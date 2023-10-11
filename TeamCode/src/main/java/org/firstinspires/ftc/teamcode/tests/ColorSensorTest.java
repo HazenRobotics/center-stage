@@ -1,17 +1,12 @@
 package org.firstinspires.ftc.teamcode.tests;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.view.View;
 
-import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.util.Range;
 
 @TeleOp
-@Config
 public class ColorSensorTest extends LinearOpMode {
 	ColorSensor color;
 
@@ -22,9 +17,9 @@ public class ColorSensorTest extends LinearOpMode {
 		waitForStart();
 
 		while(opModeIsActive()) {
-			telemetry.addData( "red", (double) color.red( ) / 256 );
-			telemetry.addData( "green", (double) color.green( ) / 256 );
-			telemetry.addData( "blue", (double) color.blue( ) / 256 );
+			telemetry.addData( "red", Range.clip( (double) color.red( ) / 32, 0, 255 ) );
+			telemetry.addData( "green", Range.clip( (double) color.green( ) / 32, 0, 255 ) );
+			telemetry.addData( "blue", Range.clip( (double) color.blue( ) / 32, 0, 255 ) );
 			telemetry.update( );
 		}
 	}
