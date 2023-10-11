@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.utils.Field;
 
@@ -47,10 +48,10 @@ public class Intake {
             else throw new IllegalArgumentException();
         }
     }
-    public Intake ( HardwareMap hw, String name ) {
-        intakeMotor = hw.get(DcMotor.class, name);
-        firstColorSensor = hw.get(ColorSensor.class, name);
-        secondColorSensor = hw.get(ColorSensor.class, name);
+    public Intake ( HardwareMap hw, String motorName, String firstName, String secondName ) {
+        intakeMotor = hw.get(DcMotor.class, motorName);
+        firstColorSensor = hw.get(ColorSensor.class, firstName);
+        secondColorSensor = hw.get(ColorSensor.class, secondName);
     }
 
     public void loop( IntakeState state ) {
@@ -71,10 +72,10 @@ public class Intake {
         telemetry.addData("Intake: ", IntakeState.getIntakeStatekey());
     }
 
-    public Field.Pixel firstColorSensorResponse ( ) {
-        double redPercent = firstColorSensor.red()/255;
-        double greenPercent = firstColorSensor.green()/255;
-        double bluePercent = firstColorSensor.blue()/255;
+    public Field.Pixel getColorResponse ( ColorSensor cs ) {
+        double redPercent = Range.clip( cs.red( ) / 32, 0, 255 );
+        double greenPercent = Range.clip( cs.green( ) / 32, 0, 255 );;
+        double bluePercent = Range.clip( cs.blue( ) / 32, 0, 255 );;
 
         if(redPercent > [greenThreshold[0]] && greenPercent > [greenThreshold[1]] && bluePercent > [greenThreshold]) {
             return
