@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.utils.Field;
+
 public class Intake {
     DcMotor intakeMotor;
     ColorSensor firstColorSensor;
@@ -69,7 +71,7 @@ public class Intake {
         telemetry.addData("Intake: ", IntakeState.getIntakeStatekey());
     }
 
-    public  firstColorSensorResponse ( ) {
+    public Field.Pixel firstColorSensorResponse ( ) {
         double redPercent = firstColorSensor.red()/255;
         double greenPercent = firstColorSensor.green()/255;
         double bluePercent = firstColorSensor.blue()/255;
