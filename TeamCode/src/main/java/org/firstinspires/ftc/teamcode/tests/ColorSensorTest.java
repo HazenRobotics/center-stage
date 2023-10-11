@@ -17,9 +17,9 @@ public class ColorSensorTest extends LinearOpMode {
 		waitForStart();
 
 		while(opModeIsActive()) {
-			telemetry.addData( "red", Range.clip( (double) color.red( ) / 32, 0, 255 ) );
-			telemetry.addData( "green", Range.clip( (double) color.green( ) / 32, 0, 255 ) );
-			telemetry.addData( "blue", Range.clip( (double) color.blue( ) / 32, 0, 255 ) );
+			telemetry.addData( "red", Range.clip( color.red( ) / 32, 0, 255 ) );
+			telemetry.addData( "green", Range.clip( color.green( ) / 32, 0, 255 ) );
+			telemetry.addData( "blue", Range.clip( color.blue( ) / 32, 0, 255 ) );
 			telemetry.update( );
 		}
 	}
