@@ -55,7 +55,7 @@ public class Lift {
 	 * @param hardwareMap the hardwareMap of the current running OpMode
 	 */
 	public Lift( HardwareMap hardwareMap ) {
-		this( hardwareMap, "lift", true, 0,
+		this( hardwareMap, "lift", false, 0,
 				0.5, 0, AngleUnit.DEGREES, 537.7, 1,
 				new PIDController(0.02, 0, 0.00012) );
 	}
