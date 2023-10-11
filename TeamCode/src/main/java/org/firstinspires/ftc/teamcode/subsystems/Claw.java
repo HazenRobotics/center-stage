@@ -1,19 +1,21 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.robocol.TelemetryMessage;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
 public class Claw {
        Servo clawServo;
+       Telemetry telemetry;
 
-
-       public Claw() {
-        clawServo = hardwareMap.servo.get("grip_servo");
+       public Claw(HardwareMap hw, Telemetry t ) {
+           clawServo = hw.get(Servo.class,"grip_servo");
+           telemetry = t;
         }
 
         public void openClaw()

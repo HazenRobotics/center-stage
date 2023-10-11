@@ -12,12 +12,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 
 
-@TeleOp
+@TeleOp (name = "Armaan")
 
 public class MecDrive extends OpMode {
 
     DcMotor frontLeft, frontRight, backLeft, backRight, lift;
     Claw claw;
+
 
     double  armPosition, gripPosition, contPower;
     double  MIN_POSITION = 0, MAX_POSITION = 1;
@@ -27,7 +28,7 @@ public class MecDrive extends OpMode {
         backLeft = hardwareMap.dcMotor.get("backLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backRight = hardwareMap.dcMotor.get("backRight");
-        claw = new Claw();
+        claw = new Claw(hardwareMap, telemetry);
 
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
