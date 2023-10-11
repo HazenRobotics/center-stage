@@ -72,13 +72,4 @@ public class Intake {
         telemetry.addData("Intake: ", IntakeState.getIntakeStatekey());
     }
 
-    public Field.Pixel getColorResponse ( ColorSensor cs ) {
-        double redPercent = Range.clip( cs.red( ) / 32, 0, 255 );
-        double greenPercent = Range.clip( cs.green( ) / 32, 0, 255 );;
-        double bluePercent = Range.clip( cs.blue( ) / 32, 0, 255 );;
-
-        if(redPercent > [greenThreshold[0]] && greenPercent > [greenThreshold[1]] && bluePercent > [greenThreshold]) {
-            return
-        }
-    }
 }
