@@ -12,7 +12,7 @@ public class Lift {
         telemetry = t;
         liftMotor = hwMap.get(DcMotor.class, "lift");
     }
-
+//
     public void armUp() {
         liftMotor.setPower(0.5);
 

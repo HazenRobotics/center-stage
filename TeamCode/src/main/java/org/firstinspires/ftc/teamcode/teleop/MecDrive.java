@@ -21,7 +21,7 @@ public class MecDrive extends OpMode {
     Claw claw;
     Lift lift;
 
-
+//
     double  armPosition, gripPosition, contPower;
     double  MIN_POSITION = 0, MAX_POSITION = 1;
     @Override
