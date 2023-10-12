@@ -10,7 +10,7 @@ public class Lift {
     Telemetry telemetry;
     public Lift(HardwareMap hwMap, Telemetry t){
         telemetry = t;
-        liftMotor = hwMap.get(DcMotor.class, 'lift');
+        liftMotor = hwMap.get(DcMotor.class, "lift");
     }
 
     public void armUp() {

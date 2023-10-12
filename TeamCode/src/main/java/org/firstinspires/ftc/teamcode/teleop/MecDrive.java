@@ -13,11 +13,11 @@ import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 
 
-@TeleOp (name = "Armaan")
+@TeleOp (name = "Nerds")
 
 public class MecDrive extends OpMode {
 
-    DcMotor frontLeft, frontRight, backLeft, backRight, lift;
+    DcMotor frontLeft, frontRight, backLeft, backRight;
     Claw claw;
     Lift lift;
 
