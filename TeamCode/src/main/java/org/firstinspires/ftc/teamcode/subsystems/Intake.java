@@ -1,15 +1,14 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utils.Field;
 
 public class Intake {
+    Telemetry telemetry;
     DcMotor intakeMotor;
     ColorSensor firstColorSensor;
     ColorSensor secondColorSensor;
@@ -27,34 +26,23 @@ public class Intake {
     double[] purpleThreshold = {0, 0, 0};
     double[] yellowThreshold = {0, 0, 0};
 
-    //consider using weight sensors?
 
-    static IntakeState intakeState = IntakeState.NONE; //default state, nothing inside
+    IntakeState intakeState = IntakeState.NONE; //default state, nothing inside
     IntakeColorSensor cs1;
     IntakeColorSensor cs2;
     Field.Pixel[] pixelColorArray = new Field.Pixel[2];
 
     public enum IntakeState {
-        ONESLOT(1),
-        TWOSLOT(2),
-        OVERFLOW(-1),
-        NONE;
-        IntakeState() {}
-        private int key;
-        private IntakeState (int key) { this.key = key;}
-        static int getIntakeStateKey() { return intakeState.key; }
-        static IntakeState getIntakeState (int x) {
-            if (x == 1) { return ONESLOT; }
-            else if (x == 2) { return TWOSLOT; }
-            else if (x == -1) { return OVERFLOW; }
-            else if (x == 0) { return NONE;}
-            else throw new IllegalArgumentException();
-        }
+        ONESLOT,
+        TWOSLOT,
+        OVERFLOW,
+        NONE
     }
-    public Intake ( HardwareMap hw, String motorName, String firstColorSensorName, String secondColorSensorName) {
+    public Intake ( HardwareMap hw, Telemetry t, String motorName, String firstColorSensorName, String secondColorSensorName) {
         intakeMotor = hw.get(DcMotor.class, motorName);
-        cs1 = new IntakeColorSensor(hardwareMap, firstColorSensorName);
-        cs2 = new IntakeColorSensor(hardwareMap, secondColorSensorName);
+        cs1 = new IntakeColorSensor(hw, t, firstColorSensorName);
+        cs2 = new IntakeColorSensor(hw, t, secondColorSensorName);
+        telemetry = t;
     }
 
     public Field.Pixel[] getPixelColorArray() {
@@ -64,6 +52,10 @@ public class Intake {
     //takes in sensor number, inputs the color into the array
     public void setPixelColorArray(int sensorNum, Field.Pixel pixelColor) {
         pixelColorArray[sensorNum + 1] = pixelColor;
+    }
+
+    public IntakeState getIntakeState() {
+        return intakeState;
     }
 
     public void loop( IntakeState state ) {
@@ -80,10 +72,13 @@ public class Intake {
                 //desire one pixel
                 break;
         }
-        telemetry.addData("Intake: ", IntakeState.getIntakeStateKey());
+
+    }
+
+    public void addTelemetry() {
+        telemetry.addData("Intake: ", getIntakeState());
         telemetry.addData("Pixel Slot 1: ", pixelColorArray[0]);
         telemetry.addData("Pixel Slot 2: ", pixelColorArray[1]);
-        telemetry.update();
     }
 
 }
