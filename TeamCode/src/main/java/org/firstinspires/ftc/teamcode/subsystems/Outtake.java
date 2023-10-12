@@ -25,4 +25,8 @@ public class Outtake {
     public void setReleasePosition (ReleaseStates state) {
         release.setPosition(state.getPosition());
     }
+
+    public double getReleasePosition() {
+        return release.getPosition();
+    }
 }
