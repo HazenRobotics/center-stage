@@ -28,8 +28,8 @@ public class IntakeColorSensor {
     //150-160 white
 
     public IntakeColorSensor (HardwareMap hardwareMap, Telemetry t, String colorSensorName) {
-        telemetry = t;
         cs = hardwareMap.get(ColorSensor.class, colorSensorName);
+        telemetry = t;
     }
 
     public void readPixelColor() {
