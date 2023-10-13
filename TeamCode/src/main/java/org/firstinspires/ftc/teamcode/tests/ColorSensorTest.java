@@ -3,21 +3,21 @@ package org.firstinspires.ftc.teamcode.tests;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.IntakeColourSensor;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeColorSensor;
 
 @TeleOp
 public class ColorSensorTest extends LinearOpMode {
-	IntakeColourSensor colour;
+	IntakeColorSensor color;
 
 	@Override
 	public void runOpMode( ) throws InterruptedException {
-		colour = new IntakeColourSensor(hardwareMap, telemetry, "color");
+		color = new IntakeColorSensor(hardwareMap, telemetry, "color");
 
 
 		waitForStart();
 
 		while(opModeIsActive()) {
-			colour.getTelemetry();
+			color.getTelemetry();
 			telemetry.update( );
 		}
 	}
