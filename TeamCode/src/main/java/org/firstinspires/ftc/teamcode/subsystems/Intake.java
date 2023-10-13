@@ -9,14 +9,14 @@ import org.firstinspires.ftc.teamcode.utils.Field;
 public class Intake {
 
 	Telemetry telemetry;
-	DcMotor intakeMotor; //intake motor
+	DcMotor intakeMotor;
 
 	//    boolean[] sensorDetectArray = {false, false};
 	IntakeCapacity intakeCapacity = IntakeCapacity.EMPTY; //default state, nothing inside
-	IntakeColorSensor cs1; //first color sensor
-	IntakeColorSensor cs2; //second color sensor
-	IntakeBreakBeamSensor breakBeam; //break beam sensor
-	Field.Pixel[] pixelColorArray = new Field.Pixel[2]; //array for pixel colors
+	IntakeColorSensor cs1;
+	IntakeColorSensor cs2;
+	IntakeBreakBeamSensor breakBeam;
+	Field.Pixel[] pixelColorArray = new Field.Pixel[2];
 
 	public enum IntakeCapacity {
 		EMPTY,
