@@ -37,7 +37,6 @@ public class Intake {
 		return pixelColorArray;
 	}
 
-	//updates pixel color array
 	public void updatePixelColorArray( ) {
 		cs1.readPixelColor( );
 		cs2.readPixelColor( );
@@ -45,8 +44,7 @@ public class Intake {
 		pixelColorArray[1] = cs2.getPixelColor( );
 	}
 
-	//returns intake state
-	public IntakeCapacity getIntakeState( ) {
+    public IntakeCapacity getIntakeState( ) {
 		return intakeCapacity;
 	}
 
@@ -79,7 +77,7 @@ public class Intake {
         return intakeMotor.getPower();
     }
 
-	//retrieves telemetry from color sensor and break beam class, adds intake state and pixel slots.
+	//retrieves telemetry from sensors, and display current pixel inventory
 	public void addTelemetry( ) {
 		cs1.getTelemetry( );
 		cs2.getTelemetry( );
