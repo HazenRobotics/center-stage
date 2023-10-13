@@ -79,8 +79,8 @@ public class Intake {
 
 	//retrieves telemetry from sensors, and display current pixel inventory
 	public void addTelemetry( ) {
-		cs1.getTelemetry( );
-		cs2.getTelemetry( );
+		cs1.getTelemetry();
+		cs2.getTelemetry();
 		breakBeam.addTelemetry( );
 		telemetry.addData( "Intake: ", getIntakeState( ) );
 		updatePixelColourArray();

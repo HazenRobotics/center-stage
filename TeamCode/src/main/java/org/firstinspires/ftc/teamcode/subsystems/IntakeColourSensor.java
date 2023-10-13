@@ -24,12 +24,6 @@ public class IntakeColourSensor {
 
     float[] hsv = new float[3];
 
-    //HSV Thresholds yo
-    //190-205 purple
-    //84-96 yellow
-    //120-132 green
-    //150-160 white
-
     public IntakeColourSensor(HardwareMap hardwareMap, Telemetry t, String colourSensorName) {
         cs = hardwareMap.get(ColorSensor.class, colourSensorName);
         telemetry = t;
@@ -43,10 +37,19 @@ public class IntakeColourSensor {
         Color.RGBToHSV(red, green, blue, hsv);
         float hue = hsv[0];
         float saturation = hsv[1];
-        if(saturation < 0.4) pixelColour = WHITE;
-        else if(hue > 175) pixelColour = PURPLE;
-        else if(hue > 115) pixelColour = GREEN;
-        else if(hue > 84) pixelColour = YELLOW;
+
+        //HSV Thresholds:
+        //Purple: 200 - 215
+        //White: 160 - 181
+        //Green: 115 - 144
+        //Yellow: 60 - 98
+
+        //note here: if the pixel is too close to the sensor, it will output (0.0, 0.0, 1.0)
+        //it is defaulted to WHITE in this code
+        if(hue > 200 && hue < 215) pixelColour = PURPLE;
+        else if(hue > 160 && hue <= 181 || hue < 2 && saturation < 2) pixelColour = WHITE;
+        else if(hue > 115 && hue < 144) pixelColour = GREEN;
+        else if(hue > 60 && hue < 98) pixelColour = YELLOW;
         else pixelColour = NONE;
     }
 
