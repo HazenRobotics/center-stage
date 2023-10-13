@@ -13,8 +13,8 @@ public class Intake {
 
 	//    boolean[] sensorDetectArray = {false, false};
 	IntakeCapacity intakeCapacity = IntakeCapacity.EMPTY; //default state, nothing inside
-	IntakeColorSensor cs1;
-	IntakeColorSensor cs2;
+	IntakeColourSensor cs1;
+	IntakeColourSensor cs2;
 	IntakeBreakBeamSensor breakBeam;
 	Field.Pixel[] pixelColorArray = new Field.Pixel[2];
 
@@ -27,8 +27,8 @@ public class Intake {
 
 	public Intake( HardwareMap hw, Telemetry t, String motorName, String firstColorSensorName, String secondColorSensorName, String breakBeamSensorName ) {
 		intakeMotor = hw.get( DcMotor.class, motorName );
-		cs1 = new IntakeColorSensor( hw, t, firstColorSensorName );
-		cs2 = new IntakeColorSensor( hw, t, secondColorSensorName );
+		cs1 = new IntakeColourSensor( hw, t, firstColorSensorName );
+		cs2 = new IntakeColourSensor( hw, t, secondColorSensorName );
 		breakBeam = new IntakeBreakBeamSensor( hw, t, breakBeamSensorName );
 		telemetry = t;
 	}
@@ -38,10 +38,10 @@ public class Intake {
 	}
 
 	public void updatePixelColorArray( ) {
-		cs1.readPixelColor( );
-		cs2.readPixelColor( );
-		pixelColorArray[0] = cs1.getPixelColor( );
-		pixelColorArray[1] = cs2.getPixelColor( );
+		cs1.readPixelColour( );
+		cs2.readPixelColour( );
+		pixelColorArray[0] = cs1.getPixelColour( );
+		pixelColorArray[1] = cs2.getPixelColour( );
 	}
 
     public IntakeCapacity getIntakeState( ) {
@@ -55,8 +55,8 @@ public class Intake {
 		updatePixelColorArray( );
 		breakBeam.updateBeamState( );
 
-		boolean pixelInSlotOne = cs1.getPixelColor( ) != Field.Pixel.NONE;
-		boolean pixelInSlotTwo = cs2.getPixelColor( ) != Field.Pixel.NONE;
+		boolean pixelInSlotOne = cs1.getPixelColour( ) != Field.Pixel.NONE;
+		boolean pixelInSlotTwo = cs2.getPixelColour( ) != Field.Pixel.NONE;
 		boolean pixelInIntake = breakBeam.getBeamState( );
 
 		if( pixelInSlotOne && pixelInSlotTwo && pixelInIntake )
