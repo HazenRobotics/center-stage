@@ -17,19 +17,19 @@ import org.firstinspires.ftc.teamcode.utils.Field;
 
 import java.util.Arrays;
 
-public class IntakeColorSensor {
+public class IntakeColourSensor {
     Telemetry telemetry;
     ColorSensor cs;
-    Field.Pixel pixelColor;
+    Field.Pixel pixelColour;
 
     float[] hsv = new float[3];
 
-    public IntakeColorSensor(HardwareMap hardwareMap, Telemetry t, String ColorSensorName) {
-        cs = hardwareMap.get(ColorSensor.class, ColorSensorName);
+    public IntakeColourSensor(HardwareMap hardwareMap, Telemetry t, String ColourSensorName) {
+        cs = hardwareMap.get(ColorSensor.class, ColourSensorName);
         telemetry = t;
     }
 
-    public void readPixelColor() {
+    public void readPixelColour() {
         int red = Range.clip( cs.red( ) / 32, 0, 255 );
         int green = Range.clip( cs.green( ) / 32, 0, 255 );
         int blue = Range.clip( cs.blue( ) / 32, 0, 255 );
@@ -48,15 +48,15 @@ public class IntakeColorSensor {
 
         //note here: if the pixel is too close to the sensor, it will output (0.0, 0.0, 1.0)
 
-        if(hue < 98) pixelColor = YELLOW;
-        else if(hue < 144) pixelColor = GREEN;
-        else if(hue < 181) pixelColor = WHITE;
-        else if(hue < 215) pixelColor = PURPLE;
-        else pixelColor = NONE;
+        if(hue < 98) pixelColour = YELLOW;
+        else if(hue < 144) pixelColour = GREEN;
+        else if(hue < 181) pixelColour = WHITE;
+        else if(hue < 215) pixelColour = PURPLE;
+        else pixelColour = NONE;
     }
 
-    public Field.Pixel getPixelColor() {
-        return pixelColor;
+    public Field.Pixel getPixelColour() {
+        return pixelColour;
     }
     public float[] getHSV() {
         return hsv;
@@ -64,8 +64,8 @@ public class IntakeColorSensor {
 
     public void getTelemetry() {
         //update pixel color, then get pixel color for telemetry
-        readPixelColor();
-        telemetry.addData("Color: ", getPixelColor());
+        readPixelColour();
+        telemetry.addData("Colour: ", getPixelColour());
         telemetry.addData("HSV: ", Arrays.toString(getHSV()));
     }
 
