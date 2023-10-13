@@ -17,10 +17,11 @@ import org.firstinspires.ftc.teamcode.utils.Field;
 
 import java.util.Arrays;
 
-public class IntakeColorSensor {
+public class IntakeColourSensor {
     Telemetry telemetry;
     ColorSensor cs;
-    Field.Pixel pixelColor;
+    Field.Pixel pixelColour;
+
     float[] hsv = new float[3];
 
     //HSV Thresholds yo
@@ -29,12 +30,12 @@ public class IntakeColorSensor {
     //120-132 green
     //150-160 white
 
-    public IntakeColorSensor (HardwareMap hardwareMap, Telemetry t, String colorSensorName) {
-        cs = hardwareMap.get(ColorSensor.class, colorSensorName);
+    public IntakeColourSensor(HardwareMap hardwareMap, Telemetry t, String colourSensorName) {
+        cs = hardwareMap.get(ColorSensor.class, colourSensorName);
         telemetry = t;
     }
 
-    public void readPixelColor() {
+    public void readPixelColour() {
         int red = Range.clip( cs.red( ) / 32, 0, 255 );
         int green = Range.clip( cs.green( ) / 32, 0, 255 );
         int blue = Range.clip( cs.blue( ) / 32, 0, 255 );
@@ -42,15 +43,15 @@ public class IntakeColorSensor {
         Color.RGBToHSV(red, green, blue, hsv);
         float hue = hsv[0];
         float saturation = hsv[1];
-        if(saturation < 0.4) pixelColor = WHITE;
-        else if(hue > 175) pixelColor = PURPLE;
-        else if(hue > 115) pixelColor = GREEN;
-        else if(hue > 84) pixelColor = YELLOW;
-        else pixelColor = NONE;
+        if(saturation < 0.4) pixelColour = WHITE;
+        else if(hue > 175) pixelColour = PURPLE;
+        else if(hue > 115) pixelColour = GREEN;
+        else if(hue > 84) pixelColour = YELLOW;
+        else pixelColour = NONE;
     }
 
-    public Field.Pixel getPixelColor() {
-        return pixelColor;
+    public Field.Pixel getPixelColour() {
+        return pixelColour;
     }
     public float[] getHSV() {
         return hsv;
@@ -58,8 +59,8 @@ public class IntakeColorSensor {
 
     public void getTelemetry() {
         //update pixel color, then get pixel color for telemetry
-        readPixelColor();
-        telemetry.addData("Colour: ", getPixelColor());
+        readPixelColour();
+        telemetry.addData("Colour: ", getPixelColour());
         telemetry.addData("HSV: ", Arrays.toString(getHSV()));
     }
 

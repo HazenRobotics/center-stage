@@ -24,7 +24,7 @@ public class IntakeBreakBeamSensor {
         return connected;
     }
 
-    public void addTelemetry() {
+    public void addTelemetry() {    
         telemetry.addData( "mode", breakBeam.getMode() );
         telemetry.addData( "state", breakBeam.getState() );
     }

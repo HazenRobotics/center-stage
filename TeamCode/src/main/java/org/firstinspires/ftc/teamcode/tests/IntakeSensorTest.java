@@ -19,6 +19,7 @@ public class IntakeSensorTest extends LinearOpMode {
 
         waitForStart();
         while(opModeIsActive()) {
+            intake.updateIntakeCapacity();
             intake.addTelemetry();
             telemetry.update();
         }
