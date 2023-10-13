@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
 @TeleOp
-public class SensorTest extends LinearOpMode {
+public class IntakeSensorTest extends LinearOpMode {
     Intake intake;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -19,7 +19,7 @@ public class SensorTest extends LinearOpMode {
 
         waitForStart();
         while(opModeIsActive()) {
-            intake.getTelemetry();
+            intake.addTelemetry();
             telemetry.update();
         }
     }
