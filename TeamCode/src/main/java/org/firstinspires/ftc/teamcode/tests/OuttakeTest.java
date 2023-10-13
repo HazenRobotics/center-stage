@@ -19,9 +19,10 @@ public class OuttakeTest extends LinearOpMode {
                 outtake.setReleasePosition( Outtake.ReleaseStates.EXTENDED );
             else if (gamepad1.b)
                 outtake.setReleasePosition( Outtake.ReleaseStates.RETRACTED );
-            else if (gamepad1.y) {
+            else if (gamepad1.y)
                 outtake.setReleasePosition( Outtake.ReleaseStates.DROP_ONE );
-            }
+            else if (gamepad1.x)
+                outtake.toggle( );
 
             telemetry.addData( "release position", outtake.getReleasePosition() );
             telemetry.update();
