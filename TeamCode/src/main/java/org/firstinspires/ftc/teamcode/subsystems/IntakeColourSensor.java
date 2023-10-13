@@ -44,12 +44,14 @@ public class IntakeColourSensor {
         //Green: 115 - 144
         //Yellow: 60 - 98
 
+        //cs1 defaults to 220/230, cs2 defaults to 240
+
         //note here: if the pixel is too close to the sensor, it will output (0.0, 0.0, 1.0)
-        //it is defaulted to WHITE in this code
-        if(hue > 200 && hue < 215) pixelColour = PURPLE;
-        else if(hue > 160 && hue <= 181 || hue < 2 && saturation < 2) pixelColour = WHITE;
-        else if(hue > 115 && hue < 144) pixelColour = GREEN;
-        else if(hue > 60 && hue < 98) pixelColour = YELLOW;
+
+        if(hue < 98) pixelColour = YELLOW;
+        else if(hue < 144) pixelColour = GREEN;
+        else if(hue < 181) pixelColour = WHITE;
+        else if(hue < 215) pixelColour = PURPLE;
         else pixelColour = NONE;
     }
 
