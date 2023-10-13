@@ -5,8 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.IntakeColorSensor;
 
-import java.util.Arrays;
-
 @TeleOp
 public class ColorSensorTest extends LinearOpMode {
 	IntakeColorSensor color;
@@ -19,9 +17,7 @@ public class ColorSensorTest extends LinearOpMode {
 		waitForStart();
 
 		while(opModeIsActive()) {
-			color.readPixelColor();
-			telemetry.addData("Colour: ", color.getPixelColor());
-			telemetry.addData("HSV: ", Arrays.toString(color.getHSV()));
+			color.getTelemetry();
 			telemetry.update( );
 		}
 	}

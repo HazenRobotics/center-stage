@@ -15,6 +15,8 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utils.Field;
 
+import java.util.Arrays;
+
 public class IntakeColorSensor {
     Telemetry telemetry;
     ColorSensor cs;
@@ -52,6 +54,13 @@ public class IntakeColorSensor {
     }
     public float[] getHSV() {
         return hsv;
+    }
+
+    public void getTelemetry() {
+        //update pixel color, then get pixel color for telemetry
+        readPixelColor();
+        telemetry.addData("Colour: ", getPixelColor());
+        telemetry.addData("HSV: ", Arrays.toString(getHSV()));
     }
 
 }
