@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -12,6 +14,7 @@ public class IntakeBreakBeamSensor {
 
     public IntakeBreakBeamSensor(HardwareMap hw, Telemetry t, String breakBeamName) {
         breakBeam = hw.get(DigitalChannel.class, breakBeamName);
+        breakBeam.setMode( DigitalChannel.Mode.INPUT );
         telemetry = t;
     }
 
@@ -23,8 +26,8 @@ public class IntakeBreakBeamSensor {
         return connected;
     }
 
-    public void getTelemetry() {
-        telemetry.addData("State: ", getBeamState());
+    public void addTelemetry() {
+        telemetry.addData( "mode", breakBeam.getMode() );
+        telemetry.addData( "state", breakBeam.getState() );
     }
-
 }
