@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
 import java.util.List;
 
 @TeleOp
-@Disabled
+//@Disabled
 public class Axon360Swerve extends LinearOpMode {
 
 	AxonSwervePod pod;
@@ -27,8 +27,7 @@ public class Axon360Swerve extends LinearOpMode {
 
 		for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 
-		pod = new AxonSwervePod( hardwareMap, "motor", "servo", "encoder" );
-		pod.setOffset( 2.413 );
+		pod = new AxonSwervePod( hardwareMap, "FLM/perp", "FLS", "FLE" );
 		pod.reverseServo();
 
 		telemetry = new MultipleTelemetry( telemetry, FtcDashboard.getInstance( ).getTelemetry( ) );
