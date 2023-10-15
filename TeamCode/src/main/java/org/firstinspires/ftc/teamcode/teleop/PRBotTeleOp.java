@@ -35,6 +35,9 @@ public class PRBotTeleOp extends OpMode {
         if( controller.a.onPress() )
             robot.launcher.toggle();
 
+        if( controller.start.onPress() )
+            robot.drive.resetIMU();
+
         controller.update();
     }
 }
