@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -37,6 +38,7 @@ public class FlywheelLauncher {
         for( int i = 0; i < flywheels.length; i++ ) {
             flywheels[i] = hw.get( DcMotorEx.class, flywheelNames[i] );
             flywheels[i].setDirection( flywheelsReversed[i] ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD );
+            flywheels[i].setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.BRAKE );
         }
 
         servo = hw.get( Servo.class, servoName);
