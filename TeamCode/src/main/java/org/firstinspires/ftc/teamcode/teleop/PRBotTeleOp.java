@@ -3,9 +3,6 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.robots.RingLauncherPRBot;
 import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
@@ -32,7 +29,7 @@ public class PRBotTeleOp extends OpMode {
 
         robot.drive.fieldCentricDrive( drive, strafe, rotate );
 
-        double flyWheelSpeed = controller.right_trigger.getTriggerValue();
+        double flyWheelSpeed = gamepad1.right_trigger;
         robot.launcher.setPower( flyWheelSpeed );
 
         if( controller.a.onPress() )

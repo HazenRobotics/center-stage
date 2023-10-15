@@ -34,6 +34,10 @@ public class MecanumDrive {
 		imu.initialize(parameters);
 	}
 
+	public void resetIMU() {
+		imu.resetYaw();
+	}
+
 	public void robotCentricDrive(double drive, double strafe, double rotate) {
 		// used for normalizing powers
 		double maxPower = Math.max(Math.abs(drive) + Math.abs(strafe) + Math.abs(rotate), 1);

@@ -1,20 +1,17 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import java.util.EnumMap;
-
 public class FlywheelLauncher {
     DcMotorEx[] flywheels = new DcMotorEx[2];
     Servo servo;
 
     public enum ReleaseStates {
-        RETRACTED(0.5 ), EXTENDED(1);
+        RETRACTED(0.4), EXTENDED(0.74);
 
         double position;
 
@@ -27,7 +24,8 @@ public class FlywheelLauncher {
         }
     }
 
-    ReleaseStates releaseState;
+    ReleaseStates releaseState = ReleaseStates.RETRACTED;
+
 
     public FlywheelLauncher(HardwareMap hw) {
         this(hw, new String[]{"left", "right"}, new boolean[]{true, false}, "servo" );

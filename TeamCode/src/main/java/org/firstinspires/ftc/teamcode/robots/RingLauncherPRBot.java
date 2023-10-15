@@ -15,8 +15,8 @@ public class RingLauncherPRBot {
 		launcher = new FlywheelLauncher( hw );
 	}
 	public RingLauncherPRBot( HardwareMap hw, String[] drivetrainNames, String[] flywheelNames, String servoName ) {
-		drive = new MecanumDrive( hw, drivetrainNames, new boolean[]{false, false, true, true} );
-		launcher = new FlywheelLauncher( hw, flywheelNames, new boolean[]{true, false}, servoName);
+		drive = new MecanumDrive(hw, drivetrainNames, new boolean[]{false, false, true, true});
+		launcher = new FlywheelLauncher(hw, flywheelNames, new boolean[]{true, false}, servoName);
 	}
 
 }
