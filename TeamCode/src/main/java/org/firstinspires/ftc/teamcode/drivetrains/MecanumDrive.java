@@ -27,7 +27,7 @@ public class MecanumDrive {
 
 	public void setupIMU( HardwareMap hw, RevHubOrientationOnRobot.LogoFacingDirection logoDir,
 						  RevHubOrientationOnRobot.UsbFacingDirection usbDir  ) {
-		IMU imu = hw.get(IMU.class, "imu");
+		imu = hw.get(IMU.class, "imu");
 
 		IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot( logoDir, usbDir));
 
