@@ -13,7 +13,7 @@ public class FlywheelLauncher {
     public enum ReleaseStates {
         RETRACTED(0.4), EXTENDED(0.74);
 
-        double position;
+        final double position;
 
         ReleaseStates(double pos) {
             position = pos;
@@ -43,8 +43,7 @@ public class FlywheelLauncher {
     }
 
     public void setPower( double power ) {
-        for( int i = 0; i < flywheels.length; i++ )
-            flywheels[i].setPower( power );
+        for (DcMotorEx flywheel : flywheels) flywheel.setPower(power);
     }
     public void setServoPos( ReleaseStates state ) {
         servo.setPosition( state.getPosition() );
