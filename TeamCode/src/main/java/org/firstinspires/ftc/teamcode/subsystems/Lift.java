@@ -21,39 +21,13 @@ public class Lift {
 	static int liftPosition = 0;
 
 	double spoolRadius;
-	double posOffset; // groundBucketHeight
-
-	public static final double LIFT_SWITCH_LIMIT = 0.75;
-
-	boolean allowLoops = true;
-
+	double posOffset;
 	double liftAngle; // the angle of the lift from the ground in 'angleUnit's
 	AngleUnit angleUnit; // the angle unit for the lift angle i.e. degrees or radians
 
 	public PIDController controller;
 	public int target = 0;
 
-	EncoderState encoderState;
-	MovementState movementState = MovementState.REST;
-
-	public enum EncoderState {
-		WITH_ENCODER, WITHOUT_ENCODER
-	}
-
-	public enum MovementState {
-		REST, HOLDING, MOVING
-	}
-
-	/**
-	 * Creates the default Lift with:
-	 * -a motorName of "lift",
-	 * -a posOffset of 0,
-	 * -a spoolRadius of 0.5",
-	 * -a liftAngle of 45°, and
-	 * -an AngleUnit of DEGREES
-	 *
-	 * @param hardwareMap the hardwareMap of the current running OpMode
-	 */
 	public Lift( HardwareMap hardwareMap ) {
 		this( hardwareMap, "lift", false, 0,
 				0.5, 0, AngleUnit.DEGREES, 103.8, 1,
@@ -74,7 +48,7 @@ public class Lift {
 		motor.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.BRAKE );
 
 		if( reverseMotor )
-			motor.setDirection( DcMotorSimple.Direction.REVERSE );
+			reverseMotor();
 
 		setPosOffset( posOffset );
 		setSpoolRadius( spoolRadius );
@@ -107,14 +81,6 @@ public class Lift {
 		motor.setMode( DcMotor.RunMode.RUN_WITHOUT_ENCODER );
 	}
 
-	/**
-	 *
-	 */
-	public void setEncoder( EncoderState state ) {
-		motor.setMode( state == EncoderState.WITHOUT_ENCODER ? DcMotor.RunMode.RUN_WITHOUT_ENCODER : DcMotor.RunMode.RUN_USING_ENCODER );
-		encoderState = state;
-	}
-
 	public void setTarget( int target ) {
 		this.target = target;
 	}
@@ -131,67 +97,6 @@ public class Lift {
 		controller.setPID( p, i, d );
 	}
 
-	// basic lift setters
-
-
-	public void waitForMoveFinish( ) {
-		while( isBusy( ) && getCurrent( CurrentUnit.AMPS ) < 11  ) {
-			try {
-				Thread.sleep( 50 );
-			} catch( InterruptedException ignored ) {
-			}
-		}
-	}
-
-	// simple lift setters
-
-
-	// util methods
-
-	/**
-	 * if the motor is below LIFT_SWITCH_LIMIT it will disable it to conserve the motor
-	 */
-	public void disableMotorIfUnused( ) {
-		if( getMotorPositionInch( ) <= LIFT_SWITCH_LIMIT )
-			motor.setMotorDisable( );
-	}
-
-	/**
-	 * exits/disables all while loops that the lift may be stuck in then enables them after waitTimeMillis
-	 *
-	 * @param waitTimeMillis the time to wait before allowing loops again (in milliseconds)
-	 */
-	public void exitLoops( long waitTimeMillis ) {
-		motor.setPower( 0 );
-		allowLoops = false;
-		long start = System.currentTimeMillis( );
-		new Thread( ( ) -> {
-			while( System.currentTimeMillis( ) < start + waitTimeMillis ) {
-				try {
-					Thread.sleep( 50 );
-				} catch( InterruptedException ignored ) {
-				}
-			}
-			allowLoops = true;
-		} ).start( );
-
-	}
-
-	/**
-	 * adds the current motor position to liftPosition then stops and resets the encoder
-	 */
-	public void stopAndReset( ) {
-
-		Log.d( "LOGGER", "motor position: " + motor.getCurrentPosition( ) );
-		liftPosition += motor.getCurrentPosition( );
-		motor.setMode( DcMotor.RunMode.STOP_AND_RESET_ENCODER );
-		// stop and reset encoder sets the encoder position to zero
-	}
-
-	public void runAfterMove( Runnable runnable ) {
-		waitForMoveFinish( );
-		new Thread( runnable ).start( );
-	}
 
 	// converters and calculators
 
@@ -249,19 +154,7 @@ public class Lift {
 		return motor.getPower( );
 	}
 
-	public void setPower( double power ) {
-		updateMovementState( power );
-		motor.setPower( power );
-	}
 
-	private void setPower( double power, MovementState state ) {
-		movementState = state;
-		motor.setPower( power );
-	}
-
-	private void updateMovementState( double speed ) {
-		movementState = speed == 0 ? (liftPosition < 5 ? MovementState.REST : MovementState.HOLDING) : MovementState.MOVING;
-	}
 
 	// getters for the lift position
 
@@ -332,10 +225,6 @@ public class Lift {
 		else if( angle.equals( AngleUnit.DEGREES ) )
 			return Math.toDegrees( liftAngle );
 		return liftAngle;
-	}
-
-	public double getCurrent( ) {
-		return getCurrent( CurrentUnit.AMPS );
 	}
 
 	public double getCurrent( CurrentUnit currentUnit ) {
