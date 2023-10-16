@@ -3,28 +3,28 @@ package org.firstinspires.ftc.teamcode.tests;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 
 @TeleOp
 public class OuttakeTest extends LinearOpMode {
-    Outtake outtake;
+    Deposit deposit;
     @Override
     public void runOpMode() throws InterruptedException {
-        outtake = new Outtake(hardwareMap, "release", "angler");
+        deposit = new Deposit(hardwareMap, "release", "angler");
 
         waitForStart();
 
         while (opModeIsActive()) {
             if (gamepad1.a)
-                outtake.setReleasePosition( Outtake.ReleaseStates.EXTENDED );
+                deposit.setReleasePosition( Deposit.ReleaseStates.EXTENDED );
             else if (gamepad1.b)
-                outtake.setReleasePosition( Outtake.ReleaseStates.RETRACTED );
+                deposit.setReleasePosition( Deposit.ReleaseStates.RETRACTED );
             else if (gamepad1.y)
-                outtake.setReleasePosition( Outtake.ReleaseStates.DROP_ONE );
+                deposit.setReleasePosition( Deposit.ReleaseStates.DROP_ONE );
             else if (gamepad1.x)
-                outtake.toggle( );
+                deposit.toggle( );
 
-            telemetry.addData( "release position", outtake.getReleasePosition() );
+            telemetry.addData( "release position", deposit.getReleasePosition() );
             telemetry.update();
         }
 

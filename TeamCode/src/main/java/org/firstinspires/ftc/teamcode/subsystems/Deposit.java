@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class Outtake {
+public class Deposit {
     Servo angler, release;
 
     public enum ReleaseStates {
@@ -24,7 +24,7 @@ public class Outtake {
 
     ReleaseStates[] states;
     int stateIndex;
-    public Outtake(HardwareMap hw, String releaseName, String anglerName) {
+    public Deposit( HardwareMap hw, String releaseName, String anglerName) {
         release = hw.get(Servo.class, releaseName);
         angler = hw.get(Servo.class, anglerName);
         states = ReleaseStates.values();
