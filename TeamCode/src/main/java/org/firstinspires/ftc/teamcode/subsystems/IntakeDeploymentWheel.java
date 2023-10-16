@@ -12,8 +12,16 @@ public class IntakeDeploymentWheel {
     IntakeWheelState state = IntakeWheelState.DOWN; //default state
 
     public enum IntakeWheelState {
-        DOWN,
-        UP
+        DOWN(0),
+        UP(0.5);
+        private final double position;
+        IntakeWheelState(double pos) {
+            position = pos;
+        }
+
+        public double getPosition() {
+            return position;
+        }
     }
 
     public IntakeDeploymentWheel(HardwareMap hardwareMap, Telemetry t, String servoName) {
@@ -26,7 +34,7 @@ public class IntakeDeploymentWheel {
     }
 
     public void setPos() {
-        deployment.setPosition(1);
+        deployment.setPosition(state.getPosition());
     }
 
     public void addTelemetry() {
