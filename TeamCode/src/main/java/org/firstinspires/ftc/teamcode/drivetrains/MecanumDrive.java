@@ -15,7 +15,7 @@ public class MecanumDrive {
 	IMU imu;
 
 	public MecanumDrive( HardwareMap hw ) {
-		this(hw, new String[]{"FLM", "BLM", "FRM", "BRM" }, new boolean[]{false, false, true, true});
+		this(hw, new String[]{"FLM", "BLM", "FRM", "BRM" }, new boolean[]{true, true, false, false});
 	}
 	public MecanumDrive( HardwareMap hw, String[] motorNames, boolean[] motorsReversed ) {
 		for( int i = 0; i < motors.length; i++ ) {
@@ -42,12 +42,12 @@ public class MecanumDrive {
 		// used for normalizing powers
 		double maxPower = Math.max(Math.abs(drive) + Math.abs(strafe) + Math.abs(rotate), 1);
 
-		double frontLeftPower = (drive + strafe + rotate) / maxPower;
-		double backLeftPower = (drive - strafe + rotate) / maxPower;
-		double frontRightPower = (drive - strafe - rotate) / maxPower;
-		double backRightPower = (drive + strafe - rotate) / maxPower;
+		double frontLeftPower = (drive - strafe + rotate) / maxPower;
+		double backLeftPower = (drive + strafe + rotate) / maxPower;
+		double frontRightPower = (drive + strafe - rotate) / maxPower;
+		double backRightPower = (drive - strafe - rotate) / maxPower;
 
-		setMotorPowers( new double[]{frontLeftPower, frontRightPower, backLeftPower, backRightPower} );
+		setMotorPowers( new double[]{frontLeftPower, backLeftPower, frontRightPower, backRightPower} );
 	}
 
 	public void fieldCentricDrive(double drive, double strafe, double rotate) {
