@@ -56,8 +56,8 @@ public class Lift {
 	 */
 	public Lift( HardwareMap hardwareMap ) {
 		this( hardwareMap, "lift", false, 0,
-				0.5, 0, AngleUnit.DEGREES, 537.7, 1,
-				new PIDController(0.02, 0, 0.00012) );
+				0.5, 0, AngleUnit.DEGREES, 103.8, 1,
+				new PIDController(0,0,0) );
 	}
 
 	/**

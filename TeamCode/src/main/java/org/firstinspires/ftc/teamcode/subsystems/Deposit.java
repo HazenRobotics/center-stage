@@ -10,7 +10,7 @@ public class Deposit {
         RETRACTED(0.582, 0), EXTENDED(0.816, 1), DROP_ONE(0.636, 2);
         private final double position;
         private final int index;
-        private ReleaseStates (double pos, int ind) {
+        ReleaseStates (double pos, int ind) {
             position = pos;
             index = ind;
         }
@@ -22,31 +22,64 @@ public class Deposit {
         }
     }
 
-    ReleaseStates[] states;
-    int stateIndex;
+    public enum AngleStates {
+        GRAB(0 ), DROP_VERT(0.15 ), DROP_ANGLE(0.51 );
+        private final double position;
+        AngleStates (double pos) {
+            position = pos;
+        }
+        double getPosition() {
+            return position;
+        }
+    }
+
+    ReleaseStates[] releaseStates;
+    int releaseStateIndex;
+
+    AngleStates angleState = AngleStates.GRAB;
+
     public Deposit( HardwareMap hw, String releaseName, String anglerName) {
         release = hw.get(Servo.class, releaseName);
         angler = hw.get(Servo.class, anglerName);
-        states = ReleaseStates.values();
-        stateIndex = 0;
+        releaseStates = ReleaseStates.values();
+        releaseStateIndex = 0;
     }
 
     /**
      * Shifts outtake state to next state; none -> 2 pixel loaded -> 1 pixel loaded -> none
      * Repeats. Not able to go from 2 to none.
      */
-    public void toggle() {
-        stateIndex++;
-        stateIndex %= 3;
-        release.setPosition(states[stateIndex].getPosition());
+    public void releaseToggle() {
+        releaseStateIndex++;
+        releaseStateIndex %= 3;
+        release.setPosition( releaseStates[releaseStateIndex].getPosition());
+    }
+
+    public void angleToggle() {
+        switch( angleState ) {
+            case GRAB:
+            case DROP_VERT:
+                angleState = AngleStates.DROP_ANGLE;
+                break;
+            case DROP_ANGLE:
+                angleState = AngleStates.GRAB;
+                break;
+        }
+        setAnglePosition( angleState );
     }
 
     public void setReleasePosition (ReleaseStates state) {
         release.setPosition(state.getPosition());
-        stateIndex = state.getIndex();
+        releaseStateIndex = state.getIndex();
+    }
+    public void setAnglePosition (AngleStates state) {
+        angler.setPosition(state.getPosition());
     }
 
     public double getReleasePosition() {
         return release.getPosition();
+    }
+    public double getAnglePosition() {
+        return angler.getPosition();
     }
 }
