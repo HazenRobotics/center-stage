@@ -25,10 +25,10 @@ public class PixelProcessor implements VisionProcessor {
 	}
 
 	PixelColor color = PixelColor.GREEN;
-	Scalar greenLowerBoundHSV = new Scalar( 40, 85, 40 );
-	Scalar greenUpperBoundHSV = new Scalar( 50, 255, 255 );
-	public Scalar greenLowerBoundLAB = new Scalar( 0, 74, 149 );
-	public Scalar greenUpperBoundLAB = new Scalar( 255, 118, 255 );
+	public Scalar greenLowerBoundHSV = new Scalar( 40, 85, 40 );
+	public Scalar greenUpperBoundHSV = new Scalar( 50, 255, 255 );
+	Scalar greenLowerBoundLAB = new Scalar( 0, 74, 149 );
+	Scalar greenUpperBoundLAB = new Scalar( 255, 118, 255 );
 	Scalar purpleLowerBound = new Scalar( 122, 23, 102 );
 	Scalar purpleUpperBound = new Scalar( 157, 111, 255 );
 	Scalar yellowLowerBound = new Scalar( 8, 135, 179 );
@@ -55,21 +55,22 @@ public class PixelProcessor implements VisionProcessor {
 
 	@Override
 	public Object processFrame( Mat frame, long captureTimeNanos ) {
-		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2Lab );
+//		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2Lab );
+		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2HSV );
 
 		Imgproc.morphologyEx( temp, temp, Imgproc.MORPH_ERODE, kernel, new Point( 0, 0 ), 3 );
 		Imgproc.morphologyEx( temp, temp, Imgproc.MORPH_DILATE, kernel, new Point( 0, 0 ), 4 );
 
-		Core.inRange( temp, greenLowerBoundLAB, greenUpperBoundLAB, green );
-//		Core.inRange( temp, purpleLowerBound, purpleUpperBound, purple );
-//		Core.inRange( temp, yellowLowerBound, yellowUpperBound, yellow );
+		Core.inRange( temp, greenLowerBoundHSV, greenUpperBoundHSV, green );
+		Core.inRange( temp, purpleLowerBound, purpleUpperBound, purple );
+		Core.inRange( temp, yellowLowerBound, yellowUpperBound, yellow );
 //		Core.inRange( temp, whiteLowerBound, whiteUpperBound, white );
 
 		List<MatOfPoint> contours = new ArrayList<>( );
 
 		findBoundingBoxes( green, greenRects, contours );
-//		findBoundingBoxes( purple, purpleRects, contours );
-//		findBoundingBoxes( yellow, yellowRects, contours );
+		findBoundingBoxes( purple, purpleRects, contours );
+		findBoundingBoxes( yellow, yellowRects, contours );
 //		findBoundingBoxes( white, whiteRects, contours );
 
 		return frame;
@@ -134,6 +135,15 @@ public class PixelProcessor implements VisionProcessor {
 					canvas.drawRect( rect, paint );
 			}
 		}
+	}
+
+	public double[] getPixelPos( ) {
+		if (greenRects.size() != 1)
+			return new double[]{};
+
+		Rect rect = greenRects.get( 0 );
+
+		return new double[]{(rect.x + rect.width) / 2.0, (rect.y + rect.height) / 2.0};
 	}
 
 

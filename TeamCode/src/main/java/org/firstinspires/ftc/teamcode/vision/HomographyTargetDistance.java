@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.vision;
 
-
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import org.opencv.core.Point;
 import Jama.Matrix;
 
@@ -13,20 +11,22 @@ public class HomographyTargetDistance {
 
 	//Value from solvePnP
 	private static final Matrix TRANSLATION_VECTOR = new Matrix( new double[][] {
-			{78.08870033},
-			{110.767108},
-			{397.27562884}
+			{-4.99441617},
+			{8.30287095},
+			{20.47677155}
 	} );
+
 	//Value after applying Rodriguez rotation formula to rotation vector from solvePnP
 	private static final Matrix ROTATION_MATRIX = new Matrix( new double[][] {
-			{-9.99849474e-01, -1.73249749e-02,  9.34937086e-04},
-			{6.96330302e-03, -3.51339381e-01,  9.36222277e-01},
-			{-1.58915472e-02,  9.36087862e-01,  3.51407134e-0}
+			{0.99633589, 0.02140191,  -0.08280548},
+			{0.02887255, 0.82718011,  0.56119465},
+			{0.08050569,  -0.56152918,  0.82353131}
 	} );
+
 	//Value from camera calibration
 	private static final Matrix CAMERA_MATRIX = new Matrix( new double[][] {
-			{823.41290477,   0.0,         359.87721122},
-			{0.0,         825.66798289, 210.74873307},
+			{882.06566201,   0.0,    733.53296718},
+			{0.0,         349.92692564, 401.9873917},
 			{0.0, 0.0, 1.0}
 	} );
 	//Z axis is always 1 since all the objects are on the ground
@@ -38,7 +38,7 @@ public class HomographyTargetDistance {
 	 * @param point camera point at which to find the corresponding 3D point
 	 * @return point's position relative to the camera
 	 */
-	public static Vector2d positionFromPoint( Point point ) {
+	public static double[] positionFromPoint( Point point ) {
 
 		//Change point into a matrix
 		Matrix pointMatrix = new Matrix( new double[][] {
@@ -61,7 +61,7 @@ public class HomographyTargetDistance {
 		//Swap X and Y, and add 24 to X to account for camera coordinate system
 		double x = calculatedPosition.get( 0, 0 );
 		double y = calculatedPosition.get( 1, 0 );
-		return new Vector2d( y + 12.9, x - 4.1);
+		return new double[]{y, x};
 	}
 
 }
