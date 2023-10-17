@@ -75,7 +75,7 @@ public class IntakeColourSensor {
         return hsv;
     }
 
-    public void getTelemetry() {
+    public void addTelemetry() {
         //update pixel color, then get pixel color for telemetry
         readPixelColour();
         telemetry.addData("Colour: ", getPixelColour());

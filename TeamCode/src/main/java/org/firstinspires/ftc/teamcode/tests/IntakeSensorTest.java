@@ -16,7 +16,8 @@ public class IntakeSensorTest extends LinearOpMode {
                 "intakeMotor",
                 "color1",
                 "color2",
-                "breakBeam");
+                "breakBeam",
+                "deploy");
 
         waitForStart();
         while(opModeIsActive()) {
