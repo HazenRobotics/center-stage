@@ -18,7 +18,6 @@ public class IntakeDeploymentWheel {
         IntakeWheelState(double pos) {
             position = pos;
         }
-
         public double getPosition() {
             return position;
         }
@@ -29,12 +28,24 @@ public class IntakeDeploymentWheel {
         telemetry = t;
     }
 
-    public IntakeWheelState getState() {
-        return state;
+    public void stateToggle() {
+        switch( state ) {
+            case DOWN:
+                state = IntakeWheelState.UP;
+                break;
+            case UP:
+                state = IntakeWheelState.DOWN;
+                break;
+        }
+        setPosition();
     }
 
-    public void setPos() {
+    public void setPosition() {
         deployment.setPosition(state.getPosition());
+    }
+
+    public IntakeWheelState getState() {
+        return state;
     }
 
     public void addTelemetry() {
