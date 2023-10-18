@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 
 
 @TeleOp (name = "Nerds")
@@ -20,8 +21,9 @@ public class MecDrive extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight;
     Claw claw;
     Lift lift;
-
+    GamepadEvents controller1;
 //
+
     double  armPosition, gripPosition, contPower;
     double  MIN_POSITION = 0, MAX_POSITION = 1;
     @Override
@@ -35,35 +37,28 @@ public class MecDrive extends OpMode {
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        controller1 = new GamepadEvents(gamepad1);
     }
 
     @Override
     public void loop() {
 
-
-         if(gamepad1.dpad_up) {
+         if(controller1.a.onPress())
              claw.openClaw();
-         } else if(gamepad1.dpad_down)
-         {
+         if(controller1.b.onPress())
              claw.closeClaw();
-         }
 
-         if(gamepad1.dpad_left) { lift.armUp(); }
-         if(gamepad1.dpad_right) { lift.armDown(); }
+         lift.armUp(controller1.right_trigger.getTriggerValue() - controller1.left_trigger.getTriggerValue());
 
-        double drive = -gamepad1.right_stick_y;
-        double strafe = gamepad1.right_stick_x;
-        double rotate = gamepad1.left_stick_x;
+
+        double drive = -controller1.right_stick_y;
+        double strafe = controller1.right_stick_x;
+        double rotate = controller1.left_stick_x;
 
         frontLeft.setPower(drive + rotate + strafe);
         backLeft.setPower(drive + rotate - strafe);
         frontRight.setPower(drive - rotate - strafe);
         backRight.setPower(drive - rotate + strafe);
-
-        if(gamepad1.a) { frontLeft.setPower(1);}
-        if(gamepad1.b) { backLeft.setPower(1);}
-        if(gamepad1.x) { frontRight.setPower(1);}
-        if(gamepad1.y) { backRight.setPower(1);}
 
 
         telemetry.addData("fl: ", frontLeft.getPower());

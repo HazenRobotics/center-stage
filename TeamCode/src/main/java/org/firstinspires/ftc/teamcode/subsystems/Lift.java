@@ -8,20 +8,14 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Lift {
     DcMotor liftMotor;
     Telemetry telemetry;
-    public Lift(HardwareMap hwMap, Telemetry t){
+    public Lift(HardwareMap hw, Telemetry t){
         telemetry = t;
-        liftMotor = hwMap.get(DcMotor.class, "lift");
+        liftMotor = hw.get(DcMotor.class, "lift");
     }
 //
-    public void armUp() {
-        liftMotor.setPower(0.5);
-
-    }
-    public void armDown(){
-        liftMotor.setDirection(DcMotor.Direction.REVERSE);
+    public void armUp(double power) {
+        liftMotor.setPower(power);
     }
 
-    public double ticksToIN(double ticks) {
-        return (3.5*Math.PI)*(ticks*28);
-    }
+
 }
