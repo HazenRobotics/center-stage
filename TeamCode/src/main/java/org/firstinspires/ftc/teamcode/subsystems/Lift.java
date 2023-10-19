@@ -13,7 +13,7 @@ public class Lift {
         liftMotor = hw.get(DcMotor.class, "lift");
     }
 //
-    public void armUp(double power) {
+    public void setPower(double power) {
         liftMotor.setPower(power);
     }
 

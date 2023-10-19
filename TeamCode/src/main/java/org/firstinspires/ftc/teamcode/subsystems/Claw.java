@@ -13,9 +13,13 @@ public class Claw {
        Servo clawServo;
        Telemetry telemetry;
 
-       public Claw(HardwareMap hw, Telemetry t ) {
-           clawServo = hw.get(Servo.class,"grip_servo");
-           telemetry = t;
+       public Claw(HardwareMap hw, Telemetry t) {
+           this(hw, t, "grip_servo");
+       }
+
+        public Claw(HardwareMap hw, Telemetry t, String servoName) {
+            clawServo = hw.get(Servo.class,servoName);
+            telemetry = t;
         }
 
         public void openClaw()
