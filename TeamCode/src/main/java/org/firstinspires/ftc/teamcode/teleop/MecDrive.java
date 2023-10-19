@@ -35,7 +35,7 @@ public class MecDrive extends LinearOpMode
         // i represents count
         for(int i = 0; i < motorNames.length; i++) motors[i] = hardwareMap.get(DcMotor.class, motorNames[i]);
 
-//
+
 
         claw = new Claw(hardwareMap, telemetry);
         lift = new Lift(hardwareMap, telemetry);
