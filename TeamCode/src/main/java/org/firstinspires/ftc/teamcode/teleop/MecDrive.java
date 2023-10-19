@@ -18,11 +18,7 @@ import java.util.ArrayList;
 
 public class MecDrive extends LinearOpMode
 {
-
     DcMotor frontLeft, frontRight, backLeft, backRight;
-    DcMotor motors[] = {frontLeft, frontRight, backLeft, backRight};
-
-
     Claw claw;
     Lift lift;
     GamepadEvents controller1;
@@ -34,18 +30,18 @@ public class MecDrive extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException {
         controller1 = new GamepadEvents(gamepad1);
-
-        String  motorNames[] = new String[]{"frontLeft", "frontRight", "backLeft", "backRight"};
+        DcMotor[] motors = {frontLeft, frontRight, backLeft, backRight};
+        String[] motorNames = {"frontLeft", "frontRight", "backLeft", "backRight"};
         // i represents count
-        for(int i = 0; i < motorNames.length; i++) {motors[i] = hardwareMap.get(DcMotor.class, motorNames[i]);}
+        for(int i = 0; i < motorNames.length; i++) motors[i] = hardwareMap.get(DcMotor.class, motorNames[i]);
 
 
 
         claw = new Claw(hardwareMap, telemetry);
         lift = new Lift(hardwareMap, telemetry);
 
-        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        motors[0].setDirection(DcMotorSimple.Direction.REVERSE);
+        motors[1].setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
 
@@ -62,16 +58,16 @@ public class MecDrive extends LinearOpMode
             double strafe = gamepad1.right_stick_x;
             double rotate = gamepad1.left_stick_x;
 
-            frontLeft.setPower(drive + rotate + strafe);
-            backLeft.setPower(drive + rotate - strafe);
-            frontRight.setPower(drive - rotate - strafe);
-            backRight.setPower(drive - rotate + strafe);
+            motors[0].setPower(drive + rotate + strafe);
+            motors[1].setPower(drive + rotate - strafe);
+            motors[2].setPower(drive - rotate - strafe);
+            motors[3].setPower(drive - rotate + strafe);
 
 
-            telemetry.addData("fl: ", frontLeft.getPower());
-            telemetry.addData("bl: ", backLeft.getPower());
-            telemetry.addData("fr: ", frontRight.getPower());
-            telemetry.addData("br: ", backRight.getPower());
+            telemetry.addData("fl: ", motors[0].getPower());
+            telemetry.addData("bl: ", motors[1].getPower());
+            telemetry.addData("fr: ",  motors[2].getPower());
+            telemetry.addData("br: ",  motors[3].getPower());
             telemetry.addData("drive: ", drive);
             telemetry.addData("strafe: ", strafe);
             telemetry.addData("rotate: ", rotate);
