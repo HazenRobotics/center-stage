@@ -13,6 +13,8 @@ public class Claw {
        Servo clawServo;
        Telemetry telemetry;
 
+
+
        public Claw(HardwareMap hw, Telemetry t) {
            this(hw, t, "grip_servo");
        }
@@ -22,15 +24,15 @@ public class Claw {
             telemetry = t;
         }
 
-        public void openClaw()
+        public void openClaw(double power)
         {
-           clawServo.setPosition(0.6);
+           clawServo.setPosition(power);
            telemetry.addData("ClawStatus: ","Open");
         }
 
-        public void closeClaw()
+        public void closeClaw(double power)
         {
-            clawServo.setPosition(0.2);
+            clawServo.setPosition(power);
             telemetry.addData("ClawStatus: ", "Closed");
         }
 }
