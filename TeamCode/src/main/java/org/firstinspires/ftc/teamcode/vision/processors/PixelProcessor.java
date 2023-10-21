@@ -48,9 +48,6 @@ public class PixelProcessor implements VisionProcessor {
 	ArrayList<Rect> purpleRects = new ArrayList<>( );
 	ArrayList<Rect> yellowRects = new ArrayList<>( );
 	ArrayList<Rect> whiteRects = new ArrayList<>( );
-	ArrayList<Rect>[] pixelsRects = new ArrayList[]{
-			greenRects,purpleRects,yellowRects,whiteRects
-	};
 
 	@Override
 	public void init( int width, int height, CameraCalibration calibration ) {
