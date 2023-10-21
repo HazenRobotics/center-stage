@@ -48,6 +48,9 @@ public class PixelProcessor implements VisionProcessor {
 	ArrayList<Rect> purpleRects = new ArrayList<>( );
 	ArrayList<Rect> yellowRects = new ArrayList<>( );
 	ArrayList<Rect> whiteRects = new ArrayList<>( );
+	ArrayList<Rect>[] pixelsRects = new ArrayList[]{
+			greenRects,purpleRects,yellowRects,whiteRects
+	};
 
 	@Override
 	public void init( int width, int height, CameraCalibration calibration ) {
@@ -83,7 +86,6 @@ public class PixelProcessor implements VisionProcessor {
 		paint.setColor( Color.GREEN );
 		paint.setStyle( Paint.Style.STROKE );
 		paint.setStrokeWidth( scaleCanvasDensity * 4 );
-
 		int minSize = 2000;
 
 		drawBoundingBoxes( canvas, paint, scaleBmpPxToCanvasPx, greenRects, minSize );
@@ -145,6 +147,7 @@ public class PixelProcessor implements VisionProcessor {
 
 		return new double[]{(rect.x + rect.width) / 2.0, (rect.y + rect.height) / 2.0};
 	}
+
 
 
 }
