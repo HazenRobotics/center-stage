@@ -8,14 +8,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class MecDrive {
     DcMotor frontLeft, frontRight, backLeft, backRight;
-    String motorNames[];
+    String[] motorNames = {"frontLeft"," frontRight", "backLeft", "backRight"};
 
 
-    DcMotor motors[] = {frontLeft, frontRight, backLeft, backRight};
+    DcMotor[] motors = {frontLeft, frontRight, backLeft, backRight};
 
     public MecDrive() {
-        Lift = new Lift(hardwareMap, telemetry);
-         motorNames[] = {"frontLeft"," frontRight", "backLeft", "backRight"};
+
         for(int i = 0; i < motors.length; i++) { motors[i] = HardwareMap.get(DcMotor.class , motorNames[i]);}
 
     }
