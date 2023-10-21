@@ -27,7 +27,7 @@ public class CoaxialSwerveDrive {
 		this( hw, new String[]{ "FLM/perp", "BLM", "FRM", "BRM/para" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLE", "BLE", "FRE", "BRE" }, encoderOffsets,
-				3.3, 11.3125, 11.3125, new double[]{ 0.6, 0.03 }, 28 * 8 );
+				3.3, 11.3125, 11.3125, new double[]{ 0.53, 0.01 }, 28 * 8 );
 	}
 
 	/**
