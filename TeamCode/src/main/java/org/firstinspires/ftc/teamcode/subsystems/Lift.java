@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import android.util.Log;
-
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -158,7 +156,6 @@ public class Lift {
 	}
 
 
-
 	// getters for the lift position
 
 	public int getTarget( ) {
@@ -213,6 +210,10 @@ public class Lift {
 
 	public double getLiftAngle( ) {
 		return liftAngle;
+	}
+
+	public void setPower(double power) {
+		motor.setPower(power);
 	}
 
 	/**
