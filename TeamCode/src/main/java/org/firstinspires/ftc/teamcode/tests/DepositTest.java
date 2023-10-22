@@ -30,9 +30,9 @@ public class DepositTest extends LinearOpMode {
             if (gamepad1.dpad_right)
                 deposit.setAnglePosition( Deposit.AngleStates.GRAB );
             else if (gamepad1.dpad_down)
-                deposit.setAnglePosition( Deposit.AngleStates.DROP_VERT );
+                deposit.setAnglePosition( Deposit.AngleStates.DROP_FLOOR );
             else if (gamepad1.dpad_left)
-                deposit.setAnglePosition( Deposit.AngleStates.DROP_ANGLE );
+                deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
             else if (controller1.dpad_up.onPress())
                 deposit.angleToggle( );
 

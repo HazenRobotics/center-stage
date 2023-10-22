@@ -7,7 +7,7 @@ public class Deposit {
     Servo angler, release;
 
     public enum ReleaseStates {
-        RETRACTED(0.582, 0), EXTENDED(0.816, 1), DROP_ONE(0.636, 2);
+        RETRACTED(0, 0), EXTENDED(0.27, 1), DROP_ONE(0.126, 2);
         private final double position;
         private final int index;
         ReleaseStates (double pos, int ind) {
@@ -23,7 +23,7 @@ public class Deposit {
     }
 
     public enum AngleStates {
-        GRAB(0 ), DROP_VERT(0.15 ), DROP_ANGLE(0.51 );
+        GRAB(0.03 ), DROP_FLOOR(0.229 ), DROP_BACKDROP( 0.54 );
         private final double position;
         AngleStates (double pos) {
             position = pos;
@@ -58,10 +58,10 @@ public class Deposit {
     public void angleToggle() {
         switch( angleState ) {
             case GRAB:
-            case DROP_VERT:
-                angleState = AngleStates.DROP_ANGLE;
+            case DROP_FLOOR:
+                angleState = AngleStates.DROP_BACKDROP;
                 break;
-            case DROP_ANGLE:
+            case DROP_BACKDROP:
                 angleState = AngleStates.GRAB;
                 break;
         }

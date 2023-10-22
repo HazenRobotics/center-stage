@@ -150,6 +150,9 @@ public class Lift {
 
 	// getters and setters for power and velocity
 
+	public void setPower( double power ) {
+		motor.setPower( power );
+	}
 	public double getPower( ) {
 		return motor.getPower( );
 	}

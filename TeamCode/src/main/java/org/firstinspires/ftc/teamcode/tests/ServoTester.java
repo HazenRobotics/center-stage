@@ -34,6 +34,7 @@ public class ServoTester extends OpMode {
         position = Math.max( 0, position);
 
         telemetry.addData( "position: ", position );
+        telemetry.addData( "servo position ", servo.getPosition() );
         telemetry.update( );
         servo.setPosition( position );
     }
