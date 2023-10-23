@@ -17,7 +17,7 @@ public class ColorSensorTest extends LinearOpMode {
 		waitForStart();
 
 		while(opModeIsActive()) {
-			color.getTelemetry();
+			color.addTelemetry();
 			telemetry.update( );
 		}
 	}
