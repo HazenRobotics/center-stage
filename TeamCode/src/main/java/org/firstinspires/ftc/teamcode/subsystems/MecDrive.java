@@ -15,11 +15,11 @@ public class MecDrive {
 
     public MecDrive() {
 
-        for(int i = 0; i < motors.length; i++) { motors[i] = HardwareMap.get(DcMotor.class , motorNames[i]);}
+        for(int i = 0; i < motors.length; i++) { motors[i] = hardwareMap.get(DcMotor.class , motorNames[i]);}
 
     }
 
-    public void moveBot(double drive, double strafe, double rotate) _{
+    public void moveBot(double drive, double strafe, double rotate) {
         frontLeft.setPower(drive + rotate + strafe);
         backLeft.setPower(drive + rotate - strafe);
         frontRight.setPower(drive - rotate + strafe);

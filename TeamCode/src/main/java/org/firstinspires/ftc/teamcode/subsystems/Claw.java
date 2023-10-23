@@ -35,4 +35,10 @@ public class Claw {
             clawServo.setPosition(power);
             telemetry.addData("ClawStatus: ", "Closed");
         }
+
+        public void midClaw(double power)
+        {
+            clawServo.setPosition(power);
+
+        }
 }
