@@ -1,25 +1,23 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.robocol.TelemetryMessage;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 //
-public class Claw {
+public class PixelPicker {
        Servo clawServo;
        Telemetry telemetry;
 
 
 
-       public Claw(HardwareMap hw, Telemetry t) {
+       public PixelPicker(HardwareMap hw, Telemetry t) {
            this(hw, t, "grip_servo");
        }
 
-        public Claw(HardwareMap hw, Telemetry t, String servoName) {
+        public PixelPicker(HardwareMap hw, Telemetry t, String servoName) {
             clawServo = hw.get(Servo.class,servoName);
             telemetry = t;
         }
