@@ -27,9 +27,7 @@ public class TeleOP extends LinearOpMode {
             if(gamepad1.b){claw.closeClaw(0.2);}
             lift.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
             //Left joy stick pressed Up, drive forward
-            bot.moveBot(gamepad1.left_stick_y, 0, 0);
-            bot.moveBot(0, gamepad1.left_stick_x, 0);
-            bot.moveBot(0, 0, gamepad1.right_stick_x);
+            bot.moveBot(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
 
         }
