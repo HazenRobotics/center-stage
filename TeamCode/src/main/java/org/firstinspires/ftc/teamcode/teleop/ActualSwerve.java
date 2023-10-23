@@ -43,8 +43,8 @@ public class ActualSwerve extends LinearOpMode {
 		controller1 = new GamepadEvents( gamepad1 );
 
 		imu.initialize( new IMU.Parameters( new RevHubOrientationOnRobot(
-				RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
-				RevHubOrientationOnRobot.UsbFacingDirection.FORWARD ) ) );
+				RevHubOrientationOnRobot.LogoFacingDirection.UP,
+				RevHubOrientationOnRobot.UsbFacingDirection.RIGHT ) ) );
 
 		imu.resetYaw( );
 

@@ -17,7 +17,7 @@ public class CoaxialSwerveDrive {
 
 	WheelState wheelState = WheelState.DRIVE;
 	AxonSwervePod[] swervePods = new AxonSwervePod[4];
-	public static final double[] encoderOffsets = { 6.257, 2.188, 1.611, 2.110 };
+	public static final double[] encoderOffsets = { 1.55, 0.62, 0.05, 5.76 };
 	double wheelbase;
 	double trackwidth;
 	double[] wheelSpeeds;
@@ -27,7 +27,7 @@ public class CoaxialSwerveDrive {
 		this( hw, new String[]{ "FLM/perp", "BLM", "FRM", "BRM/para" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLE", "BLE", "FRE", "BRE" }, encoderOffsets,
-				3.3, 11.3125, 11.3125, new double[]{ 0.53, 0.01 }, 28 * 8 );
+				3.3, 12.334646, 12.334646, new double[]{ 0.6, 0.0065 }, 28 * 8 );
 	}
 
 	/**
