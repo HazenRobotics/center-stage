@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class PixelPicker {
        Servo clawServo;
        Telemetry telemetry;
-//
+
 
 
        public PixelPicker(HardwareMap hw, Telemetry t) {
