@@ -4,6 +4,7 @@ import static java.lang.Math.PI;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
 
 public class CoaxialSwerveDrive {
@@ -16,16 +17,17 @@ public class CoaxialSwerveDrive {
 
 	WheelState wheelState = WheelState.DRIVE;
 	AxonSwervePod[] swervePods = new AxonSwervePod[4];
+	public static final double[] encoderOffsets = { 1.55, 0.62, 0.05, 5.76 };
 	double wheelbase;
 	double trackwidth;
 	double[] wheelSpeeds;
 	double[] wheelAngles;
 
 	public CoaxialSwerveDrive( HardwareMap hw ) {
-		this( hw, new String[]{ "FLM", "BLM", "FRM", "BRM" }, new boolean[]{ false, false, false, false },
+		this( hw, new String[]{ "FLM/perp", "BLM", "FRM", "BRM/para" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
-				new String[]{ "FLE", "BLE", "FRE", "BRE" }, new double[]{ 5.96, 0.92, 4.71, 4.84 },
-				3.3, 11.3125, 11.3125, new double[]{ 0.6, 0.0065 }, 28 * 8 );
+				new String[]{ "FLE", "BLE", "FRE", "BRE" }, encoderOffsets,
+				3.3, 12.334646, 12.334646, new double[]{ 0.6, 0.0065 }, 28 * 8 );
 	}
 
 	/**
@@ -57,19 +59,19 @@ public class CoaxialSwerveDrive {
 	 * @param rotatePower power to turn the robot (right)
 	 */
 	public void drive( double drivePower, double strafePower, double rotatePower ) {
-		boolean rotatePods = Math.abs(drivePower) > 0.02 ||
-				Math.abs(strafePower) > 0.02 ||
-				Math.abs(rotatePower) > 0.02;
+		boolean rotatePods = Math.abs( drivePower ) > 0.02 ||
+				Math.abs( strafePower ) > 0.02 ||
+				Math.abs( rotatePower ) > 0.02;
 
-		switch (wheelState) {
+		switch( wheelState ) {
 			case DRIVE:
 				// distance between opposite wheels
 				double R = Math.sqrt( wheelbase * wheelbase + trackwidth * trackwidth );
 
 				double A = strafePower - rotatePower * (wheelbase / R);
 				double B = strafePower + rotatePower * (wheelbase / R);
-				double C = drivePower + rotatePower * (trackwidth / R);
-				double D = drivePower - rotatePower * (trackwidth / R);
+				double C = -drivePower + rotatePower * (trackwidth / R);
+				double D = -drivePower - rotatePower * (trackwidth / R);
 
 				double ws1 = Math.sqrt( B * B + D * D );
 				double wa1 = Math.atan2( B, D ) - PI / 2;
@@ -111,18 +113,32 @@ public class CoaxialSwerveDrive {
 		}
 	}
 
-	public void fieldCentricDrive ( double drivePower, double strafePower, double rotatePower, double heading ) {
-		double temp = drivePower * Math.cos( heading ) + strafePower * Math.sin( heading );
-		strafePower = -drivePower * Math.sin( heading ) + strafePower * Math.cos( heading );
-		drivePower = -temp;
+	public void fieldCentricDrive( double drivePower, double strafePower, double rotatePower, double heading ) {
+		double strafe = strafePower * Math.cos( -heading ) - drivePower * Math.sin( -heading );
+		double drive = strafePower * Math.sin( -heading ) + drivePower * Math.cos( -heading );
 
-		drive(drivePower, strafePower, rotatePower);
+		drive(drive, strafe, rotatePower);
+
 	}
 
 	public void setWheelState( WheelState state ) {
 		wheelState = state;
 	}
+
 	public WheelState getWheelState( ) {
 		return wheelState;
+	}
+
+	public void setPDs( int p, int d ) {
+		for( int i = 0; i < swervePods.length; i++ ) {
+			swervePods[i].setPID( p, d );
+		}
+	}
+
+	public void displayWheelAngles( Telemetry t ) {
+		t.addData( "FL", wheelAngles[0] );
+		t.addData( "BL", wheelAngles[1] );
+		t.addData( "FR", wheelAngles[2] );
+		t.addData( "BR", wheelAngles[3] );
 	}
 }

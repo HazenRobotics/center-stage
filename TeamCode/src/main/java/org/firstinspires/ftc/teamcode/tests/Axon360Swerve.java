@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.tests;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
 import java.util.List;
 
 @TeleOp
+//@Disabled
 public class Axon360Swerve extends LinearOpMode {
 
 	AxonSwervePod pod;
@@ -25,8 +27,7 @@ public class Axon360Swerve extends LinearOpMode {
 
 		for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 
-		pod = new AxonSwervePod( hardwareMap, "motor", "servo", "encoder" );
-		pod.setOffset( 2.413 );
+		pod = new AxonSwervePod( hardwareMap, "FLM/perp", "FLS", "FLE" );
 		pod.reverseServo();
 
 		telemetry = new MultipleTelemetry( telemetry, FtcDashboard.getInstance( ).getTelemetry( ) );

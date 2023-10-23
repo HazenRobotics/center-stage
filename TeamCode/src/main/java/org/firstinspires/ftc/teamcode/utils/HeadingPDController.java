@@ -1,30 +1,26 @@
 package org.firstinspires.ftc.teamcode.utils;
 
 import static org.firstinspires.ftc.teamcode.subsystems.AxonAbsolutePositionEncoder.TWO_PI;
-
 import static java.lang.Math.PI;
-import static java.lang.Math.signum;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class SwervePDController {
+public class HeadingPDController {
 
 
 	double Kp, Kd, lastError, error;
-	final double Ks = 0.03;
 	ElapsedTime timer;
 
-	double targetAngle;
-	double motorDirection;
+	double targetHeading;
 
-	public SwervePDController( ) {
+	public HeadingPDController( ) {
 		this( 0, 0 );
 	}
 
-	public SwervePDController( double p, double d ) {
+	public HeadingPDController( double p, double d ) {
 		setPD( p, d );
 		timer = new ElapsedTime( );
-		targetAngle = 0;
+		targetHeading = 0;
 	}
 
 	public void setPD( double p, double d ) {
@@ -32,23 +28,19 @@ public class SwervePDController {
 		Kd = d;
 	}
 
-	public double[] update( double currentAngle ) {
-		error = findShortestAngularTravel( targetAngle, currentAngle );
-
-		motorDirection = Math.abs( error ) >= (PI / 2) ? -1 : 1;
-
-		if( motorDirection < 0 ) error = findShortestAngularTravel( targetAngle + PI, currentAngle );
+	public double update( double currentAngle ) {
+		error = findShortestAngularTravel( targetHeading, currentAngle );
 
 		double derivative = (error - lastError) / timer.seconds( );
 		lastError = error;
 
 		timer.reset( );
 
-		return new double[]{ (Kp * error) + (Kd * derivative) + (Math.abs(error) < 0.08 ? Ks * signum( error ) : 0 ), motorDirection };
+		return (Kp * error) + (Kd * derivative);
 	}
 
-	public void setTargetAngle( double angle ) {
-		targetAngle = angle;
+	public void setTargetHeading( double heading ) {
+		targetHeading = heading;
 	}
 
 	public double getError( ) {
