@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.robocol.TelemetryMessage;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-//
+// We don't really need this class
 public class Claw {
        Servo clawServo;
        Telemetry telemetry;
