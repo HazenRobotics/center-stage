@@ -11,15 +11,19 @@ public class Lift {
     Servo liftServo;
     Telemetry telemetry;
     public Lift(HardwareMap hw, Telemetry telemetry){ this(hw, telemetry, "lift_Motor", "Lift_Servo");}
-    public Lift(HardwareMap hw, Telemetry telemetry, String liftName, String servoName){
+    public Lift(HardwareMap hw, Telemetry telemetry, String liftName, String servoName) {
 
         liftMotor = hw.get(DcMotor.class, liftName);
         liftServo = hw.get(Servo.class, servoName);
         this.telemetry = telemetry;
-
     }
+
 
     public void setPower(double power) { liftMotor.setPower(power);}
 
-    public void LiftServo(double power){ liftServo.setPosition(power);}
+    public void rotateFinger(double position){
+        liftServo.setPosition(position);
+
+    }
+
 }
