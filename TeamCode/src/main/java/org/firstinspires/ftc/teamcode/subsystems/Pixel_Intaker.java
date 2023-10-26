@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Pixel_Intaker {
    Servo intakeServo;
    DcMotor intakeMotor;
-
+//
    Telemetry telemetry;
    public Pixel_Intaker(HardwareMap hw, Telemetry telemetry) { this(hw, telemetry, "intake_Servo", "intake_motor")}
     public Pixel_Intaker(HardwareMap hw, Telemetry telemetry, String servoName, String motorName)
