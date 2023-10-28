@@ -212,10 +212,6 @@ public class Lift {
 		return liftAngle;
 	}
 
-	public void setPower(double power) {
-		motor.setPower(power);
-	}
-
 	/**
 	 * @param angle the angle unit to get the lift's angle in
 	 * @return the angle of the lift in the angle unit requested

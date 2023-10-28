@@ -17,6 +17,7 @@ public class IntakeTest extends LinearOpMode {
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		intake = new Intake( hardwareMap, telemetry );
+		intake.setAdjustIncrement( 0.005 );
 		controller = new GamepadEvents( gamepad1 );
 		timer = new ElapsedTime( );
 
@@ -24,10 +25,18 @@ public class IntakeTest extends LinearOpMode {
 
 		while( opModeIsActive() ) {
 
-			if( gamepad1.left_bumper )
+			// 0.235 top pixel
+			// 0.185 bottom pixel
+
+			if( controller.left_bumper.onPress() )
 				intake.adjustUp( );
-			else if( gamepad1.right_bumper )
+			else if( controller.right_bumper.onPress() )
 				intake.adjustDown( );
+
+			if (controller.a.onPress())
+				intake.setDeployPos( Intake.DeploymentState.TOP_PIXEL.getPosition() );
+			else if( controller.b.onPress() )
+				intake.setDeployPos( Intake.DeploymentState.SECOND_PIXEL.getPosition() );
 
 			if(controller.left_bumper.onPress() && timer.seconds() < 0.25)
 				intake.foldIntake();
@@ -35,10 +44,7 @@ public class IntakeTest extends LinearOpMode {
 			if(controller.left_bumper.onRelease())
 				timer.reset();
 
-
-
-			if( controller.a.onPress( ) ) intakePower = intakePower == 1 ? 0 : 1;
-			else if( controller.b.onPress( ) ) intakePower = intakePower == -1 ? 0 : -1;
+			intakePower = gamepad1.right_trigger;
 
 			intake.setIntakeMotorPower( intakePower );
 

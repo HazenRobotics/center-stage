@@ -18,7 +18,7 @@ public class Intake {
     IntakeCapacity intakeCapacity = IntakeCapacity.EMPTY; //default state, nothing inside
     IntakeBreakBeamSensor breakBeam;
 
-    private final double adjustIncrement = 0.005;
+    private double adjustIncrement;
     private double servoPos;
     private double motorPower;
 
@@ -26,7 +26,7 @@ public class Intake {
         EMPTY, ONE_PIXEL, FULL, OVERFLOW
     }
     public enum DeploymentState {
-        FOLDED(0.73), FULLY_DEPLOYED(0);
+        FOLDED(0.73), TOP_PIXEL(0.235), SECOND_PIXEL(0.185), FULLY_DEPLOYED(0);
         public final double position;
         DeploymentState(double pos) {
             position = pos;
@@ -45,12 +45,16 @@ public class Intake {
         deploymentServo = hw.get(Servo.class, deploymentServoName);
         breakBeam = new IntakeBreakBeamSensor(hw, t, breakBeamSensorName);
         telemetry = t;
+        adjustIncrement = 0.02;
     }
 
     public IntakeCapacity getIntakeState() {
         return intakeCapacity;
     }
 
+    public void setAdjustIncrement(double increment) {
+        adjustIncrement = increment;
+    }
     public void setDeployPos( double pos ) {
         servoPos = Range.clip( pos, DeploymentState.FULLY_DEPLOYED.getPosition(), DeploymentState.FOLDED.getPosition());
         deploymentServo.setPosition( servoPos );
