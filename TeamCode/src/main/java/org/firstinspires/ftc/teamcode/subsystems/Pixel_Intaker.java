@@ -23,7 +23,7 @@ public class Pixel_Intaker {
     {
         intakeMotor.setPower(power);
     }
-    public void intakeServoOn(double power)
+    public void intakeServoOn(double position)
     {
         intakeServo.setPosition(power);
     }

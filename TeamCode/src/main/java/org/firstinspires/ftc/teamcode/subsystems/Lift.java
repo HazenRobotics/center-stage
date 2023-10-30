@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Lift {
+    //Make an array because the servo
     DcMotor liftMotor;
     Servo liftServo;
     Telemetry telemetry;
