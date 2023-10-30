@@ -6,9 +6,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Deposit {
     Servo retractionServo;
     Servo rotationServo;
+    HardwareMap hardwareMap;
 
-    public Deposit() {
-        HardwareMap hw = new HardwareMap();
+    public Deposit(HardwareMap hw) {
+        hardwareMap=hw;
         retractionServo = hw.get(Servo.class, "retractionServo");
         rotationServo = hw.get(Servo.class, "rotationServo");
     }

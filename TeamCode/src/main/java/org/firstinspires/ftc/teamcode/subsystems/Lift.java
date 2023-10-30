@@ -21,7 +21,7 @@ public class Lift {
 
     public void setPower(double power) { liftMotor.setPower(power);}
 
-    public void rotateFinger(double position){
+    public void rotateServo(double position){
         liftServo.setPosition(position);
 
     }
