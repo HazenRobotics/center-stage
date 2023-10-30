@@ -3,25 +3,25 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class Outtake {
+public class Deposit {
     Servo retractionServo;
     Servo rotationServo;
 
-    public Outtake() {
+    public Deposit() {
         HardwareMap hw = new HardwareMap();
         retractionServo = hw.get(Servo.class, "retractionServo");
         rotationServo = hw.get(Servo.class, "rotationServo");
     }
 
 
-    public void rotateServoUp() {
+    public void rotateDepositUp() {
         rotationServo.setPosition(1.0);
     }
     public void rotateDepositDown() {
         rotationServo.setPosition(0.0);
     }
 
-    public void extendOuttake() {
+    public void extendDeposit() {
         retractionServo.setPosition(1.0);
     }
     public void dropFirstPixel() {
