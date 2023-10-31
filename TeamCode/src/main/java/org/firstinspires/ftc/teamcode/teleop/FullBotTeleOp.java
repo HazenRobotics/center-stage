@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.drivetrains.CoaxialSwerveDrive;
+import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
@@ -30,7 +31,7 @@ public class FullBotTeleOp extends LinearOpMode {
 	Lift lift;
 	Deposit deposit;
 	Intake intake;
-
+	Climber climber;
 	Orientation orientation;
 	IMU imu;
 	GamepadEvents controller1;
@@ -50,6 +51,7 @@ public class FullBotTeleOp extends LinearOpMode {
 		lift = new Lift( hardwareMap );
 		deposit = new Deposit( hardwareMap, "release", "angler" );
 		intake = new Intake( hardwareMap, telemetry );
+
 
 		timer = new ElapsedTime( );
 
@@ -110,6 +112,8 @@ public class FullBotTeleOp extends LinearOpMode {
 			else if( controller1.b.onPress( ) ) intakePower = intakePower == -1 ? 0 : -1;
 
 			intake.setIntakeMotorPower( intakePower );
+
+			climber.setPower( (gamepad1.dpad_up ? 1 : 0) + (gamepad1.dpad_down ? -1 : 0) );
 
 			telemetry.addData( "lift pos", liftPos );
 			telemetry.addData( "release pos", deposit.getReleasePosition( ) );

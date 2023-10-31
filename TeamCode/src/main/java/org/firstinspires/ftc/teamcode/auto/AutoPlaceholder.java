@@ -4,5 +4,4 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class AutoPlaceholder extends  {
-    DcMotorEx dcMotorEx =
 }
