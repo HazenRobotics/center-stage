@@ -30,17 +30,17 @@ public class PRBotTeleOp extends OpMode {
 
     @Override
     public void loop( ) {
-        double drive = -controller.left_stick_y;
-        double strafe = controller.left_stick_x;
-        double rotate = controller.right_stick_x;
+        double drive = -controller.left_stick_y * (gamepad1.left_stick_button ? 1 : 0.6);
+        double strafe = controller.left_stick_x * (gamepad1.left_stick_button ? 1 : 0.6);
+        double rotate = controller.right_stick_x * (gamepad1.right_stick_button ? 1 : 0.6);
 
         if (fieldCentric)
             robot.drive.fieldCentricDrive( drive, strafe, rotate );
         else
             robot.drive.robotCentricDrive( drive, strafe, rotate );
 
-        double flyWheelSpeed = gamepad1.right_trigger - gamepad1.left_trigger;
-        robot.launcher.setPower( flyWheelSpeed + (flywheelToggle ? 1 : 0) );
+        double flyWheelSpeed = gamepad1.right_trigger + (gamepad1.left_trigger * 0.5);
+        robot.launcher.setPower( flyWheelSpeed + (flywheelToggle ? 0.7 : 0) );
 
         if( timer.seconds() > 0.5 )
             robot.launcher.setServoPos( FlywheelLauncher.ReleaseStates.RETRACTED );
@@ -58,9 +58,12 @@ public class PRBotTeleOp extends OpMode {
 
         if( controller.y.onPress() ) {
             flywheelToggle = !flywheelToggle;
-            autoFire = flywheelToggle;
+//            autoFire = flywheelToggle;
         }
 
+        telemetry.addData( "power", robot.launcher.getPower() );
+
         controller.update();
+        telemetry.update();
     }
 }

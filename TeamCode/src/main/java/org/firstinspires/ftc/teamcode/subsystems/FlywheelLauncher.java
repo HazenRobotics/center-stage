@@ -45,6 +45,10 @@ public class FlywheelLauncher {
     public void setPower( double power ) {
         for (DcMotorEx flywheel : flywheels) flywheel.setPower(power);
     }
+
+    public double getPower() {
+        return flywheels[0].getPower();
+    }
     public void setServoPos( ReleaseStates state ) {
         servo.setPosition( state.getPosition() );
         releaseState = state;
