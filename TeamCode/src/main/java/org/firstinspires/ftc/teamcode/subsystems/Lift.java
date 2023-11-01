@@ -7,7 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 enum Enum
 {
      half;
-
+   //
     public double halfwayUpTheLift()
     {
         return 0.5;
