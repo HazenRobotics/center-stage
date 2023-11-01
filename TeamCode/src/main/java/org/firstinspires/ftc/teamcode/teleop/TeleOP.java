@@ -11,9 +11,10 @@ import org.firstinspires.ftc.teamcode.subsystems.MecDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Pixel_Intaker;
 
 
+
 public class TeleOP extends LinearOpMode {
     MecDrive bot = new MecDrive();
-
+    Enum anEnum = Enum.THING;
 
     private com.qualcomm.robotcore.hardware.HardwareMap HardwareMap;
     private org.firstinspires.ftc.robotcore.external.Telemetry Telemetry;
@@ -25,6 +26,9 @@ public class TeleOP extends LinearOpMode {
     int rotatePress = 0;
     @Override
     public void runOpMode() throws InterruptedException {
+        if(anEnum==Enum.THING) {
+
+        }
         while (opModeIsActive()) {
 
             lift.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
@@ -47,6 +51,7 @@ public class TeleOP extends LinearOpMode {
                     retractPress = 0;
                 }
             }
+            // The rotation of the deposit should be automatic
             if(gamepad1.b){
                 //rotate up
                 if(rotatePress == 0){
