@@ -10,9 +10,8 @@ public class Lift {
 
     private com.qualcomm.robotcore.hardware.HardwareMap HardwareMap;
     DcMotor liftMotor;
-    Deposit deposit = new Deposit(HardwareMap);
     Telemetry telemetry;
-    //Change halfEnum to a different name
+
 
     public Lift(HardwareMap hw, Telemetry telemetry){ this(hw, telemetry, "lift_Motor" );}
     public Lift(HardwareMap hw, Telemetry telemetry, String liftName) {
@@ -30,21 +29,8 @@ public class Lift {
 
      */
 
-     public void rotateDeposit(){
-
-         int rotatePress = 0;
-        if(liftMotor.getCurrentPosition() >= 0.5)
-        {
-            if(rotatePress == 0){
-                deposit.rotateDepositUp();
-                rotatePress++;
-                //rotate down
-            }else if(rotatePress == 1){
-                deposit.rotateDepositDown();
-                rotatePress = 0;
-            }
-        }
-
+     public double getLiftPosition(){
+        return liftMotor.getCurrentPosition();
     }
 
 }

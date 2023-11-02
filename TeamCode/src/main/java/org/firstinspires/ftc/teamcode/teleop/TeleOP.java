@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Pixel_Intaker;
 
 public class TeleOP extends LinearOpMode {
     MecDrive bot = new MecDrive();
-    Enum anEnum = Enum.THING;
+
 
     private com.qualcomm.robotcore.hardware.HardwareMap HardwareMap;
     private org.firstinspires.ftc.robotcore.external.Telemetry Telemetry;
@@ -24,11 +24,13 @@ public class TeleOP extends LinearOpMode {
     Deposit deposit = new Deposit(HardwareMap);
     int retractPress = 0;
     int rotatePress = 0;
+
+    boolean canExtend = true;
+    // isIn is to make sure that the depsoit does not
+
     @Override
     public void runOpMode() throws InterruptedException {
-        if(anEnum==Enum.THING) {
 
-        }
         while (opModeIsActive()) {
 
             lift.setPower(gamepad1.left_trigger - gamepad1.right_trigger);
@@ -52,17 +54,18 @@ public class TeleOP extends LinearOpMode {
                 }
             }
             // The rotation of the deposit should be automatic
-            if(gamepad1.b){
-                //rotate up
-                if(rotatePress == 0){
-                    deposit.rotateDepositUp();
-                    rotatePress++;
-                //rotate down
-                }else if(rotatePress == 1){
-                    deposit.rotateDepositDown();
-                    rotatePress = 0;
-                }
-            }
+
+          /* Create method in lift that returns lift current position then text if
+            it is greater than 0.5 then it will rotate the deooisit up
+
+            */
+            if(canExtend && lift.getLiftPosition() >= 0.5) {deposit.rotateDepositUp();}
+            //if b pressed then drop deposit and set canExtend to false
+            if(gamepad1.b){ deposit.rotateDepositDown();}
+            //If lift position is less than 0.5, then the deposit will be allowed to extend
+            if(lift.getLiftPosition() < 0.5) { deposit.rotateDepositDown(); canExtend = true;}
+
+
         }
     }
 }
