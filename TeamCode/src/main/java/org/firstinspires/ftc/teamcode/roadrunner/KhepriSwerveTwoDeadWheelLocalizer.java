@@ -33,29 +33,30 @@ import java.util.List;
  *    \--------------/
  *
  */
-public class SwerveTwoDeadWheelLocalizer extends TwoTrackingWheelLocalizer {
+public class KhepriSwerveTwoDeadWheelLocalizer extends TwoTrackingWheelLocalizer {
 
 	public static double TICKS_PER_REV = 8192;
-	public static double WHEEL_RADIUS = 0.748; // in
+	public static double WHEEL_RADIUS = 0.689; // in
 	public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-	public static double PARALLEL_X = 0.51; // X is the up and down direction
-	public static double PARALLEL_Y = 6.74; // Y is the strafe direction
+	public static double PARALLEL_X = -2.19; // X is the up and down direction
 
-	public static double PERPENDICULAR_X = 0.23;
-	public static double PERPENDICULAR_Y = -6.65;
+	// 5.55 towards intake
+	public static double PARALLEL_Y = 5.48; // Y is the strafe direction
 
-	public static double X_MULTIPLIER = 0.9974141123; // Multiplier in the X direction
-	public static double Y_MULTIPLIER = 0.9988642543; // Multiplier in the Y direction
+	public static double PERPENDICULAR_X = 1.195;
+	public static double PERPENDICULAR_Y = 6.51;
+	public static double X_MULTIPLIER = 1.080130365395661; // Multiplier in the X direction
+	public static double Y_MULTIPLIER = 1.084339563913817; // Multiplier in the Y direction
 
 	// Parallel/Perpendicular to the forward axis
 	// Parallel wheel is parallel to the forward axis
 	// Perpendicular is perpendicular to the forward axis
 	private Encoder parallelEncoder, perpendicularEncoder;
 
-	private SampleSwerveDrive drive;
+	private KhepriSwerveDrive drive;
 
-	public SwerveTwoDeadWheelLocalizer( HardwareMap hardwareMap, SampleSwerveDrive drive ) {
+	public KhepriSwerveTwoDeadWheelLocalizer( HardwareMap hardwareMap, KhepriSwerveDrive drive ) {
 		super( Arrays.asList(
 				new Pose2d( PARALLEL_X, PARALLEL_Y, 0 ),
 				new Pose2d( PERPENDICULAR_X, PERPENDICULAR_Y, Math.toRadians( 90 ) )
@@ -63,11 +64,11 @@ public class SwerveTwoDeadWheelLocalizer extends TwoTrackingWheelLocalizer {
 
 		this.drive = drive;
 
-		parallelEncoder = new Encoder(hardwareMap.get( DcMotorEx.class, "BRM/para"));
-		perpendicularEncoder = new Encoder(hardwareMap.get( DcMotorEx.class, "FLM/perp"));
+		parallelEncoder = new Encoder(hardwareMap.get( DcMotorEx.class, "FLM/paraEnc"));
+		perpendicularEncoder = new Encoder(hardwareMap.get( DcMotorEx.class, "BRM/perpEnc"));
 
 		// TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
-		parallelEncoder.setDirection( Encoder.Direction.REVERSE );
+		perpendicularEncoder.setDirection( Encoder.Direction.REVERSE );
 	}
 
 	public static double encoderTicksToInches( double ticks ) {

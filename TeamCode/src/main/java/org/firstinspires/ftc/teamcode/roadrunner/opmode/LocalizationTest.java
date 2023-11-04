@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.roadrunner.SampleSwerveDrive;
+import org.firstinspires.ftc.teamcode.roadrunner.KhepriSwerveDrive;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ import java.util.List;
 public class LocalizationTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        SampleSwerveDrive drive = new SampleSwerveDrive(hardwareMap);
+        KhepriSwerveDrive drive = new KhepriSwerveDrive(hardwareMap);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -30,7 +30,7 @@ public class LocalizationTest extends LinearOpMode {
             drive.setWeightedDrivePower(
                     new Pose2d(
                             -gamepad1.left_stick_y,
-                            -gamepad1.left_stick_x,
+                            -gamepad1.left_stick_x + 0.001,
                             -gamepad1.right_stick_x
                     )
             );

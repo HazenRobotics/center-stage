@@ -1,14 +1,14 @@
 package org.firstinspires.ftc.teamcode.roadrunner;
 
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MAX_ACCEL;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MAX_ANG_ACCEL;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MAX_ANG_VEL;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MAX_VEL;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.TRACK_WIDTH;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.encoderTicksToInches;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.kA;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.kStatic;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.kV;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.MAX_ACCEL;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.MAX_ANG_ACCEL;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.MAX_ANG_VEL;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.MAX_VEL;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.TRACK_WIDTH;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.encoderTicksToInches;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.kA;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.kStatic;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.kV;
 import static org.firstinspires.ftc.teamcode.drivetrains.CoaxialSwerveDrive.encoderOffsets;
 
 import androidx.annotation.NonNull;
@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SampleSwerveDrive extends SwerveDrive {
+public class KhepriSwerveDrive extends SwerveDrive {
 
 	public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients( 0, 0, 0 );
 	public static PIDCoefficients HEADING_PID = new PIDCoefficients( 0, 0, 0 );
@@ -71,7 +71,7 @@ public class SampleSwerveDrive extends SwerveDrive {
 	private List<Integer> lastEncPositions = new ArrayList<>( );
 	private List<Integer> lastEncVels = new ArrayList<>( );
 
-	public SampleSwerveDrive( HardwareMap hardwareMap ) {
+	public KhepriSwerveDrive( HardwareMap hardwareMap ) {
 		super( kV, kA, kStatic, TRACK_WIDTH );
 
 		follower = follower = new HolonomicPIDVAFollower( TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
@@ -87,17 +87,17 @@ public class SampleSwerveDrive extends SwerveDrive {
 
 		imu = hardwareMap.get( IMU.class, "imu" );
 		IMU.Parameters parameters = new IMU.Parameters( new RevHubOrientationOnRobot(
-				DriveConstants.LOGO_FACING_DIR, DriveConstants.USB_FACING_DIR ) );
+				KhepriDriveConstants.LOGO_FACING_DIR, KhepriDriveConstants.USB_FACING_DIR ) );
 		imu.initialize( parameters );
 
-		frontLeft = new AxonSwervePod( hardwareMap,"FLM/perp", false, "FLS", false,
-				"FLE", encoderOffsets[0], 3.3, new double[]{ 0.6, 0.02 }, 28 * 8 );
-		backLeft = new AxonSwervePod( hardwareMap,"BLM", false, "BLS", false,
-				"BLE", encoderOffsets[1], 3.3, new double[]{ 0.6, 0.02 }, 28 * 8 );
+		frontLeft = new AxonSwervePod( hardwareMap,"FLM/paraEnc", false, "FLS", false,
+				"FLE", encoderOffsets[0], 3.3, new double[]{ 0.6, 0.0065 }, 28 * 8 );
+		backLeft = new AxonSwervePod( hardwareMap,"BLM/climbEnc", false, "BLS", false,
+				"BLE", encoderOffsets[1], 3.3, new double[]{ 0.6, 0.0065 }, 28 * 8 );
 		frontRight = new AxonSwervePod( hardwareMap,"FRM", false, "FRS", false,
-				"FRE", encoderOffsets[2], 3.3, new double[]{ 0.6, 0.02 }, 28 * 8 );
-		backRight = new AxonSwervePod( hardwareMap,"BRM/para", false, "BRS", false,
-				"BRE", encoderOffsets[3], 3.3, new double[]{ 0.6, 0.02 }, 28 * 8 );
+				"FRE", encoderOffsets[2], 3.3, new double[]{ 0.6, 0.0065 }, 28 * 8 );
+		backRight = new AxonSwervePod( hardwareMap,"BRM/perpEnc", false, "BRS", false,
+				"BRE", encoderOffsets[3], 3.3, new double[]{ 0.6, 0.0065 }, 28 * 8 );
 
 		pods = Arrays.asList( frontLeft, backLeft, frontRight, backRight );
 
@@ -111,7 +111,7 @@ public class SampleSwerveDrive extends SwerveDrive {
 		List<Integer> lastTrackingEncVels = new ArrayList<>();
 
 		// TODO: if desired, use setLocalizer() to change the localization method
-		setLocalizer(new SwerveTwoDeadWheelLocalizer(hardwareMap, this));
+		setLocalizer(new KhepriSwerveTwoDeadWheelLocalizer(hardwareMap, this));
 
 		trajectorySequenceRunner = new TrajectorySequenceRunner(
 				follower, HEADING_PID, batteryVoltageSensor,

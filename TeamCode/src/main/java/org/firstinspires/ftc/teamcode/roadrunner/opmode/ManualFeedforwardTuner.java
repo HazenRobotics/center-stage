@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.roadrunner.opmode;
 
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MAX_ACCEL;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MAX_VEL;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.RUN_USING_ENCODER;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.kA;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.kStatic;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.kV;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.MAX_ACCEL;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.MAX_VEL;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.RUN_USING_ENCODER;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.kA;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.kStatic;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.kV;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -22,7 +22,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.roadrunner.SampleSwerveDrive;
+import org.firstinspires.ftc.teamcode.roadrunner.KhepriSwerveDrive;
 
 import java.util.Objects;
 
@@ -48,7 +48,7 @@ public class ManualFeedforwardTuner extends LinearOpMode {
 
     private FtcDashboard dashboard = FtcDashboard.getInstance();
 
-    private SampleSwerveDrive drive;
+    private KhepriSwerveDrive drive;
 
     enum Mode {
         DRIVER_MODE,
@@ -72,7 +72,7 @@ public class ManualFeedforwardTuner extends LinearOpMode {
 
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, dashboard.getTelemetry());
 
-        drive = new SampleSwerveDrive(hardwareMap);
+        drive = new KhepriSwerveDrive(hardwareMap);
 
         final VoltageSensor voltageSensor = hardwareMap.voltageSensor.iterator().next();
 

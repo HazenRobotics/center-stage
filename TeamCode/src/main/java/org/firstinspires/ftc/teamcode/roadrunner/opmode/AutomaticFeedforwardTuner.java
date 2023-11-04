@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.roadrunner.opmode;
 
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MAX_RPM;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.RUN_USING_ENCODER;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.rpmToVelocity;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.MAX_RPM;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.RUN_USING_ENCODER;
+import static org.firstinspires.ftc.teamcode.roadrunner.KhepriDriveConstants.rpmToVelocity;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
-import org.firstinspires.ftc.teamcode.roadrunner.SampleSwerveDrive;
+import org.firstinspires.ftc.teamcode.roadrunner.KhepriSwerveDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.util.LoggingUtil;
 import org.firstinspires.ftc.teamcode.roadrunner.util.RegressionUtil;
 
@@ -47,7 +47,7 @@ public class AutomaticFeedforwardTuner extends LinearOpMode {
 
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        SampleSwerveDrive drive = new SampleSwerveDrive(hardwareMap);
+        KhepriSwerveDrive drive = new KhepriSwerveDrive(hardwareMap);
 
         NanoClock clock = NanoClock.system();
 
