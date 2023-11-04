@@ -17,14 +17,14 @@ public class CoaxialSwerveDrive {
 
 	WheelState wheelState = WheelState.DRIVE;
 	AxonSwervePod[] swervePods = new AxonSwervePod[4];
-	public static final double[] encoderOffsets = { 1.55, 0.62, 0.05, 5.76 };
+	public static final double[] encoderOffsets = { 4.74, 3.79, 3.17, 2.59 };
 	double wheelbase;
 	double trackwidth;
 	double[] wheelSpeeds;
 	double[] wheelAngles;
 
 	public CoaxialSwerveDrive( HardwareMap hw ) {
-		this( hw, new String[]{ "FLM/perp", "BLM", "FRM", "BRM/para" }, new boolean[]{ false, false, false, false },
+		this( hw, new String[]{ "FLM/paraEnc", "BLM/climbEnc", "FRM", "BRM/perpEnc" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLE", "BLE", "FRE", "BRE" }, encoderOffsets,
 				3.3, 12.334646, 12.334646, new double[]{ 0.6, 0.0065 }, 28 * 8 );

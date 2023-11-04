@@ -12,12 +12,9 @@ public class Intake {
     Telemetry telemetry;
     DcMotor intakeMotor;
     Servo deploymentServo;
-
-
     //    boolean[] sensorDetectArray = {false, false};
     IntakeCapacity intakeCapacity = IntakeCapacity.EMPTY; //default state, nothing inside
-    IntakeBreakBeamSensor breakBeam;
-
+    IntakeBreakBeamSensor breakBeamTop, breakBeamBottom, breakBeamIntake;
     private double adjustIncrement;
     private double servoPos;
     private double motorPower;
@@ -26,7 +23,7 @@ public class Intake {
         EMPTY, ONE_PIXEL, FULL, OVERFLOW
     }
     public enum DeploymentState {
-        FOLDED(0.73), TOP_PIXEL(0.235), SECOND_PIXEL(0.185), FULLY_DEPLOYED(0);
+        FOLDED(0.655), TOP_PIXEL(0.235), SECOND_PIXEL(0.185), FULLY_DEPLOYED(0.215);
         public final double position;
         DeploymentState(double pos) {
             position = pos;
@@ -37,13 +34,16 @@ public class Intake {
     }
 
     public Intake(HardwareMap hw, Telemetry t) {
-        this(hw, t, "intake", "deployment", "breakBeam");
+        this(hw, t, "intake", "deployIntake",
+                "BB-Top", "BB-Bot", "BB-In");
     }
 
-    public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName, String breakBeamSensorName) {
+    public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName, String breakBeamTopName, String breakBeamBottomName, String breakBeamIntakeName) {
         intakeMotor = hw.get(DcMotor.class, motorName);
         deploymentServo = hw.get(Servo.class, deploymentServoName);
-        breakBeam = new IntakeBreakBeamSensor(hw, t, breakBeamSensorName);
+        breakBeamTop = new IntakeBreakBeamSensor(hw, t, breakBeamTopName);
+        breakBeamBottom = new IntakeBreakBeamSensor(hw, t, breakBeamBottomName);
+        breakBeamIntake = new IntakeBreakBeamSensor(hw, t, breakBeamIntakeName);
         telemetry = t;
         adjustIncrement = 0.02;
     }
@@ -59,8 +59,13 @@ public class Intake {
         servoPos = Range.clip( pos, DeploymentState.FULLY_DEPLOYED.getPosition(), DeploymentState.FOLDED.getPosition());
         deploymentServo.setPosition( servoPos );
     }
-    public void foldIntake() {
+    public void foldIntake( ) {
         setDeployPos( DeploymentState.FOLDED.getPosition() );
+        setIntakeMotorPower( 0 );
+    }
+    public void deployIntake( double powerMultiplier ) {
+        setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
+        setIntakeMotorPower( (motorPower < 0 ? 0.8 : -0.8) * powerMultiplier );
     }
 
     public void adjustUp() {

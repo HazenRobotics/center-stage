@@ -7,7 +7,7 @@ public class Deposit {
     Servo angler, release;
 
     public enum ReleaseStates {
-        RETRACTED(0.04, 0), EXTENDED(0.303, 1), DROP_ONE(0.146, 2);
+        RETRACTED(0.241, 0), EXTENDED(0.4, 1), DROP_ONE(0.306, 2);
         private final double position;
         private final int index;
         ReleaseStates (double pos, int ind) {
@@ -23,7 +23,7 @@ public class Deposit {
     }
 
     public enum AngleStates {
-        GRAB(0.03 ), DROP_FLOOR(0.229 ), DROP_BACKDROP( 0.54 );
+        GRAB(0.274 ), DROP_FLOOR(0.363 ), DROP_BACKDROP( 0.583 );
         private final double position;
         AngleStates (double pos) {
             position = pos;
@@ -38,6 +38,9 @@ public class Deposit {
 
     AngleStates angleState = AngleStates.GRAB;
 
+    public Deposit( HardwareMap hw ) {
+        this(hw, "release", "pivot");
+    }
     public Deposit( HardwareMap hw, String releaseName, String anglerName) {
         release = hw.get(Servo.class, releaseName);
         angler = hw.get(Servo.class, anglerName);
