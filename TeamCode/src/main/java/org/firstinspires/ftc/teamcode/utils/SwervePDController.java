@@ -59,4 +59,13 @@ public class SwervePDController {
 		return ((((targetAngle - currentAngle + PI) % TWO_PI) + TWO_PI) % TWO_PI) - PI;
 	}
 
+	public static double normalizeRadians( double angle ) {
+		angle %= TWO_PI;
+
+		if (angle < 0)
+			angle += TWO_PI;
+
+		return angle;
+	}
+
 }

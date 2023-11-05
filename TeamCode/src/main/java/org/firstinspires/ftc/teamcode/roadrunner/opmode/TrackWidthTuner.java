@@ -71,6 +71,7 @@ public class TrackWidthTuner extends LinearOpMode {
             double trackWidth = KhepriDriveConstants.TRACK_WIDTH * Math.toRadians(ANGLE) / headingAccumulator;
             trackWidthStats.add(trackWidth);
 
+            drive.stopPodRotation();
             sleep(DELAY);
         }
 

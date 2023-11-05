@@ -38,14 +38,11 @@ public class LocalizationTest extends LinearOpMode {
             drive.update();
 
             Pose2d poseEstimate = drive.getPoseEstimate();
-            List<Double> velos = drive.getWheelVelocities();
             telemetry.addData("x", poseEstimate.getX());
             telemetry.addData("y", poseEstimate.getY());
             telemetry.addData("heading", poseEstimate.getHeading());
-            if (velos != null) {
-                telemetry.addData( "x velo", velos.get( 0 ) );
-                telemetry.addData( "y velo", velos.get( 1 ) );
-            }
+            telemetry.addData( "angular velo", drive.getExternalHeadingVelocity() );
+
             telemetry.update();
         }
     }

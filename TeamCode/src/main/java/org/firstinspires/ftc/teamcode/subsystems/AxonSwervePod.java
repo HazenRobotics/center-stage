@@ -102,6 +102,11 @@ public class AxonSwervePod {
 		controller.setPD( p, d );
 	}
 
+	public void update( ) {
+		double[] results = controller.update( getAngle( ) );
+
+		setRotatePower( results[0] );
+	}
 	public void update( double motorPower ) {
 		double[] results = controller.update( getAngle( ) );
 

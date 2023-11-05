@@ -13,6 +13,7 @@ import static org.firstinspires.ftc.teamcode.drivetrains.CoaxialSwerveDrive.enco
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Config
 public class KhepriSwerveDrive extends SwerveDrive {
 
 	public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients( 0, 0, 0 );
@@ -156,6 +158,13 @@ public class KhepriSwerveDrive extends SwerveDrive {
 		backLeft.setAngleTarget( v1 );
 		frontRight.setAngleTarget( v2 );
 		backRight.setAngleTarget( v3 );
+	}
+
+	public void stopPodRotation() {
+		frontLeft.setRotatePower( 0 );
+		backLeft.setRotatePower( 0 );
+		frontRight.setRotatePower( 0 );
+		backRight.setRotatePower( 0 );
 	}
 
 	@Override

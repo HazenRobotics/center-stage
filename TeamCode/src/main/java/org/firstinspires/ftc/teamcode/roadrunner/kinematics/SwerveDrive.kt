@@ -6,6 +6,8 @@ import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.kinematics.Kinematics
 import com.acmerobotics.roadrunner.localization.Localizer
 import com.acmerobotics.roadrunner.util.Angle
+import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod
+import org.firstinspires.ftc.teamcode.utils.SwervePDController.normalizeRadians
 import java.lang.Math.PI
 
 /**
@@ -115,7 +117,8 @@ abstract class SwerveDrive @JvmOverloads constructor(
                 wheelBase
         )
         setMotorPowers(powers[0], powers[1], powers[2], powers[3])
-        setModuleOrientations(orientations[0], orientations[1], orientations[2], orientations[3])
+
+        setModuleOrientations(normalizeRadians(orientations[0] + PI / 2), normalizeRadians(orientations[1] + PI / 2), normalizeRadians(orientations[2] + PI / 2), normalizeRadians(orientations[3] + PI / 2))
     }
 
     override fun setDrivePower(drivePower: Pose2d) {
