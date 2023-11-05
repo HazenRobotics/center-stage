@@ -24,12 +24,13 @@ public class Lift {
 	AngleUnit angleUnit; // the angle unit for the lift angle i.e. degrees or radians
 
 	public PIDController controller;
+	double ff = 0.2;
 	public int target = 0;
 
 	public Lift( HardwareMap hardwareMap ) {
 		this( hardwareMap, "lift", false, 0,
 				0.5, 0, AngleUnit.DEGREES, 103.8, 1,
-				new PIDController(0,0,0) );
+				new PIDController(0.02,0,0.001) );
 	}
 
 	/**

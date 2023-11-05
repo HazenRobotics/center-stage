@@ -29,6 +29,7 @@ public class PropDetectionOpMode extends LinearOpMode {
 
 		while( opModeInInit() && !opModeIsActive() ) {
 			telemetry.addData( "position", propProcessor.getPiecePosition() );
+			telemetry.update();
 		}
 	}
 }
