@@ -15,6 +15,8 @@ public class BlueFarSidePark extends LinearOpMode {
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
 
+		robot.roadrunnerDrive.getLocalizer().setPoseEstimate( new Pose2d(-36.5,61.5, Math.toRadians( 270 ) ));
+
 		waitForStart();
 
 		robot.roadrunnerDrive.followTrajectorySequence( robot.roadrunnerDrive.trajectorySequenceBuilder(new Pose2d(-36.5,61.5, Math.toRadians( 270 )))
