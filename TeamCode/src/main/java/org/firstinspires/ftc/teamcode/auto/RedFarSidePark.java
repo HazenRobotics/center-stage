@@ -28,7 +28,7 @@ public class RedFarSidePark extends LinearOpMode {
 				.setReversed( true )
 				.splineToLinearHeading( new Pose2d( -35, -10, Math.toRadians( 0 ) ), 0 )
 				.splineTo( new Vector2d( 35, -10 ), 0 )
-				.splineToConstantHeading( new Vector2d( 59, -10 ), 0 )
+				.splineToConstantHeading( new Vector2d( 55, -10 ), 0 )
 				.build());
 	}
 }

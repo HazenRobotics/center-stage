@@ -21,18 +21,19 @@ public class PropProcessor implements VisionProcessor {
 		RED, BLUE
 	}
 	PropColor propColor = PropColor.RED;
+			;
 	PropPosition propPosition;
 
-	public Rect leftPos = new Rect( 0, 153, 60, 166 );
-	public Rect midPos = new Rect( 260, 166, 85, 126 );
-	public Rect rightPos = new Rect( 545, 140, 85, 160 );
+	public Rect leftPos = new Rect( 5, 100, 40, 83 );
+	public Rect midPos = new Rect( 325, 120, 42, 63 );
+	public Rect rightPos = new Rect( 600, 100, 32, 80 );
 
-	final Scalar redLowerBound = new Scalar( 0, 100, 40 );
-	final Scalar redUpperBound = new Scalar( 5, 255, 255 );
-	final Scalar redLowerBound2 = new Scalar( 175, 100, 40 );
-	final Scalar redUpperBound2 = new Scalar( 180, 255, 255 );
-	final Scalar blueLowerBound = new Scalar( 100, 60, 40 );
-	final Scalar blueUpperBound = new Scalar( 130, 255, 255 );
+	private Scalar redLowerBound = new Scalar( 0, 100, 40 );
+	private Scalar redUpperBound = new Scalar( 5, 255, 255 );
+	private Scalar redLowerBound2 = new Scalar( 175, 100, 40 );
+	private Scalar redUpperBound2 = new Scalar( 180, 255, 255 );
+	private Scalar blueLowerBound = new Scalar( 100, 60, 40 );
+	private Scalar blueUpperBound = new Scalar( 130, 255, 255 );
 
 	Mat matRed = new Mat( );
 	Mat matRed2 = new Mat( );

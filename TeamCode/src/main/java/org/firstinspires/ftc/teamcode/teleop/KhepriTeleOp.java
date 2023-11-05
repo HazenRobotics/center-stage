@@ -44,7 +44,7 @@ public class KhepriTeleOp extends LinearOpMode {
 
 			if ( liftPos < 50 && liftPower < 0 )
 				robot.deposit.setAnglePosition( Deposit.AngleStates.GRAB );
-			else if (liftPower > 0 && liftPos > 50)
+			else if (liftPower > 0 && liftPos > 90)
 				robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
 
 			if(controller1.left_bumper.onPress())
