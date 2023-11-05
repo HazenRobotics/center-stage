@@ -23,9 +23,9 @@ public class PropProcessor implements VisionProcessor {
 	PropColor propColor = PropColor.RED;
 	PropPosition propPosition;
 
-	public Rect leftPos = new Rect( 0, 230, 120, 250 );
-	public Rect midPos = new Rect( 520, 250, 190, 190 );
-	public Rect rightPos = new Rect( 1090, 210, 190, 240 );
+	public Rect leftPos = new Rect( 0, 153, 60, 166 );
+	public Rect midPos = new Rect( 260, 166, 85, 126 );
+	public Rect rightPos = new Rect( 545, 140, 85, 160 );
 
 	final Scalar redLowerBound = new Scalar( 0, 100, 40 );
 	final Scalar redUpperBound = new Scalar( 5, 255, 255 );
@@ -158,5 +158,9 @@ public class PropProcessor implements VisionProcessor {
 
 	public PropPosition getPiecePosition( ) {
 		return propPosition;
+	}
+
+	public void setPropColor( PropColor color ) {
+		propColor = color;
 	}
 }

@@ -87,8 +87,8 @@ public class Lift {
 		setTarget( convertDistTicks( inches, 2 * spoolRadius * Math.PI ) );
 	}
 
-	public void updatePID( double multiplier ) {
-		motor.setPower( controller.calculate( motor.getCurrentPosition(), target ) * multiplier );
+	public void updatePID( ) {
+		motor.setPower( controller.calculate( motor.getCurrentPosition(), target ) );
 	}
 
 	public void setPIDValues(double p, double i, double d) {

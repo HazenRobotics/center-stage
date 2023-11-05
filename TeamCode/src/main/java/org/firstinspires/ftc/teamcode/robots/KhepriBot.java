@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.drivetrains.CoaxialSwerveDrive;
+import org.firstinspires.ftc.teamcode.roadrunner.KhepriSwerveDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
@@ -24,6 +25,7 @@ public class KhepriBot {
 	Telemetry telemetry;
 
 	public CoaxialSwerveDrive drive;
+	public KhepriSwerveDrive roadrunnerDrive;
 	public Lift lift;
 	public Deposit deposit;
 	public Intake intake;
@@ -39,10 +41,13 @@ public class KhepriBot {
 		hubs = hw.getAll( LynxModule.class );
 		for( LynxModule hub : hubs ) hub.setBulkCachingMode( LynxModule.BulkCachingMode.AUTO );
 
+		roadrunnerDrive = new KhepriSwerveDrive(hw);
+
 		drive = new CoaxialSwerveDrive( hw );
 		lift = new Lift( hw );
 		deposit = new Deposit( hw );
 		intake = new Intake( hw, t );
+		intake.foldIntake();
 		climber = new Climber( hw );
 		launcher = new SlingshotLauncher( hw );
 

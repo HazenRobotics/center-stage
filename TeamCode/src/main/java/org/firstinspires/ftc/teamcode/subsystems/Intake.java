@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -40,6 +41,7 @@ public class Intake {
 
     public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName, String breakBeamTopName, String breakBeamBottomName, String breakBeamIntakeName) {
         intakeMotor = hw.get(DcMotor.class, motorName);
+        intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
         deploymentServo = hw.get(Servo.class, deploymentServoName);
         breakBeamTop = new IntakeBreakBeamSensor(hw, t, breakBeamTopName);
         breakBeamBottom = new IntakeBreakBeamSensor(hw, t, breakBeamBottomName);
@@ -100,7 +102,7 @@ public class Intake {
 //    }
 
     public void setIntakeMotorPower(double power) {
-        motorPower = power * (intakeCapacity == IntakeCapacity.OVERFLOW ? -1 : 1);
+        motorPower = power /* * (intakeCapacity == IntakeCapacity.OVERFLOW ? -1 : 1)*/;
         intakeMotor.setPower( motorPower );
     }
 
