@@ -20,12 +20,12 @@ public class PropProcessor implements VisionProcessor {
 	public enum PropColor {
 		RED, BLUE
 	}
-	PropColor propColor = PropColor.BLUE;
+	PropColor propColor = PropColor.RED;
 	PropPosition propPosition;
 
-	private final Rect leftPos = new Rect( 0, 0, 420, 720 );
-	private final Rect midPos = new Rect( 424, 0, 420, 720 );
-	private final Rect rightPos = new Rect( 848, 0, 420, 720 );
+	public Rect leftPos = new Rect( 0, 230, 120, 250 );
+	public Rect midPos = new Rect( 520, 250, 190, 190 );
+	public Rect rightPos = new Rect( 1090, 210, 190, 240 );
 
 	final Scalar redLowerBound = new Scalar( 0, 100, 40 );
 	final Scalar redUpperBound = new Scalar( 5, 255, 255 );
@@ -67,32 +67,41 @@ public class PropProcessor implements VisionProcessor {
 		right = frame.submat( rightPos );
 
 		double leftValue = Core.sumElems( left ).val[0] / leftPos.area( );
-		if( leftValue > percentColorThreshold ) {
-			left.release( );
-			middle.release( );
-			right.release( );
-			return PropPosition.LEFT;
-		}
+//		if( leftValue > percentColorThreshold ) {
+//			left.release( );
+//			middle.release( );
+//			right.release( );
+//			return PropPosition.LEFT;
+//		}
 
 		double middleValue = Core.sumElems( middle ).val[0] / midPos.area( );
-		if( middleValue > percentColorThreshold ) {
-			left.release( );
-			middle.release( );
-			right.release( );
-			return PropPosition.MIDDLE;
-		}
+//		if( middleValue > percentColorThreshold ) {
+//			left.release( );
+//			middle.release( );
+//			right.release( );
+//			return PropPosition.MIDDLE;
+//		}
 
 		double rightValue = Core.sumElems( right ).val[0] / rightPos.area( );
-		if( rightValue > percentColorThreshold ) {
-			left.release( );
-			middle.release( );
-			right.release( );
-			return PropPosition.RIGHT;
-		}
+//		if( rightValue > percentColorThreshold ) {
+//			left.release( );
+//			middle.release( );
+//			right.release( );
+//			return PropPosition.RIGHT;
+//		}
+
+		double maxValue = Math.max( leftValue, Math.max( middleValue, rightValue ) );
 
 		left.release( );
 		middle.release( );
 		right.release( );
+
+		if (maxValue > percentColorThreshold) {
+			if( maxValue == leftValue ) return PropPosition.LEFT;
+			if( maxValue == middleValue ) return PropPosition.MIDDLE;
+			if( maxValue == rightValue ) return PropPosition.RIGHT;
+		}
+
 		return PropPosition.NOT_FOUND;
 	}
 
