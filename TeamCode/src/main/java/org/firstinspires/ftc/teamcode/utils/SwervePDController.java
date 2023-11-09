@@ -11,6 +11,7 @@ public class SwervePDController {
 
 
 	double Kp, Kd, lastError, error;
+	final double Ks = 0.03;
 	ElapsedTime timer;
 
 	double targetAngle;
@@ -43,7 +44,7 @@ public class SwervePDController {
 
 		timer.reset( );
 
-		return new double[]{ (Kp * error) + (Kd * derivative), motorDirection };
+		return new double[]{ (Kp * error) + (Kd * derivative) + (Math.abs(error) < 0.08 ? Ks * signum( error ) : 0 ), motorDirection };
 	}
 
 	public void setTargetAngle( double angle ) {
@@ -56,6 +57,15 @@ public class SwervePDController {
 
 	public static double findShortestAngularTravel( double targetAngle, double currentAngle ) {
 		return ((((targetAngle - currentAngle + PI) % TWO_PI) + TWO_PI) % TWO_PI) - PI;
+	}
+
+	public static double normalizeRadians( double angle ) {
+		angle %= TWO_PI;
+
+		if (angle < 0)
+			angle += TWO_PI;
+
+		return angle;
 	}
 
 }

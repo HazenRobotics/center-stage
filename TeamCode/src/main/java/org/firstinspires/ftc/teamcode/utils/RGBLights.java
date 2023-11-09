@@ -45,7 +45,7 @@ public class RGBLights {
 	}
 	public void showPixel(Field.Pixel pixel ) {
 		switch( pixel ) {
-			case PINK:
+			case PURPLE:
 				setPattern( BlinkinPattern.HOT_PINK );
 				break;
 			case GREEN:
