@@ -10,12 +10,15 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Intake {
 
+    public boolean isSettling;
+    public static final double SETTLING_POWER=0.5;
+
     Telemetry telemetry;
     DcMotor intakeMotor;
     Servo deploymentServo;
+
     //    boolean[] sensorDetectArray = {false, false};
     IntakeCapacity intakeCapacity = IntakeCapacity.EMPTY; //default state, nothing inside
-    IntakeBreakBeamSensor breakBeamTop, breakBeamBottom, breakBeamIntake;
     private double adjustIncrement;
     private double servoPos;
     private double motorPower;
@@ -35,17 +38,13 @@ public class Intake {
     }
 
     public Intake(HardwareMap hw, Telemetry t) {
-        this(hw, t, "intake", "deployIntake",
-                "BB-Top", "BB-Bot", "BB-In");
+        this(hw, t, "intake", "deployIntake");
     }
 
-    public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName, String breakBeamTopName, String breakBeamBottomName, String breakBeamIntakeName) {
+    public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName) {
         intakeMotor = hw.get(DcMotor.class, motorName);
         intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
         deploymentServo = hw.get(Servo.class, deploymentServoName);
-        breakBeamTop = new IntakeBreakBeamSensor(hw, t, breakBeamTopName);
-        breakBeamBottom = new IntakeBreakBeamSensor(hw, t, breakBeamBottomName);
-        breakBeamIntake = new IntakeBreakBeamSensor(hw, t, breakBeamIntakeName);
         telemetry = t;
         adjustIncrement = 0.02;
     }
@@ -102,6 +101,7 @@ public class Intake {
 //    }
 
     public void setIntakeMotorPower(double power) {
+
         motorPower = power /* * (intakeCapacity == IntakeCapacity.OVERFLOW ? -1 : 1)*/;
         intakeMotor.setPower( motorPower );
     }
@@ -120,5 +120,4 @@ public class Intake {
         telemetry.addData( "intakePower", motorPower );
         telemetry.addData( "servoPos", servoPos );
     }
-
 }

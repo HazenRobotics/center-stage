@@ -2,17 +2,16 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import org.firstinspires.ftc.teamcode.subsystems.IntakeBreakBeamSensor;
+import org.firstinspires.ftc.teamcode.subsystems.BreakBeamSensor;
 
 @TeleOp
 public class BreakBeamTest extends LinearOpMode {
-    IntakeBreakBeamSensor breakBeam;
+    BreakBeamSensor breakBeam;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        breakBeam = new IntakeBreakBeamSensor( hardwareMap, telemetry, "breakBeam");
+        breakBeam = new BreakBeamSensor( hardwareMap, telemetry, "breakBeam");
         waitForStart();
 
         while (opModeIsActive()) {

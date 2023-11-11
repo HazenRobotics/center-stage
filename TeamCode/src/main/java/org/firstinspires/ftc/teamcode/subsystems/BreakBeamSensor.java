@@ -5,26 +5,23 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class IntakeBreakBeamSensor {
+public class BreakBeamSensor {
+    String name;
     DigitalChannel breakBeam;
     Telemetry telemetry;
-    boolean connected;
 
-    public IntakeBreakBeamSensor(HardwareMap hw, Telemetry t, String breakBeamName) {
+    public BreakBeamSensor(HardwareMap hw, Telemetry t, String breakBeamName) {
         breakBeam = hw.get(DigitalChannel.class, breakBeamName);
         breakBeam.setMode( DigitalChannel.Mode.INPUT );
+        name = breakBeamName;
         telemetry = t;
     }
 
-    public void updateBeamState() {
-        connected = breakBeam.getState();
-    }
-
     public boolean getBeamState() {
-        return connected;
+        return breakBeam.getState();
     }
 
     public void addTelemetry() {
-        telemetry.addData( "state", breakBeam.getState() );
+        telemetry.addData( name+" state", breakBeam.getState() );
     }
 }
