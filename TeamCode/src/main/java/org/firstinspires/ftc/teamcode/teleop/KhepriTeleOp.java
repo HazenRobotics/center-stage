@@ -60,14 +60,15 @@ public class KhepriTeleOp extends LinearOpMode {
 
 			if (gamepad1.options)
 				robot.launcher.release();
+
 			//deals with the intake sellting the 2nd pixel
-			if(!robot.ramp.getBeamState()) {
-				robot.intake.isSettling=true;
+			if(!robot.getBBRamp()) {
+				robot.intake.setIsSettling(true);
 			}
-			if(!robot.top.getBeamState()&& robot.isIntakeClear()) {
-				robot.intake.isSettling=false;
+			else if(!robot.getBBRamp() && robot.isIntakeClear()) {
+				robot.intake.setIsSettling(false);
 			}
-			if(robot.intake.isSettling) {
+			if(robot.intake.getIsSettling()) {
 				robot.intake.setIntakeMotorPower(Intake.SETTLING_POWER);
 			}
 

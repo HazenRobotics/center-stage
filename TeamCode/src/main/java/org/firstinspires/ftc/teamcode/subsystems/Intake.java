@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Intake {
 
-    public boolean isSettling;
+    private boolean isSettling;
     public static final double SETTLING_POWER=0.5;
 
     Telemetry telemetry;
@@ -77,6 +77,12 @@ public class Intake {
     public void adjustDown() {
         servoPos -= adjustIncrement;
         setDeployPos( servoPos );
+    }
+    public void setIsSettling(boolean settling) {
+        isSettling=settling;
+    }
+    public boolean getIsSettling() {
+        return isSettling;
     }
 
     /**

@@ -34,7 +34,7 @@ public class KhepriBot {
 	public SlingshotLauncher launcher;
 	public IMU imu;
 	public List<LynxModule> hubs;
-	public BreakBeamSensor bottom,top,in,ramp;
+	private BreakBeamSensor bottom,top,in,ramp;
 
 	public KhepriBot ( HardwareMap hw, Telemetry t) {
 		bottom = new BreakBeamSensor(hw,t,"bb-Bot");
@@ -69,10 +69,22 @@ public class KhepriBot {
 		return hubs.get( 0 ).getCurrent( CurrentUnit.AMPS ) + hubs.get( 1 ).getCurrent( CurrentUnit.AMPS );
 	}
 	public boolean isIntakeClear() {
-		return /**in.getBeamState() &&**/ ramp.getBeamState();
+		return /**getBBin() &&**/ getBBRamp();
 	}
 	public boolean bucketFull() {
-		return top.getBeamState() && bottom.getBeamState();
+		return getBBTop() && getBBBottom();
+	}
+	public boolean getBBin() {
+		return in.getBeamState();
+	}
+	public boolean getBBTop() {
+		return top.getBeamState();
+	}
+	public boolean getBBBottom() {
+		return bottom.getBeamState();
+	}
+	public boolean getBBRamp() {
+		return ramp.getBeamState();
 	}
 
 }
