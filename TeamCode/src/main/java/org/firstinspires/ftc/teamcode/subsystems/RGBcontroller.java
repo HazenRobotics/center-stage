@@ -15,7 +15,7 @@ public class RGBcontroller extends RGBLights{
     {
         super(HardwareMap, name);
 
-    }
+    }//
 
     public void setColor(RevBlinkinLedDriver.BlinkinPattern Color) {
         rgbSignal.setPattern(Color);
