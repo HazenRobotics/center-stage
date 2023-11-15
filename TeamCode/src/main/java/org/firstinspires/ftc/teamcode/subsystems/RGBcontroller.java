@@ -3,27 +3,23 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class RGBcontroller {
-    RevBlinkinLedDriver rgbSignal;
-    RevBlinkinLedDriver.BlinkinPattern[] rgbArray = {RevBlinkinLedDriver.BlinkinPattern.WHITE,RevBlinkinLedDriver.BlinkinPattern.YELLOW ,
-            RevBlinkinLedDriver.BlinkinPattern.GREEN,RevBlinkinLedDriver.BlinkinPattern.HOT_PINK };
+import org.firstinspires.ftc.teamcode.utils.RGBLights;
 
-    public RGBcontroller(HardwareMap hw, String name)
+public class RGBcontroller extends RGBLights{
+
+    private static final com.qualcomm.robotcore.hardware.HardwareMap HardwareMap = ;
+    RGBLights rgbSignal;
+
+
+    public RGBcontroller(String name)
     {
-        rgbSignal = hw.get(RevBlinkinLedDriver.class, name);
+        super(HardwareMap, name);
 
     }
 
-    public RevBlinkinLedDriver.BlinkinPattern selectColor(int num)
-     {
-         return rgbArray[num];
-
-     }
-
-     public void turnOffColor()
-     {
-
-     }
+    public void setColor(RevBlinkinLedDriver.BlinkinPattern Color) {
+        rgbSignal.setPattern(Color);
+    }
 
 
 }
