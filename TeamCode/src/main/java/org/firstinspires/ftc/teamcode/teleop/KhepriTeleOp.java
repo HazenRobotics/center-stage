@@ -11,19 +11,19 @@ import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 
 @TeleOp
 public class KhepriTeleOp extends LinearOpMode {
-	KhepriBot robot;
-	GamepadEvents controller1;
-	double liftPos, liftPower, loop, loopTime, normalizedPowerMultiplier;
+    KhepriBot robot;
+    GamepadEvents controller1;
+    double liftPos, liftPower, loop, loopTime, normalizedPowerMultiplier;
 
-	@Override
-	public void runOpMode( ) throws InterruptedException {
-		robot = new KhepriBot( hardwareMap, telemetry );
-		controller1 = new GamepadEvents( gamepad1 );
+    @Override
+    public void runOpMode() throws InterruptedException {
+        robot = new KhepriBot(hardwareMap, telemetry);
+        controller1 = new GamepadEvents(gamepad1);
 
-		waitForStart( );
+        waitForStart();
 
-		while( opModeIsActive( ) ) {
-			normalizedPowerMultiplier = 12.0 / robot.hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS ) ;
+        while (opModeIsActive()) {
+            normalizedPowerMultiplier = 12.0 / robot.hubs.get(0).getInputVoltage(VoltageUnit.VOLTS);
 
 //			heading = robot.imu.getRobotYawPitchRollAngles().getYaw( AngleUnit.RADIANS );
 
@@ -33,63 +33,66 @@ public class KhepriTeleOp extends LinearOpMode {
 
 //			robot.drive.fieldCentricDrive( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x,
 //					robot.imu.getRobotYawPitchRollAngles().getYaw( AngleUnit.RADIANS ) );
-			robot.drive.drive( -gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x );
+            robot.drive.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
-			liftPos = robot.lift.getMotorPosition();
-			liftPower = gamepad1.right_trigger - (gamepad1.left_trigger * 0.6);
+            liftPos = robot.lift.getMotorPosition();
+            liftPower = gamepad1.right_trigger - (gamepad1.left_trigger * 0.6);
 
-			robot.lift.setPower( liftPower );
+            robot.lift.setPower(liftPower);
 
-			if( controller1.a.onPress( ) )
-				robot.deposit.releaseToggle( );
+            if (controller1.a.onPress())
+                robot.deposit.releaseToggle();
 
-			if ( liftPos < 50 && liftPower < 0 )
-				robot.deposit.setAnglePosition( Deposit.AngleStates.GRAB );
-			else if (liftPower > 0 && liftPos > 90)
-				robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
+            if (liftPos < 50 && liftPower < 0)
+                robot.deposit.setAnglePosition(Deposit.AngleStates.GRAB);
+            else if (liftPower > 0 && liftPos > 90)
+                robot.deposit.setAnglePosition(Deposit.AngleStates.DROP_BACKDROP);
 
-			if((controller1.left_bumper.onPress() || robot.bucketFull()))
-				robot.intake.foldIntake();
-			else if( controller1.right_bumper.onPress() )
-				robot.intake.deployIntake( normalizedPowerMultiplier );
+            if (controller1.left_bumper.onPress())
+                robot.intake.foldIntake();
+            else if (controller1.right_bumper.onPress())
+                robot.intake.deployIntake(normalizedPowerMultiplier);
 
-			if ( controller1.dpad_up.onPress() )
-				robot.climber.goUp();
-			else if( controller1.dpad_down.onPress() )
-				robot.climber.goDown();
+            if (controller1.dpad_up.onPress())
+                robot.climber.goUp();
+            else if (controller1.dpad_down.onPress())
+                robot.climber.goDown();
 
-			if (gamepad1.options)
-				robot.launcher.release();
+            if (gamepad1.options)
+                robot.launcher.release();
 
-			//deals with the intake sellting the 2nd pixel
-			if(!robot.getBBRamp()) {
-				robot.intake.setIsSettling(true);
-			}
-			else if(!robot.getBBRamp() && robot.isIntakeClear()) {
-				robot.intake.setIsSettling(false);
-			}
-			if(robot.intake.getIsSettling()) {
-				robot.intake.setIntakeMotorPower(Intake.SETTLING_POWER);
-			}
+            //deals with the intake sellting the 2nd pixel
+            if (!robot.intake.getIsSettling() && !robot.getBBin()) {
+                robot.intake.setIsSettling(true);
+            } else if (robot.isIntakeClear()) {
+                robot.intake.setIsSettling(false);
+                if (robot.intake.getIntakeMotorPower() > 0) {
+                    robot.intake.setIntakeMotorPower(robot.intake.SETTLING_POWER);
+                } else {
+                    robot.intake.setIntakeMotorPower(-robot.intake.SETTLING_POWER);
+                }
+            }
+            robot.intake.setIntakeMotorPower(robot.intake.getIntakeMotorPower());
+            displayTelemetry();
+            controller1.update();
+        }
+    }
 
-			displayTelemetry();
-			controller1.update( );
-		}
-	}
+    public void displayTelemetry() {
+        telemetry.addData("lift pos", liftPos);
+        telemetry.addData("release pos", robot.deposit.getReleasePosition());
+        telemetry.addData("angler pos", robot.deposit.getAnglePosition());
+        telemetry.addData("STATE", robot.drive.getWheelState());
+        telemetry.addData("current draw total", robot.getRobotCurrentAmps());
+        telemetry.addData("launcher position", robot.launcher.getPosition());
+        telemetry.addData("BB", robot.getBBin() + " " + robot.getBBRamp() + " " + robot.getBBBottom() + " " + robot.getBBTop());
+        telemetry.addData("Is setting", robot.intake.getIsSettling());
+        loop = System.nanoTime();
+        telemetry.addData("hz ", 1000000000 / (loop - loopTime));
+        loopTime = loop;
+        robot.drive.displayWheelAngles(telemetry);
 
-	public void displayTelemetry() {
-		telemetry.addData( "lift pos", liftPos );
-		telemetry.addData( "release pos", robot.deposit.getReleasePosition( ) );
-		telemetry.addData( "angler pos", robot.deposit.getAnglePosition( ) );
-		telemetry.addData( "STATE", robot.drive.getWheelState( ) );
-		telemetry.addData( "current draw total", robot.getRobotCurrentAmps() );
-		telemetry.addData( "launcher position", robot.launcher.getPosition() );
-		loop = System.nanoTime( );
-		telemetry.addData( "hz ", 1000000000 / (loop - loopTime) );
-		loopTime = loop;
-		robot.drive.displayWheelAngles( telemetry );
+        telemetry.update();
 
-		telemetry.update( );
-
-	}
+    }
 }

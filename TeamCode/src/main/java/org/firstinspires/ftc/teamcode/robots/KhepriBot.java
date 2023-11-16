@@ -69,7 +69,7 @@ public class KhepriBot {
 		return hubs.get( 0 ).getCurrent( CurrentUnit.AMPS ) + hubs.get( 1 ).getCurrent( CurrentUnit.AMPS );
 	}
 	public boolean isIntakeClear() {
-		return /**getBBin() &&**/ getBBRamp();
+		return getBBin() && getBBRamp();
 	}
 	public boolean bucketFull() {
 		return getBBTop() && getBBBottom();
