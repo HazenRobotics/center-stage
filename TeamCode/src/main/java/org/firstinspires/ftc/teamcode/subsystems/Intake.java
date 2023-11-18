@@ -23,6 +23,8 @@ public class Intake {
     private double servoPos;
     private double motorPower;
 
+    DeploymentState deploymentState = DeploymentState.FOLDED;
+
     public enum IntakeCapacity {
         EMPTY, ONE_PIXEL, FULL, OVERFLOW
     }
@@ -53,6 +55,10 @@ public class Intake {
         return intakeCapacity;
     }
 
+    public DeploymentState getDeploymentState() {
+        return deploymentState;
+    }
+
     public void setAdjustIncrement(double increment) {
         adjustIncrement = increment;
     }
@@ -61,12 +67,14 @@ public class Intake {
         deploymentServo.setPosition( servoPos );
     }
     public void foldIntake( ) {
+        deploymentState = DeploymentState.FOLDED;
         setDeployPos( DeploymentState.FOLDED.getPosition() );
         setIntakeMotorPower( 0 );
     }
     public void deployIntake( double powerMultiplier ) {
+        deploymentState = DeploymentState.FULLY_DEPLOYED;
         setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
-        setIntakeMotorPower( (motorPower < 0 ? 0.8 : -0.8) * powerMultiplier );
+        setIntakeMotorPower( (motorPower <= 0 ? 0.8 : -0.8) * powerMultiplier );
     }
 
     public void adjustUp() {
