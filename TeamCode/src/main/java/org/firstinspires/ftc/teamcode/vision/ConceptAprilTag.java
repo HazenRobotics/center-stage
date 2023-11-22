@@ -29,24 +29,26 @@
 
 package org.firstinspires.ftc.teamcode.vision;
 
+import android.graphics.Point;
 import android.util.Size;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.utils.Field;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.opencv.core.Point3;
 
 import java.util.List;
+import java.util.Vector;
 
 /*
  * This OpMode illustrates the basics of AprilTag recognition and pose estimation,
@@ -65,6 +67,9 @@ public class ConceptAprilTag extends OpMode {
      * The variable to store our instance of the AprilTag processor.
      */
     private AprilTagProcessor aprilTag;
+    final static double CamreaOffsetX = 0;
+    final static double CamreaOffsetY = 0;
+
 
     /**
      * The variable to store our instance of the vision portal.
@@ -78,21 +83,21 @@ public class ConceptAprilTag extends OpMode {
 
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
-            .setDrawAxes(true)
-            .setDrawCubeProjection(true)
-            .setDrawTagOutline(true)
-            .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-            .setTagLibrary( AprilTagGameDatabase.getCenterStageTagLibrary())
-            .setOutputUnits( DistanceUnit.INCH, AngleUnit.DEGREES)
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagOutline(true)
+                .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+                .setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
 
-            // == CAMERA CALIBRATION ==
-            // If you do not manually specify calibration parameters, the SDK will attempt
-            // to load a predefined calibration for your camera.
-            //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
+                // == CAMERA CALIBRATION ==
+                // If you do not manually specify calibration parameters, the SDK will attempt
+                // to load a predefined calibration for your camera.
+                //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
 
-            // ... these parameters are fx, fy, cx, cy.
+                // ... these parameters are fx, fy, cx, cy.
 
-            .build();
+                .build();
 
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
@@ -159,7 +164,7 @@ public class ConceptAprilTag extends OpMode {
     }   // end method telemetryAprilTag()
 
     @Override
-    public void init( ) {
+    public void init() {
         initAprilTag();
 
         // Wait for the DS start button to be touched.
@@ -169,7 +174,7 @@ public class ConceptAprilTag extends OpMode {
     }
 
     @Override
-    public void loop( ) {
+    public void loop() {
         telemetryAprilTag();
 
         // Push telemetry to the Driver Station.
@@ -177,5 +182,16 @@ public class ConceptAprilTag extends OpMode {
 
         // Save CPU resources; can resume streaming when needed.
 
+    }
+
+    public Point3 getPositionBasedOnTag() {
+        Point3 totalPosition = new Point3(0,0,0);
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            Point3 p3 = Field.getTagPosition(detection.id);
+            totalPosition.set(new double[]{totalPosition.x+p3.x,totalPosition.y+p3.y,totalPosition.z+p3.z});
+        }
+        totalPosition.set(new double[] {totalPosition.x/currentDetections.size(),totalPosition.y/currentDetections.size(),totalPosition.y/currentDetections.size()});
+        return totalPosition;
     }
 }   // end class
