@@ -1,7 +1,28 @@
 package org.firstinspires.ftc.teamcode.utils;
 
+import static android.icu.util.MeasureUnit.INCH;
+
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+
 public class Field {
     //in
+    //left to right
+    final static VectorF APIRL_TAG_BOARD_POSTIONS[] = {
+            new VectorF(  60.25f, 41.41f,  4f),
+            new VectorF( 60.25f,  35.41f,  4f),
+            new VectorF(  60.25f,  29.41f,  4f),
+            new VectorF(  60.25f,  -29.41f,  4f),
+            new VectorF(  60.25f,  -35.41f,  4f),
+            new VectorF(  60.25f,  -41.41f,  4f),
+            };
+    //Bigs are the 5.5s and 4s are the small
+    final static VectorF APIRL_TAG_WALL_POSTIONS[] = {
+            new VectorF(  -70.25f,  -40.625f,  5.5f),
+            new VectorF(  -70.25f,  -35.125f,  4f),
+            new VectorF(  -70.25f,  35.125f,  4f),
+            new VectorF(  -70.25f,  40.625f,  5.5f),
+    };
+
     final static double TILE_SIZE = 24;
     final static double TILE_CONNECTOR_SIZE = 1;
     final static double TILE_SIZE_EDGE = 24.375;
