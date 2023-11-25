@@ -67,8 +67,8 @@ public class ConceptAprilTag extends OpMode {
      * The variable to store our instance of the AprilTag processor.
      */
     private AprilTagProcessor aprilTag;
-    final static double CamreaOffsetX = 0;
-    final static double CamreaOffsetY = 0;
+    final static double camreaOffsetX = 0;
+    final static double camreaOffsetY = -6.4375;
 
 
     /**
@@ -188,10 +188,13 @@ public class ConceptAprilTag extends OpMode {
         Point3 totalPosition = new Point3(0,0,0);
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
-            Point3 p3 = Field.getTagPosition(detection.id);
+            Point3 tagPosition = Field.getTagPosition(detection.id);
+            Point3 distance = new Point3(detection.ftcPose.x,detection.ftcPose.y,detection.ftcPose.z);
+            Point3 p3 = new Point3(tagPosition.x-distance.x,tagPosition.y-distance.y,tagPosition.z-distance.z);
+
             totalPosition.set(new double[]{totalPosition.x+p3.x,totalPosition.y+p3.y,totalPosition.z+p3.z});
         }
-        totalPosition.set(new double[] {totalPosition.x/currentDetections.size(),totalPosition.y/currentDetections.size(),totalPosition.y/currentDetections.size()});
+        totalPosition.set(new double[] {(totalPosition.x/currentDetections.size())+camreaOffsetX,(totalPosition.y/currentDetections.size())+camreaOffsetY,totalPosition.y/currentDetections.size()});
         return totalPosition;
     }
 }   // end class
