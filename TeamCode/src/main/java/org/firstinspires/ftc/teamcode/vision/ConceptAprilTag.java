@@ -29,7 +29,6 @@
 
 package org.firstinspires.ftc.teamcode.vision;
 
-import android.graphics.Point;
 import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -40,7 +39,6 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.utils.Field;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
@@ -67,8 +65,23 @@ public class ConceptAprilTag extends OpMode {
      * The variable to store our instance of the AprilTag processor.
      */
     private AprilTagProcessor aprilTag;
-    final static double camreaOffsetX = 0;
+    final static double camreaOffsetX = 1.4375;
     final static double camreaOffsetY = -6.4375;
+    final static Point3 APIRL_TAG_BOARD_POSTIONS[] = {
+            new Point3(  60.25f, 41.41f,  4f),
+            new Point3( 60.25f,  35.41f,  4f),
+            new Point3(  60.25f,  29.41f,  4f),
+            new Point3(  60.25f,  -29.41f,  4f),
+            new Point3(  60.25f,  -35.41f,  4f),
+            new Point3(  60.25f,  -41.41f,  4f),
+    };
+    //Bigs are the 5.5s and 4s are the small
+    final static Point3 APIRL_TAG_WALL_POSTIONS[] = {
+            new Point3(  -70.25f,  -40.625f,  5.5f),
+            new Point3(  -70.25f,  -35.125f,  4f),
+            new Point3(  -70.25f,  35.125f,  4f),
+            new Point3(  -70.25f,  40.625f,  5.5f),
+    };
 
 
     /**
@@ -79,6 +92,13 @@ public class ConceptAprilTag extends OpMode {
     /**
      * Initialize the AprilTag processor.
      */
+    public static Point3 getTagPosition(int i) {
+        if(i>APIRL_TAG_BOARD_POSTIONS.length-1) {
+            return APIRL_TAG_WALL_POSTIONS[i];
+        } else {
+            return APIRL_TAG_BOARD_POSTIONS[i];
+        }
+    }
     private void initAprilTag() {
 
         // Create the AprilTag processor.
@@ -188,7 +208,7 @@ public class ConceptAprilTag extends OpMode {
         Point3 totalPosition = new Point3(0,0,0);
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
-            Point3 tagPosition = Field.getTagPosition(detection.id);
+            Point3 tagPosition = getTagPosition(detection.id);
             Point3 distance = new Point3(detection.ftcPose.x,detection.ftcPose.y,detection.ftcPose.z);
             Point3 p3 = new Point3(tagPosition.x-distance.x,tagPosition.y-distance.y,tagPosition.z-distance.z);
 
