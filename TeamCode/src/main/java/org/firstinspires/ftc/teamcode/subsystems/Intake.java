@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,6 +16,7 @@ public class Intake {
 
     Telemetry telemetry;
     DcMotor intakeMotor;
+    CRServo wheelServo;
     Servo deploymentServo;
 
     //    boolean[] sensorDetectArray = {false, false};
@@ -22,6 +24,7 @@ public class Intake {
     private double adjustIncrement;
     private double servoPos;
     private double motorPower;
+    private boolean reverse = true;
 
     DeploymentState deploymentState = DeploymentState.FOLDED;
 
@@ -46,6 +49,8 @@ public class Intake {
     public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName) {
         intakeMotor = hw.get(DcMotor.class, motorName);
         intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
+        wheelServo = hw.get( CRServo.class, "wheelServo ");
+        wheelServo.setDirection( DcMotorSimple.Direction.REVERSE );
         deploymentServo = hw.get(Servo.class, deploymentServoName);
         telemetry = t;
         adjustIncrement = 0.02;
@@ -69,12 +74,16 @@ public class Intake {
     public void foldIntake( ) {
         deploymentState = DeploymentState.FOLDED;
         setDeployPos( DeploymentState.FOLDED.getPosition() );
+        reverse = true;
         setIntakeMotorPower( 0 );
+        wheelServo.setPower( 0 );
     }
     public void deployIntake( double powerMultiplier ) {
         deploymentState = DeploymentState.FULLY_DEPLOYED;
         setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
-        setIntakeMotorPower( (motorPower <= 0 ? 0.8 : -0.8) * powerMultiplier );
+        reverse = !reverse;
+        setIntakeMotorPower( (reverse ? -0.8 : 0.8) * powerMultiplier );
+        wheelServo.setPower( (reverse ? -1 : 1) );
     }
 
     public void adjustUp() {

@@ -16,7 +16,7 @@ public class IntakeTest extends LinearOpMode {
 	KhepriBot robot;
 	GamepadEvents controller;
 	ElapsedTime timer;
-	double intakePower = 0, intakeSpeed = 0.5, normalizedPowerMultiplier;
+	double intakePower = 0, intakeSpeed = 0.8, normalizedPowerMultiplier;
 
 	@Override
 	public void runOpMode( ) throws InterruptedException {
@@ -33,16 +33,16 @@ public class IntakeTest extends LinearOpMode {
 			// 0.235 top pixel
 			// 0.185 bottom pixel
 
-			intakePower = normalizedPowerMultiplier *  (((int) timer.seconds() % 2 == 0) ? 0.5 : 0.8) * intakeSpeed;
-//			intakePower = normalizedPowerMultiplier *  intakeSpeed;
+//			intakePower = normalizedPowerMultiplier *  (((int) timer.seconds() % 2 == 0) ? 0.5 : 0.8) * intakeSpeed;
+			intakePower = normalizedPowerMultiplier *  intakeSpeed;
 
 			if (controller.left_bumper.onPress())
 				robot.intake.foldIntake();
 			else if (controller.right_bumper.onPress())
-				robot.intake.deployIntake( intakePower );
+				robot.intake.deployIntake( 0.8 );
 
-			if (robot.intake.getDeploymentState() != Intake.DeploymentState.FOLDED)
-				robot.intake.setIntakeMotorPower( intakePower );
+//			if (robot.intake.getDeploymentState() != Intake.DeploymentState.FOLDED)
+//				robot.intake.setIntakeMotorPower( intakePower );
 
 			if(controller.dpad_up.onPress())
 				intakeSpeed += 0.05;

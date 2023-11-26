@@ -37,10 +37,10 @@ public class KhepriBot {
 	private BreakBeamSensor bottom,top,in,ramp;
 
 	public KhepriBot ( HardwareMap hw, Telemetry t) {
-		bottom = new BreakBeamSensor(hw,t,"bb-Bot");
-		top = new BreakBeamSensor(hw,t,"bb-Top");
-		in = new BreakBeamSensor(hw,t,"bb-In");
-		ramp = new BreakBeamSensor(hw,t," bb-Ramp");
+		bottom = new BreakBeamSensor(hw,t,"BB-Bot");
+		top = new BreakBeamSensor(hw,t,"BB-Top");
+		in = new BreakBeamSensor(hw,t,"BB-In");
+		ramp = new BreakBeamSensor(hw,t,"BB-Ramp");
 		this.hw = hw;
 		telemetry = new MultipleTelemetry( t, FtcDashboard.getInstance( ).getTelemetry( ) );
 
