@@ -16,8 +16,8 @@ public class CoaxialSwerveDrive {
 	}
 
 	WheelState wheelState = WheelState.DRIVE;
-	AxonSwervePod[] swervePods = new AxonSwervePod[4];
-	public static final double[] encoderOffsets = { 4.72, 0.03, 3.20, 2.20 };
+	public AxonSwervePod[] swervePods = new AxonSwervePod[4];
+	public static final double[] encoderOffsets = { 1.15, 3.597, 5.585, 0.003 };
 	double wheelbase;
 	double trackwidth;
 	double[] wheelSpeeds;
@@ -27,7 +27,7 @@ public class CoaxialSwerveDrive {
 		this( hw, new String[]{ "FLM/paraEnc", "BLM/climbEnc", "FRM", "BRM/perpEnc" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLE", "BLE", "FRE", "BRE" }, encoderOffsets,
-				3.3, 12.334646, 12.334646, new double[]{ 0.6, 0.0065 }, 28 * 8 );
+				3.3, 12.334646, 12.334646, new double[]{ 0.5, 0.0065 }, 28 * 8 );
 	}
 
 	/**
@@ -137,8 +137,12 @@ public class CoaxialSwerveDrive {
 
 	public void displayWheelAngles( Telemetry t ) {
 		t.addData( "FL", wheelAngles[0] );
+		t.addData( "FL error", swervePods[0].getError() );
 		t.addData( "BL", wheelAngles[1] );
+		t.addData( "FL error", swervePods[1].getError() );
 		t.addData( "FR", wheelAngles[2] );
+		t.addData( "FL error", swervePods[2].getError() );
 		t.addData( "BR", wheelAngles[3] );
+		t.addData( "FL error", swervePods[3].getError() );
 	}
 }

@@ -43,7 +43,6 @@ public class KhepriSwerveTwoDeadWheelLocalizer extends TwoTrackingWheelLocalizer
 
 	// 5.55 towards intake
 	public static double PARALLEL_Y = 5.48; // Y is the strafe direction
-
 	public static double PERPENDICULAR_X = 1.195;
 	public static double PERPENDICULAR_Y = 6.51;
 	public static double X_MULTIPLIER = 1.080130365395661; // Multiplier in the X direction
@@ -56,13 +55,13 @@ public class KhepriSwerveTwoDeadWheelLocalizer extends TwoTrackingWheelLocalizer
 
 	private KhepriSwerveDrive drive;
 
-	public KhepriSwerveTwoDeadWheelLocalizer( HardwareMap hardwareMap, KhepriSwerveDrive drive ) {
+	public KhepriSwerveTwoDeadWheelLocalizer( HardwareMap hardwareMap/*, KhepriSwerveDrive drive*/ ) {
 		super( Arrays.asList(
 				new Pose2d( PARALLEL_X, PARALLEL_Y, 0 ),
 				new Pose2d( PERPENDICULAR_X, PERPENDICULAR_Y, Math.toRadians( 90 ) )
 		) );
 
-		this.drive = drive;
+//		this.drive = drive;
 
 		parallelEncoder = new Encoder(hardwareMap.get( DcMotorEx.class, "FLM/paraEnc"));
 		perpendicularEncoder = new Encoder(hardwareMap.get( DcMotorEx.class, "BRM/perpEnc"));

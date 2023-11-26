@@ -28,7 +28,7 @@ public class Lift {
 	public int target = 0;
 
 	public Lift( HardwareMap hardwareMap ) {
-		this( hardwareMap, "lift", false, 0,
+		this( hardwareMap, "lift", true, 0,
 				0.5, 0, AngleUnit.DEGREES, 103.8, 1,
 				new PIDController(0.02,0,0.001) );
 	}

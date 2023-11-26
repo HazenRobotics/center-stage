@@ -41,7 +41,7 @@ public class Intake {
 
     public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName, String breakBeamTopName, String breakBeamBottomName, String breakBeamIntakeName) {
         intakeMotor = hw.get(DcMotor.class, motorName);
-        intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
+//        intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
         deploymentServo = hw.get(Servo.class, deploymentServoName);
         breakBeamTop = new IntakeBreakBeamSensor(hw, t, breakBeamTopName);
         breakBeamBottom = new IntakeBreakBeamSensor(hw, t, breakBeamBottomName);
@@ -67,7 +67,7 @@ public class Intake {
     }
     public void deployIntake( double powerMultiplier ) {
         setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
-        setIntakeMotorPower( (motorPower < 0 ? 0.8 : -0.8) * powerMultiplier );
+        setIntakeMotorPower( (motorPower < 0 ? 1 : -1) * powerMultiplier * 0.8 );
     }
 
     public void adjustUp() {

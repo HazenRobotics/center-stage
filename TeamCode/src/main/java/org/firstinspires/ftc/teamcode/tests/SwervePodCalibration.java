@@ -5,13 +5,17 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.checkerframework.checker.units.qual.A;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
 import org.firstinspires.ftc.teamcode.utils.Field;
 import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
+
+import java.util.List;
 
 @Config
 @TeleOp
@@ -27,6 +31,8 @@ public class SwervePodCalibration extends LinearOpMode {
     double[] encoderOffsets;
 
     int selection;
+
+    public List<LynxModule> hubs;
 
     GamepadEvents controller1;
 
@@ -52,6 +58,10 @@ public class SwervePodCalibration extends LinearOpMode {
         }
 
         telemetry = new MultipleTelemetry( telemetry, FtcDashboard.getInstance( ).getTelemetry( ) );
+
+        hubs = hardwareMap.getAll( LynxModule.class );
+        hubs.get( 0 ).setBulkCachingMode( LynxModule.BulkCachingMode.AUTO );
+        hubs.get( 1 ).setBulkCachingMode( LynxModule.BulkCachingMode.AUTO );
 
         waitForStart();
 
@@ -87,6 +97,9 @@ public class SwervePodCalibration extends LinearOpMode {
             telemetry.addData( motorNames[i] + " offset", pods[i].getOffset() );
             telemetry.addLine();
         }
+
+        telemetry.addData( "CH amps", hubs.get( 0 ).getCurrent( CurrentUnit.AMPS ) );
+        telemetry.addData( "EH amps", hubs.get( 1 ).getCurrent( CurrentUnit.AMPS ) );
 
         telemetry.update();
     }
