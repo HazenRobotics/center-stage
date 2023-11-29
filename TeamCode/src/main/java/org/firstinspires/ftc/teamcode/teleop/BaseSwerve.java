@@ -55,7 +55,7 @@ public class BaseSwerve extends LinearOpMode {
 
 		while( opModeIsActive( ) ) {
 
-			heading = robot.imu.getYaw().getRadians();
+			heading = robot.tracker.getPose2D().getTheta().toAngleRadians().getTheta();
 
 			if( controller1.x.onPress( ) ) {
 				headingLock = !headingLock;

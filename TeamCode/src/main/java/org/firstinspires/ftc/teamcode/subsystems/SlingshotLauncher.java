@@ -9,11 +9,11 @@ public class SlingshotLauncher {
 
 	public SlingshotLauncher ( HardwareMap hw ) {
 		servo = hw.get(Servo.class, "droneLaunch" );
-		servo.setPosition( 0.3 );
+		servo.setPosition( 0 );
 	}
 
 	public void release() {
-		servo.setPosition( 0 );
+		servo.setPosition( 1 );
 	}
 
 	public double getPosition() {

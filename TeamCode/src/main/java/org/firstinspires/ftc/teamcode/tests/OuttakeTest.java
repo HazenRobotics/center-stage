@@ -24,7 +24,7 @@ public class OuttakeTest extends LinearOpMode {
 		waitForStart();
 
 		while( opModeIsActive() ) {
-			liftPos = lift.getMotorPosition();
+			liftPos = lift.getPosition();
 			liftPower = gamepad1.right_trigger - (gamepad1.left_trigger * (0.4 + (((620 - liftPos) / 620) * 0.2)));
 
 			lift.setPower( liftPower );

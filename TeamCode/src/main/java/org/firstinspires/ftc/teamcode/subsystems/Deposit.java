@@ -7,7 +7,7 @@ public class Deposit {
     Servo angler, release;
 
     public enum ReleaseStates {
-        RETRACTED(0.241, 0), EXTENDED(0.4, 1), DROP_ONE(0.306, 2);
+        RETRACTED(0.241, 0), EXTENDED(0.4, 1), DROP_ONE(0.296, 2);
         private final double position;
         private final int index;
         ReleaseStates (double pos, int ind) {

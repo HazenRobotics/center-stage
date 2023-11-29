@@ -167,12 +167,12 @@ public class Lift {
 		return liftPosition;
 	}
 
-	public int getMotorPosition( ) {
+	public int getPosition( ) {
 		return motor.getCurrentPosition( );
 	}
 
 	public double getMotorPositionInch( ) {
-		return convertTicksDist( getMotorPosition( ), 2 * spoolRadius * Math.PI );
+		return convertTicksDist( getPosition( ), 2 * spoolRadius * Math.PI );
 	}
 
 	// setters and getters for angleUnit

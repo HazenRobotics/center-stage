@@ -9,11 +9,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class Intake {
-
-    private boolean isSettling;
-    public static final double SETTLING_POWER=0.5;
-
+public class Intake implements Subsystem{
     Telemetry telemetry;
     DcMotor intakeMotor;
     CRServo wheelServo;
@@ -23,16 +19,30 @@ public class Intake {
     IntakeCapacity intakeCapacity = IntakeCapacity.EMPTY; //default state, nothing inside
     private double adjustIncrement;
     private double servoPos;
-    private double motorPower;
     private boolean reverse = true;
 
     DeploymentState deploymentState = DeploymentState.FOLDED;
+
+    @Override
+    public void read( ) {
+
+    }
+
+    @Override
+    public void write( ) {
+
+    }
+
+    @Override
+    public void update( ) {
+
+    }
 
     public enum IntakeCapacity {
         EMPTY, ONE_PIXEL, FULL, OVERFLOW
     }
     public enum DeploymentState {
-        FOLDED(0.655), TOP_PIXEL(0.235), SECOND_PIXEL(0.185), FULLY_DEPLOYED(0.215);
+        FOLDED(0.655), TOP_TWO(0.334), FULLY_DEPLOYED(0.215);
         public final double position;
         DeploymentState(double pos) {
             position = pos;
@@ -83,7 +93,7 @@ public class Intake {
         setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
         reverse = !reverse;
         setIntakeMotorPower( (reverse ? -0.8 : 0.8) * powerMultiplier );
-        wheelServo.setPower( (reverse ? -1 : 1) );
+        wheelServo.setPower( (reverse ? -1 : 0.8) );
     }
 
     public void adjustUp() {
@@ -94,12 +104,6 @@ public class Intake {
     public void adjustDown() {
         servoPos -= adjustIncrement;
         setDeployPos( servoPos );
-    }
-    public void setIsSettling(boolean settling) {
-        isSettling=settling;
-    }
-    public boolean getIsSettling() {
-        return isSettling;
     }
 
     /**
@@ -124,13 +128,15 @@ public class Intake {
 //    }
 
     public void setIntakeMotorPower(double power) {
+        intakeMotor.setPower( power );
+    }
 
-        motorPower = power /* * (intakeCapacity == IntakeCapacity.OVERFLOW ? -1 : 1)*/;
-        intakeMotor.setPower( motorPower );
+    public void setIntakeServoPower(double power) {
+        wheelServo.setPower( power );
     }
 
     public double getIntakeMotorPower() {
-        return motorPower;
+        return intakeMotor.getPower( );
     }
 
     //retrieves telemetry from sensors, and display current pixel inventory
@@ -140,7 +146,7 @@ public class Intake {
 //        updatePixelColorArray();
 //        telemetry.addData("Pixel Slot 1: ", pixelColorArray[0]);
 //        telemetry.addData("Pixel Slot 2: ", pixelColorArray[1]);
-        telemetry.addData( "intakePower", motorPower );
+        telemetry.addData( "intakePower", getIntakeMotorPower() );
         telemetry.addData( "servoPos", servoPos );
     }
 }

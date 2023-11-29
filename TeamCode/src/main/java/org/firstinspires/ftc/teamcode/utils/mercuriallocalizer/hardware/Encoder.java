@@ -78,7 +78,7 @@ public class Encoder {
 
 	/**
 	 * <p>needs to be called once per loop to be accurate</p>
-	 * <p>if using this in a {@link org.mercurialftc.mercurialftc.scheduler.subsystems.SubsystemInterface} subclass, chuck it in the periodic loop, and never think about it again</p>
+	 * <p>if using this in a {@link org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.scheduler.subsystems.SubsystemInterface} subclass, chuck it in the periodic loop, and never think about it again</p>
 	 */
 	public void updateVelocity() {
 		int currentPosition = getCurrentPosition();

@@ -26,6 +26,7 @@ import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Vector2D
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleDegrees;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.IMU_EX;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.Encoder;
+import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.tracker.ThreeWheelTracker;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.tracker.TwoWheelTracker;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.tracker.WheeledTrackerConstants;
 
@@ -36,7 +37,7 @@ public class KhepriBot {
 	Telemetry telemetry;
 
 	public CoaxialSwerveDrive drive;
-	public TwoWheelTracker tracker;
+	public ThreeWheelTracker tracker;
 	public Lift lift;
 	public Deposit deposit;
 	public Intake intake;
@@ -95,20 +96,23 @@ public class KhepriBot {
 	}
 
 	public void setupTracker( Pose2D startPose ) {
-		tracker = new TwoWheelTracker(
+		tracker = new ThreeWheelTracker(
 				new Pose2D( startPose.getX(),
 							startPose.getY(),
 							startPose.getTheta( ).add( new AngleDegrees( 90 ) )
 				),
-				new WheeledTrackerConstants.TwoWheeledTrackerConstants(
+				new WheeledTrackerConstants.ThreeWheeledTrackerConstants(
 						new Vector2D( ),
 						1,
 						1,
-						new EncoderTicksConverter(8192 / (Math.PI * 1.37795), Units.INCH),
-						new EncoderTicksConverter(8192 / (Math.PI * 1.37795), Units.INCH)),
-				new Encoder(hw.get( DcMotorEx.class, "FLM/paraEnc")).setDirection(Encoder.Direction.FORWARD),
-				new Encoder(hw.get( DcMotorEx.class, "BRM/perpEnc")).setDirection(Encoder.Direction.REVERSE),
-				imu
+						new EncoderTicksConverter(1769.9, Units.INCH),
+						new EncoderTicksConverter(1768.22592593, Units.INCH),
+						new EncoderTicksConverter( 1742.38148148, Units.INCH ),
+						283.756949439),
+				new Encoder( hw.get( DcMotorEx.class, "FLM/paraLEnc" ) ).setDirection( Encoder.Direction.FORWARD ),
+				new Encoder( hw.get( DcMotorEx.class, "BRM/paraREnc" ) ).setDirection( Encoder.Direction.FORWARD ),
+				new Encoder( hw.get( DcMotorEx.class, "BLM/perpEnc" ) ).setDirection( Encoder.Direction.FORWARD )
+//				imu
 		);
 	}
 
