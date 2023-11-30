@@ -15,7 +15,7 @@ public class IntakeTest extends LinearOpMode {
 	GamepadEvents controller;
 	ElapsedTime timer;
 	double intakePower = 0;
-	double 	normalizedPowerMultiplier;
+	double normalizedPowerMultiplier;
 
 
 	@Override
@@ -55,7 +55,7 @@ public class IntakeTest extends LinearOpMode {
 
 			normalizedPowerMultiplier = 12.0 / robot.hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS ) ;
 
-//			robot.intake.setIntakeMotorPower( intakePower );
+			robot.intake.setIntakeMotorPower( intakePower * normalizedPowerMultiplier );
 			robot.intake.setIntakeServoPower( intakePower * normalizedPowerMultiplier );
 
 //			robot.intake.addTelemetry();

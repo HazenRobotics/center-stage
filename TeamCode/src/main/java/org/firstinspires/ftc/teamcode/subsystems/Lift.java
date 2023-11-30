@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.Encoder;
 
 public class Lift {
 
@@ -15,6 +16,7 @@ public class Lift {
 	double GEAR_RATIO;
 
 	public DcMotorEx motor;
+	Encoder encoder;
 
 	static int liftPosition = 0;
 
@@ -28,7 +30,7 @@ public class Lift {
 	public int target = 0;
 
 	public Lift( HardwareMap hardwareMap ) {
-		this( hardwareMap, "lift", true, 0,
+		this( hardwareMap, "lift", true, "FRM/liftEnc", 0,
 				0.5, 0, AngleUnit.DEGREES, 103.8, 1,
 				new PIDController(0.02,0,0.001) );
 	}
@@ -41,13 +43,18 @@ public class Lift {
 	 * @param liftAngle   the angle of the lift from the ground in
 	 * @param angleUnit   the angle unit to make calculations and input variables
 	 */
-	public Lift( HardwareMap hardwareMap, String motorName, boolean reverseMotor, double posOffset,
+	public Lift( HardwareMap hardwareMap, String motorName, boolean reverseMotor, String encoderName, double posOffset,
 				 double spoolRadius, double liftAngle, AngleUnit angleUnit, double PPR, double gearRatio, PIDController controller ) {
 		motor = hardwareMap.get( DcMotorEx.class, motorName );
 		motor.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.BRAKE );
+		encoder = new Encoder( hardwareMap.get(DcMotorEx.class, encoderName ));
+		encoder.reset();
 
-		if( reverseMotor )
-			reverseMotor();
+
+		if( reverseMotor ) {
+			reverseMotor( );
+			encoder.setDirection( Encoder.Direction.REVERSE );
+		}
 
 		setPosOffset( posOffset );
 		setSpoolRadius( spoolRadius );
@@ -168,7 +175,7 @@ public class Lift {
 	}
 
 	public int getPosition( ) {
-		return motor.getCurrentPosition( );
+		return encoder.getCurrentPosition( );
 	}
 
 	public double getMotorPositionInch( ) {

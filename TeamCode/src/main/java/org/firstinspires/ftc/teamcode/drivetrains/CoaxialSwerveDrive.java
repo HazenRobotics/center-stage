@@ -24,7 +24,7 @@ public class CoaxialSwerveDrive {
 	double[] wheelAngles;
 
 	public CoaxialSwerveDrive( HardwareMap hw ) {
-		this( hw, new String[]{ "FLM/paraLEnc", "BLM/perpEnc", "FRM/climbEnc", "BRM/paraREnc" }, new boolean[]{ false, false, false, false },
+		this( hw, new String[]{ "FLM/paraLEnc", "BLM/perpEnc", "FRM/liftEnc", "BRM/paraREnc" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLE", "BLE", "FRE", "BRE" }, encoderOffsets,
 				3.3, 12.334646, 12.334646, new double[]{ 0.5, 0.0065 }, 28 * 8 );

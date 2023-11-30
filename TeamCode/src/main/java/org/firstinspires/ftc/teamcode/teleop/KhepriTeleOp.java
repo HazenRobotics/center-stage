@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import static org.firstinspires.ftc.teamcode.utils.SwervePDController.findShortestAngularTravel;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -16,7 +18,7 @@ public class KhepriTeleOp extends LinearOpMode {
 	GamepadEvents controller1;
 	double drive, strafe, rotate, liftPos, liftPower, climbPos, climbPower, loop, prevTime, normalizedPowerMultiplier, heading, target, error;
 	boolean headingLock, climbAboveHeight, climbBelowHeight;
-
+	boolean endGame = false;
 	final double maxClimbHeight = 14384;
 
 	@Override
@@ -24,10 +26,12 @@ public class KhepriTeleOp extends LinearOpMode {
 		robot = new KhepriBot( hardwareMap, telemetry );
 		controller1 = new GamepadEvents( gamepad1 );
 
+		telemetry = new MultipleTelemetry( telemetry, FtcDashboard.getInstance( ).getTelemetry( ) );
+
 		waitForStart( );
 
 		while( opModeIsActive( ) ) {
-			normalizedPowerMultiplier = 12.0 / robot.hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS ) ;
+			normalizedPowerMultiplier = 12.0 / robot.hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS );
 
 //			heading = robot.imu.getRobotYawPitchRollAngles().getYaw( AngleUnit.RADIANS );
 
@@ -45,9 +49,9 @@ public class KhepriTeleOp extends LinearOpMode {
 					target = heading;
 			}
 
-			drive = -gamepad1.left_stick_y * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.DRIVE.getFast() : KhepriBot.DriveSpeeds.DRIVE.getNorm());
-			strafe = gamepad1.left_stick_x * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.STRAFE.getFast() : KhepriBot.DriveSpeeds.STRAFE.getNorm());
-			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast() : KhepriBot.DriveSpeeds.ROTATE.getNorm());
+			drive = -gamepad1.left_stick_y * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.DRIVE.getFast( ) : KhepriBot.DriveSpeeds.DRIVE.getNorm( ));
+			strafe = gamepad1.left_stick_x * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.STRAFE.getFast( ) : KhepriBot.DriveSpeeds.STRAFE.getNorm( ));
+			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( ));
 
 			if( headingLock ) {
 				error = findShortestAngularTravel( target, heading );
@@ -56,45 +60,49 @@ public class KhepriTeleOp extends LinearOpMode {
 
 			robot.drive.drive( drive, strafe, rotate );
 
-			liftPos = robot.lift.getPosition();
+			liftPos = robot.lift.getPosition( );
 			liftPower = gamepad1.right_trigger - (gamepad1.left_trigger * 0.6);
 
 			robot.lift.setPower( liftPower );
 
-			climbPos = robot.climber.getPosition();
-			climbPower = robot.climber.getPower();
-
-			climbAboveHeight = climbPos > maxClimbHeight;
-			climbBelowHeight = climbPos < 0;
+			if( endGame ) {
+				climbPos = robot.climber.getPosition( );
+				climbPower = robot.climber.getPower( );
+				climbAboveHeight = climbPos > maxClimbHeight;
+				climbBelowHeight = climbPos < 0;
+			}
 
 
 			if( controller1.a.onPress( ) )
 				robot.deposit.releaseToggle( );
 
-			if( controller1.b.onPress() )
-				robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
-
-
-			if ( liftPos < 50 && liftPower < 0 )
+			if( liftPos < 50 && liftPower < 0 )
 				robot.deposit.setAnglePosition( Deposit.AngleStates.GRAB );
-			else if (liftPower > 0 && liftPos > 90)
+			else if( liftPower > 0 && liftPos > 90 )
 				robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
 
-			if(controller1.left_bumper.onPress())
-				robot.intake.foldIntake();
-			else if( controller1.right_bumper.onPress() )
+			if( controller1.right_bumper.onPress( ) ) {
 				robot.intake.deployIntake( normalizedPowerMultiplier );
+				robot.deposit.setReleasePosition( Deposit.ReleaseStates.RETRACTED );
+				robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
+			} else if( controller1.left_bumper.onPress( ) )
+				robot.intake.foldIntake( );
 
-			if ( controller1.dpad_up.onPress() && !climbAboveHeight )
-				robot.climber.goUp();
-			else if( controller1.dpad_down.onPress() && !climbBelowHeight )
+			if( controller1.dpad_up.onPress( ) && !climbAboveHeight ) {
+				endGame = true;
+				robot.climber.goUp( );
+			}  else if( controller1.dpad_down.onPress() && !climbBelowHeight ) {
+				endGame = true;
 				robot.climber.goDown();
+			}
 
 			if (climbAboveHeight && climbPower > 0 || climbBelowHeight && climbPower < 0 )
 				robot.climber.setPower( 0 );
 
-			if (gamepad1.options)
-				robot.launcher.release();
+			if (gamepad1.options) {
+				endGame = true;
+				robot.launcher.release( );
+			}
 
 			displayTelemetry();
 			controller1.update( );
@@ -107,9 +115,10 @@ public class KhepriTeleOp extends LinearOpMode {
 		telemetry.addData( "release pos", robot.deposit.getReleasePosition( ) );
 		telemetry.addData( "angler pos", robot.deposit.getAnglePosition( ) );
 		telemetry.addData( "STATE", robot.drive.getWheelState( ) );
-		telemetry.addData( "current draw total", robot.getRobotCurrentAmps() );
-		telemetry.addData( "launcher position", robot.launcher.getPosition() );
-		telemetry.addData( "climb encoder", robot.climber.getPosition() );
+//		telemetry.addData( "current draw total", robot.getRobotCurrentAmps() );
+//		telemetry.addData( "climb encoder", robot.climber.getPosition() );
+//		telemetry.addData( "intake current draw", robot.intake.getMotorCurrent() );
+//		telemetry.addData( "intake servo power", robot.intake.getIntakeServoPower() );
 		loop = System.currentTimeMillis( );
 		telemetry.addData( "hz ", 1000 / (loop - prevTime) );
 		prevTime = loop;

@@ -97,23 +97,24 @@ public class KhepriBot {
 
 	public void setupTracker( Pose2D startPose ) {
 		tracker = new ThreeWheelTracker(
-				new Pose2D( startPose.getX(),
-							startPose.getY(),
-							startPose.getTheta( ).add( new AngleDegrees( 90 ) )
-				),
+				startPose,
 				new WheeledTrackerConstants.ThreeWheeledTrackerConstants(
 						new Vector2D( ),
 						1,
 						1,
-						new EncoderTicksConverter(1769.9, Units.INCH),
-						new EncoderTicksConverter(1768.22592593, Units.INCH),
-						new EncoderTicksConverter( 1742.38148148, Units.INCH ),
-						283.756949439),
+						new EncoderTicksConverter(1769.9, Units.MILLIMETER),
+						new EncoderTicksConverter(1768.22592593, Units.MILLIMETER),
+						new EncoderTicksConverter( 1742.38148148, Units.MILLIMETER ),
+						10.98),
 				new Encoder( hw.get( DcMotorEx.class, "FLM/paraLEnc" ) ).setDirection( Encoder.Direction.FORWARD ),
 				new Encoder( hw.get( DcMotorEx.class, "BRM/paraREnc" ) ).setDirection( Encoder.Direction.FORWARD ),
 				new Encoder( hw.get( DcMotorEx.class, "BLM/perpEnc" ) ).setDirection( Encoder.Direction.FORWARD )
 //				imu
 		);
+	}
+
+	public Pose2D getPose() {
+		return tracker.getPose2D();
 	}
 
 	public void clearBulkCache( ) {

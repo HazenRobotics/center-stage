@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.tracker;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.arcrobotics.ftclib.geometry.Rotation2d;
+
 import org.jetbrains.annotations.NotNull;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Vector2D;
@@ -16,6 +21,8 @@ public abstract class WheeledTracker implements Tracker {
 	private Pose2D pose2D, previousPose2D;
 	private Vector2D deltaPositionVector;
 	private int insistIndex, insistFrequency;
+
+	Canvas field;
 
 	public WheeledTracker(@NotNull Pose2D initialPose, WheeledTrackerConstants trackerConstants) {
 		this.pose2D = initialPose;
@@ -126,6 +133,19 @@ public abstract class WheeledTracker implements Tracker {
 			insistIndex++;
 			insistIndex %= insistFrequency;
 		}
+
+		TelemetryPacket packet = new TelemetryPacket();
+		field = packet.fieldOverlay();
+		int robotRadius = 8;
+		double fx = pose2D.getX();
+		double fy = pose2D.getY();
+		field.strokeCircle(fx, fy, robotRadius);
+		double heading = pose2D.getTheta().getRadians();
+		double arrowX = new Rotation2d(heading).getCos() * robotRadius, arrowY = new Rotation2d(heading).getSin() * robotRadius;
+		double x1 = fx, y1 = fy;
+		double x2 = fx + arrowX, y2 = fy+ arrowY;
+		field.strokeLine(x1, y1, x2, y2);
+		FtcDashboard.getInstance().sendTelemetryPacket(packet);
 	}
 
 	/**

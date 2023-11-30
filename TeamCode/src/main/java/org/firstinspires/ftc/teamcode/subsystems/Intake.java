@@ -2,16 +2,18 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-public class Intake implements Subsystem{
+public class Intake{
     Telemetry telemetry;
-    DcMotor intakeMotor;
+    DcMotorEx intakeMotor;
     CRServo wheelServo;
     Servo deploymentServo;
 
@@ -22,21 +24,6 @@ public class Intake implements Subsystem{
     private boolean reverse = true;
 
     DeploymentState deploymentState = DeploymentState.FOLDED;
-
-    @Override
-    public void read( ) {
-
-    }
-
-    @Override
-    public void write( ) {
-
-    }
-
-    @Override
-    public void update( ) {
-
-    }
 
     public enum IntakeCapacity {
         EMPTY, ONE_PIXEL, FULL, OVERFLOW
@@ -57,7 +44,7 @@ public class Intake implements Subsystem{
     }
 
     public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName) {
-        intakeMotor = hw.get(DcMotor.class, motorName);
+        intakeMotor = hw.get(DcMotorEx.class, motorName);
         intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
         wheelServo = hw.get( CRServo.class, "wheelServo ");
         wheelServo.setDirection( DcMotorSimple.Direction.REVERSE );
@@ -93,7 +80,7 @@ public class Intake implements Subsystem{
         setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
         reverse = !reverse;
         setIntakeMotorPower( (reverse ? -0.8 : 0.8) * powerMultiplier );
-        wheelServo.setPower( (reverse ? -1 : 0.8) );
+        wheelServo.setPower( (reverse ? -1 : 0.8) * powerMultiplier);
     }
 
     public void adjustUp() {
@@ -137,6 +124,11 @@ public class Intake implements Subsystem{
 
     public double getIntakeMotorPower() {
         return intakeMotor.getPower( );
+    }
+    public double getIntakeServoPower() {return wheelServo.getPower(); }
+
+    public double getMotorCurrent() {
+        return intakeMotor.getCurrent( CurrentUnit.AMPS ) * getIntakeMotorPower();
     }
 
     //retrieves telemetry from sensors, and display current pixel inventory

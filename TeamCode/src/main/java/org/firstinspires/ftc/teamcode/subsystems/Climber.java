@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -9,16 +10,13 @@ import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.Encoder;
 public class Climber {
 
 	DcMotorEx motor;
-	Encoder encoder;
-
 	public Climber (HardwareMap hw) {
-		this(hw, "climb", false, "FRM/climbEnc");
+		this(hw, "climb", false);
 	}
 
-	public Climber ( HardwareMap hw, String motorName, boolean motorReversed, String encoderName ) {
+	public Climber ( HardwareMap hw, String motorName, boolean motorReversed ) {
 		motor = hw.get( DcMotorEx.class, motorName );
-		encoder = new Encoder(hw.get( DcMotorEx.class, encoderName ));
-		encoder.reset();
+		motor.setMode( DcMotor.RunMode.STOP_AND_RESET_ENCODER );
 
 		if (motorReversed) motor.setDirection( DcMotorSimple.Direction.REVERSE );
 
@@ -35,7 +33,7 @@ public class Climber {
 	}
 
 	public double getPosition() {
-		return encoder.getCurrentPosition();
+		return motor.getCurrentPosition();
 	}
 
 	public double getPower() {

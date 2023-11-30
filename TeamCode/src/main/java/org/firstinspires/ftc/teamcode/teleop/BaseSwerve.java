@@ -25,6 +25,7 @@ import org.firstinspires.ftc.teamcode.robots.KhepriBot;
 import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 import org.firstinspires.ftc.teamcode.utils.HeadingPDController;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
+import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleRadians;
 
 import java.util.List;
 
@@ -36,15 +37,14 @@ public class BaseSwerve extends LinearOpMode {
 	PIDController headingController;
 	double drive, strafe, rotate, loop, prevTime, heading, error, adjustedHeading;
 	public static double target, startHeading = Math.toRadians( 90 );
-	Pose2d poseEstimate;
-	double x, y, poseHeading;
-	Canvas field;
-	boolean headingLock = true;
+	Pose2D poseEstimate;
+	boolean headingLock = false;
 
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
-		robot.setupTracker( new Pose2D(0, 0 , startHeading) );
+		Pose2D startPose = new Pose2D(0, 0 , startHeading);
+		robot.setupTracker( startPose );
 		target = startHeading;
 
 		controller1 = new GamepadEvents( gamepad1 );
@@ -54,8 +54,8 @@ public class BaseSwerve extends LinearOpMode {
 		waitForStart( );
 
 		while( opModeIsActive( ) ) {
-
-			heading = robot.tracker.getPose2D().getTheta().toAngleRadians().getTheta();
+			poseEstimate = robot.getPose();
+			heading = poseEstimate.getTheta().getRadians();
 
 			if( controller1.x.onPress( ) ) {
 				headingLock = !headingLock;
@@ -87,7 +87,8 @@ public class BaseSwerve extends LinearOpMode {
 		prevTime = loop;
 
 		telemetry.addData( "heading lock", headingLock );
-		telemetry.addData("position", robot.tracker.getPose2D());
+		telemetry.addData("where the localizer thinks it is", poseEstimate);
+		telemetry.addData( "where i want the localizer to think it is", poseEstimate.add( 0, 0, new AngleRadians(Math.toRadians( 90 )) ) );
 
 //		x = poseEstimate.getX();
 //		y = poseEstimate.getY();
