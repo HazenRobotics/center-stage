@@ -4,13 +4,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.vision.VisionProcessor;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -25,138 +20,196 @@ import java.util.List;
 
 public class BackdropProcessor implements VisionProcessor {
 
-	public enum PixelColor {
-		GREEN, PURPLE, YELLOW, WHITE
-	}
-	public final static double SQAURE_THRESHOLD = 1.5;
-	public final static double SIZE_THRESHOLD_LOW = 12;
-	public final static double SIZE_THRESHOLD_HIGH = 30;
+    public enum PixelColor {
+        GREEN, PURPLE, YELLOW, WHITE
+    }
+
+    public final static double PIXEL_SQUARE_THRESHOLD = 1.5;
+    public final static double PIXEL_SIZE_THRESHOLD_LOW = 10;
+    public final static double PIXEL_SIZE_THRESHOLD_HIGH = 40;
+    public final static double APRIL_SQUARE_THRESHOLD_LOW = 1.1;
+    public final static double APRIL_SQUARE_THRESHOLD_HIGH = 2;
+    public final static double APRIL_SIZE_THRESHOLD_LOW = 40;
+    public final static double APRIL_SIZE_THRESHOLD_HIGH = 100;
+    public final static double APRIL_Y_THRESHOLD_HIGH = 450;
+    public final static double APRIL_Y_THRESHOLD_LOW = 0;
+    public final static int NEAR_SIZE_TORLANCE = 10;
+    private int[] gridRow6s = new int[7];
+    private int[] gridColumns6 = new int[7];
+    private int[] gridRows7 = new int[7];
+    private int[] gridColumns7 = new int[7];
 
 
+    public Scalar holeLowerBound = new Scalar(0, 0, 0);
+    public Scalar holeUpperBound = new Scalar(255, 255, 120);
+    Mat pixels = new Mat();
 
-	PixelColor color = PixelColor.GREEN;
-	public Scalar holeLowerBound = new Scalar( 0, 0, 0 );
-	public Scalar holeUpperBound = new Scalar( 255, 255, 120 );
-	AprilTagProcessor aprilTag = new AprilTagProcessor.Builder()
-			.setDrawAxes(true)
-			.setDrawCubeProjection(true)
-			.setDrawTagOutline(true)
-			.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-			.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
-			.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES).build();
-	Mat temp = new Mat( );
+    Mat kernel = Mat.ones(3, 3, CvType.CV_32F);
 
-	Mat kernel = Mat.ones( 3, 3, CvType.CV_32F );
+    ArrayList<Rect> holeRects = new ArrayList<>();
+    ArrayList<Rect> aprilRects = new ArrayList<>();
+    ArrayList<Rect> noiseRects = new ArrayList<>();
+    ArrayList<Rect> allRects = new ArrayList<>();
 
-	ArrayList<Rect> holeRects = new ArrayList<>( );
-	ArrayList<Rect> aprilRects = new ArrayList<>( );
+    @Override
+    public void init(int width, int height, CameraCalibration calibration) {
 
-	@Override
-	public void init( int width, int height, CameraCalibration calibration ) {
-	}
+    }
 
-	@Override
-	public Object processFrame( Mat frame, long captureTimeNanos ) {
-		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2HSV );
-
-		Core.inRange( temp, holeLowerBound, holeUpperBound, temp );
-
-		Imgproc.morphologyEx( temp, temp, Imgproc.MORPH_ERODE, kernel, new Point( 0, 0 ), 3 );
-		Imgproc.morphologyEx( temp, temp, Imgproc.MORPH_DILATE, kernel, new Point( 0, 0 ), 3 );
+    @Override
+    public Object processFrame(Mat frame, long captureTimeNanos) {
+        Imgproc.cvtColor(frame, pixels, Imgproc.COLOR_RGB2HSV);
 
 
-		List<MatOfPoint> contours = new ArrayList<>( );
-		Mat hierarchy = new Mat( );
-		Imgproc.findContours( temp, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE );
+        Core.inRange(pixels, holeLowerBound, holeUpperBound, pixels);
 
-		holeRects.clear();
-		int highestY=0;
-		int lowestY=1000000;
-		for( int i = 0; i < contours.size( ); i++ ) {
-			MatOfPoint point = contours.get( i );
-			Rect boundingRect = Imgproc.boundingRect( point );
-			if(boundingRect.height< boundingRect.width*SQAURE_THRESHOLD && boundingRect.width< boundingRect.height*SQAURE_THRESHOLD) {
-				if(boundingRect.height<SIZE_THRESHOLD_HIGH && boundingRect.height>SIZE_THRESHOLD_LOW ) {
-					if(boundingRect.width<SIZE_THRESHOLD_HIGH && boundingRect.width>SIZE_THRESHOLD_LOW ) {
-						holeRects.add(boundingRect);
-						if(boundingRect.y>highestY) {
-							highestY= boundingRect.y;
-						}
-						if(boundingRect.y<lowestY) {
-							lowestY= boundingRect.y;
-						}
-					}
+        Imgproc.morphologyEx(pixels, pixels, Imgproc.MORPH_ERODE, kernel, new Point(0, 0), 3);
+        Imgproc.morphologyEx(pixels, pixels, Imgproc.MORPH_DILATE, kernel, new Point(0, 0), 3);
 
-				}
+        List<MatOfPoint> contours = new ArrayList<>();
+        Mat hierarchy = new Mat();
+        Imgproc.findContours(pixels, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
-			}
+        holeRects.clear();
+        aprilRects.clear();
+        noiseRects.clear();
+        allRects.clear();
+        int highestY = 0;
+        int lowestY = 1000000;
+        for (int i = 0; i < contours.size(); i++) {
+            Rect boundingRect = Imgproc.boundingRect(contours.get(i));
+            allRects.add(boundingRect);
+            if (boundingRect.height < boundingRect.width * PIXEL_SQUARE_THRESHOLD && boundingRect.width < boundingRect.height * PIXEL_SQUARE_THRESHOLD && boundingRect.width < PIXEL_SIZE_THRESHOLD_HIGH && boundingRect.width > PIXEL_SIZE_THRESHOLD_LOW && boundingRect.height < PIXEL_SIZE_THRESHOLD_HIGH && boundingRect.height > PIXEL_SIZE_THRESHOLD_LOW) {
+                holeRects.add(boundingRect);
+                if (boundingRect.y > highestY) {
+                    highestY = boundingRect.y;
+                }
+                if (boundingRect.y < lowestY) {
+                    lowestY = boundingRect.y;
+                }
 
-		}
-		ArrayList<AprilTagDetection> detections = aprilTag.getDetections();
-		int startingX = 0;
-		int scaleX = 0;
-		if(detections.size()>1) {
-			scaleX = (int) (detections.get(1).center.x-detections.get(0).center.x);
-		}
-		for( int i=0; i>detections.size(); i++) {
-			if(detections.get(i).id==4 || detections.get(i).id==1) {
-				startingX= (int) detections.get(i).center.x-scaleX;
-			}
+            } else if (boundingRect.height > boundingRect.width * APRIL_SQUARE_THRESHOLD_LOW && boundingRect.height < boundingRect.width * APRIL_SQUARE_THRESHOLD_HIGH && boundingRect.width < APRIL_SIZE_THRESHOLD_HIGH && boundingRect.width > APRIL_SIZE_THRESHOLD_LOW && boundingRect.y > APRIL_Y_THRESHOLD_LOW && boundingRect.x < APRIL_Y_THRESHOLD_HIGH) {
+                aprilRects.add(boundingRect);
+            } else {
+                noiseRects.add(boundingRect);
+            }
+        }
+        removeBadPixels(allRects);
+        return frame;
+    }
 
-		}
-		for(int i=3; i>0; i--) {
-			aprilRects.add(pointToPointRect(startingX,startingX+scaleX*2,lowestY,highestY));
-			startingX+=scaleX;
-		}
-
-		return frame;
-	}
-
-	@Override
-	public void onDrawFrame( Canvas canvas, int onscreenWidth, int onscreenHeight,
-							 float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext ) {
-		Paint paint = new Paint( );
-		paint.setColor( Color.GREEN );
-		paint.setStyle( Paint.Style.STROKE );
-		paint.setStrokeWidth( scaleCanvasDensity * 4 );
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight,
+                            float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
+        Paint paint = new Paint();
+        paint.setColor(Color.GREEN);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(scaleCanvasDensity * 4);
+        displayRects(holeRects, Color.GREEN, paint, canvas, scaleBmpPxToCanvasPx);
+        displayRects(noiseRects, Color.RED, paint, canvas, scaleBmpPxToCanvasPx);
+        displayRects(aprilRects, Color.BLUE, paint, canvas, scaleBmpPxToCanvasPx);
 
 
-		for( int i = 0; i < holeRects.size( ); i++ ) {
-			if (holeRects.get(i) != null) {
-				android.graphics.Rect rect = makeGraphicsRect(holeRects.get(i), scaleBmpPxToCanvasPx);
-				int height = rect.height();
-				int width = rect.width();
-				int area = height * width;
-				canvas.drawRect(rect, paint);
-			}
-		}
-		Paint paint2 = new Paint( );
-		paint2.setColor( Color.BLUE );
-		paint2.setStyle( Paint.Style.STROKE );
-		paint2.setStrokeWidth( scaleCanvasDensity * 4 );
-		for( int i = 0; i < aprilRects.size( ); i++ ) {
-			if (aprilRects.get(i) != null) {
-				android.graphics.Rect rect = makeGraphicsRect(aprilRects.get(i), scaleBmpPxToCanvasPx);
-				int height = rect.height();
-				int width = rect.width();
-				int area = height * width;
-				canvas.drawRect(rect, paint2);
-			}
-		}
+    }
 
-	}
+    private android.graphics.Rect makeGraphicsRect(Rect rect, float scaleBmpPxToCanvasPx) {
+        int left = Math.round(rect.x * scaleBmpPxToCanvasPx);
+        int top = Math.round(rect.y * scaleBmpPxToCanvasPx);
+        int right = left + Math.round(rect.width * scaleBmpPxToCanvasPx);
+        int bottom = top + Math.round(rect.height * scaleBmpPxToCanvasPx);
+        return new android.graphics.Rect(left, top, right, bottom);
+    }
 
-	private android.graphics.Rect makeGraphicsRect( Rect rect, float scaleBmpPxToCanvasPx ) {
-		int left = Math.round( rect.x * scaleBmpPxToCanvasPx );
-		int top = Math.round( rect.y * scaleBmpPxToCanvasPx );
-		int right = left + Math.round( rect.width * scaleBmpPxToCanvasPx );
-		int bottom = top + Math.round( rect.height * scaleBmpPxToCanvasPx );
+    private Rect pointToPointRect(int x1, int x2, int y1, int y2) {
+        return new Rect(x1, y1, x2 - x1, y2 - y1);
+    }
 
-		return new android.graphics.Rect( left, top, right, bottom );
-	}
-	private Rect pointToPointRect(int x1, int x2,int y1,int y2) {
-		return new Rect(x1,y1,x2-x1,y2-y1);
-	}
+    public void removeSmallerPixel(Rect r1, Rect r2) {
+
+        Rect removeRect = r1;
+        if (aprilRects.contains(r1)) {
+            removeRect = r2;
+        } else if (aprilRects.contains(r2)) {
+        } else if (noiseRects.contains(r1)) {
+        } else if (noiseRects.contains(r2)) {
+            removeRect = r2;
+        } else if (r1.area() > r2.area()) {
+            removeRect = r2;
+        }
+        holeRects.remove(removeRect);
 
 
+    }
+
+    public boolean isNear(Rect r1, Rect r2) {
+        r1 = new Rect(r1.x, r1.y, r1.width + NEAR_SIZE_TORLANCE, r1.height + NEAR_SIZE_TORLANCE);
+        r2 = new Rect(r2.x, r2.y, r2.width + NEAR_SIZE_TORLANCE, r2.height + NEAR_SIZE_TORLANCE);
+
+        return (r1.x <= r2.x) && (r2.x < r1.x + r1.width) && (r2.y <= r1.y) && (r1.y < r2.y + r2.width) || (r2.x <= r1.x) && (r1.x < r2.x + r2.width) && (r2.y <= r1.y) && (r1.y < r2.y + r2.width);
+    }
+
+    public void createGrid() {
+        gridColumns6[0] = holeRects.get(0).y + holeRects.get(0).height;
+        for (int i = 1; i > gridColumns6.length; i++) {
+
+        }
+
+    }
+
+    public boolean outOfGrid(Rect rect) {
+        return inColum(rect.y).isEmpty() && inRow(rect).isEmpty();
+    }
+
+    public ArrayList<Rect> inRow(Rect r1) {
+        ArrayList<Rect> rects = new ArrayList<>();
+        for (Rect rect : holeRects) {
+            if ((rect.x <= r1.x) && (r1.x < rect.x + rect.width) && rect.equals(r1)) {
+                rects.add(rect);
+            }
+        }
+        return rects;
+    }
+
+    public ArrayList<Rect> inColum(int y) {
+        ArrayList<Rect> rects = new ArrayList<>();
+        for (Rect rect : holeRects) {
+            if ((rect.y <= y) && (y < rect.y + rect.height)) {
+                rects.add(rect);
+            }
+        }
+        return rects;
+    }
+
+    public void removeBadPixels(ArrayList<Rect> rects) {
+        for (int i = 0; i < rects.size(); i++) {
+            for (int j = 0; j < rects.size(); j++) {
+                Rect r1 = rects.get(j);
+                Rect r2 = rects.get(i);
+                if (isNear(r1, r2) && !r2.equals(r1)) {
+                    if (holeRects.contains(r1) && outOfGrid(r1)) {
+                        holeRects.remove(r1);
+                    } else {
+                        removeSmallerPixel(r1, r2);
+                    }
+
+                }
+
+            }
+        }
+
+    }
+
+    public void displayRects(ArrayList<Rect> rects, int color, Paint paint, Canvas canvas, float scaleBmpPxToCanvasPx) {
+        paint.setColor(color);
+        for (int i = 0; i < rects.size(); i++) {
+            if (rects.get(i) != null) {
+                canvas.drawRect(makeGraphicsRect(rects.get(i), scaleBmpPxToCanvasPx), paint);
+            }
+        }
+
+    }
+
+    public ArrayList<Rect> getHoleRects() {
+        return holeRects;
+    }
 }
