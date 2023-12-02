@@ -21,7 +21,6 @@ public class PropProcessor implements VisionProcessor {
 		RED, BLUE
 	}
 	PropColor propColor = PropColor.RED;
-			;
 	PropPosition propPosition;
 
 	public Rect leftPos = new Rect( 5, 100, 40, 83 );
@@ -68,28 +67,8 @@ public class PropProcessor implements VisionProcessor {
 		right = frame.submat( rightPos );
 
 		double leftValue = Core.sumElems( left ).val[0] / leftPos.area( );
-//		if( leftValue > percentColorThreshold ) {
-//			left.release( );
-//			middle.release( );
-//			right.release( );
-//			return PropPosition.LEFT;
-//		}
-
 		double middleValue = Core.sumElems( middle ).val[0] / midPos.area( );
-//		if( middleValue > percentColorThreshold ) {
-//			left.release( );
-//			middle.release( );
-//			right.release( );
-//			return PropPosition.MIDDLE;
-//		}
-
 		double rightValue = Core.sumElems( right ).val[0] / rightPos.area( );
-//		if( rightValue > percentColorThreshold ) {
-//			left.release( );
-//			middle.release( );
-//			right.release( );
-//			return PropPosition.RIGHT;
-//		}
 
 		double maxValue = Math.max( leftValue, Math.max( middleValue, rightValue ) );
 

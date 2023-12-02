@@ -7,36 +7,37 @@ public class Deposit {
     Servo angler, release;
 
     public enum ReleaseStates {
-        RETRACTED(0.241, 0), EXTENDED(0.4, 1), DROP_ONE(0.296, 2);
+        RETRACTED(0.241),
+        EXTENDED(0.4),
+        DROP_ONE(0.296);
         private final double position;
-        private final int index;
-        ReleaseStates (double pos, int ind) {
+        ReleaseStates (double pos) {
             position = pos;
-            index = ind;
         }
         double getPosition() {
             return position;
-        }
-        int getIndex() {
-            return index;
         }
     }
 
     public enum AngleStates {
-        GRAB(0.265 ), DROP_FLOOR(0.363 ), DROP_FLOOR_AUTO( 0.42 ), DROP_BACKDROP( 0.583 );
+        GRAB( 0.265 ),
+        DROP_FLOOR( 0.363 ),
+        DROP_FLOOR_AUTO( 0.42 ),
+        DROP_BACKDROP( 0.583 ),
+        FIX_BUCKET(0.22);
         private final double position;
-        AngleStates (double pos) {
+
+        AngleStates( double pos ) {
             position = pos;
         }
-        double getPosition() {
+
+        double getPosition( ) {
             return position;
         }
     }
 
-    ReleaseStates[] releaseStates;
-    int releaseStateIndex;
-
     AngleStates angleState = AngleStates.GRAB;
+    ReleaseStates releaseState = ReleaseStates.RETRACTED;
 
     public Deposit( HardwareMap hw ) {
         this(hw, "release", "pivot");
@@ -44,8 +45,6 @@ public class Deposit {
     public Deposit( HardwareMap hw, String releaseName, String anglerName) {
         release = hw.get(Servo.class, releaseName);
         angler = hw.get(Servo.class, anglerName);
-        releaseStates = ReleaseStates.values();
-        releaseStateIndex = 0;
     }
 
     /**
@@ -53,30 +52,26 @@ public class Deposit {
      * Repeats. Not able to go from 2 to none.
      */
     public void releaseToggle() {
-        releaseStateIndex++;
-        releaseStateIndex %= 3;
-        release.setPosition( releaseStates[releaseStateIndex].getPosition());
-    }
-
-    public void angleToggle() {
-        switch( angleState ) {
-            case GRAB:
-            case DROP_FLOOR:
-                angleState = AngleStates.DROP_BACKDROP;
+        switch( releaseState ) {
+            case RETRACTED:
+                setReleasePosition( ReleaseStates.EXTENDED );
                 break;
-            case DROP_BACKDROP:
-                angleState = AngleStates.GRAB;
+            case EXTENDED:
+                setReleasePosition( ReleaseStates.DROP_ONE );
+                break;
+            case DROP_ONE:
+                setReleasePosition( ReleaseStates.RETRACTED );
                 break;
         }
-        setAnglePosition( angleState );
     }
 
     public void setReleasePosition (ReleaseStates state) {
-        release.setPosition(state.getPosition());
-        releaseStateIndex = state.getIndex();
+        releaseState = state;
+        release.setPosition(releaseState.getPosition());
     }
     public void setAnglePosition (AngleStates state) {
-        angler.setPosition(state.getPosition());
+        angleState = state;
+        angler.setPosition(angleState.getPosition());
     }
 
     public double getReleasePosition() {

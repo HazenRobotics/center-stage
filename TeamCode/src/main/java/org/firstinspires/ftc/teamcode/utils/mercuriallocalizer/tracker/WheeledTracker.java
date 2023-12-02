@@ -133,19 +133,6 @@ public abstract class WheeledTracker implements Tracker {
 			insistIndex++;
 			insistIndex %= insistFrequency;
 		}
-
-		TelemetryPacket packet = new TelemetryPacket();
-		field = packet.fieldOverlay();
-		int robotRadius = 8;
-		double fx = pose2D.getX();
-		double fy = pose2D.getY();
-		field.strokeCircle(fx, fy, robotRadius);
-		double heading = pose2D.getTheta().getRadians();
-		double arrowX = new Rotation2d(heading).getCos() * robotRadius, arrowY = new Rotation2d(heading).getSin() * robotRadius;
-		double x1 = fx, y1 = fy;
-		double x2 = fx + arrowX, y2 = fy+ arrowY;
-		field.strokeLine(x1, y1, x2, y2);
-		FtcDashboard.getInstance().sendTelemetryPacket(packet);
 	}
 
 	/**

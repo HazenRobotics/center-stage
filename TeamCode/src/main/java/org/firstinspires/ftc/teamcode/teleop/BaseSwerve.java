@@ -72,7 +72,7 @@ public class BaseSwerve extends LinearOpMode {
 				rotate += headingController.calculate( error, 0 );
 			}
 
-			robot.drive.fieldCentricDrive( drive, strafe, rotate, heading - (Math.PI / 2) );
+			robot.drive.fieldCentricDrive( drive, strafe, rotate, heading - (Math.PI / 2));
 
 			robot.tracker.updatePose();
 			displayTelemetry();
@@ -87,8 +87,8 @@ public class BaseSwerve extends LinearOpMode {
 		prevTime = loop;
 
 		telemetry.addData( "heading lock", headingLock );
-		telemetry.addData("where the localizer thinks it is", poseEstimate);
-		telemetry.addData( "where i want the localizer to think it is", poseEstimate.add( 0, 0, new AngleRadians(Math.toRadians( 90 )) ) );
+		telemetry.addData("where the localizer thinks it is", poseEstimate.subtract( 0, 0, new AngleRadians(Math.toRadians( 90 )) ));
+		telemetry.addData( "where i want the localizer to think it is", poseEstimate);
 
 //		x = poseEstimate.getX();
 //		y = poseEstimate.getY();

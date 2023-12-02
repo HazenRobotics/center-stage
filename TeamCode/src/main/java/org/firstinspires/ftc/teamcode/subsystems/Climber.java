@@ -11,12 +11,13 @@ public class Climber {
 
 	DcMotorEx motor;
 	public Climber (HardwareMap hw) {
-		this(hw, "climb", false);
+		this(hw, "climb", true);
 	}
 
 	public Climber ( HardwareMap hw, String motorName, boolean motorReversed ) {
 		motor = hw.get( DcMotorEx.class, motorName );
 		motor.setMode( DcMotor.RunMode.STOP_AND_RESET_ENCODER );
+		motor.setMode( DcMotor.RunMode.RUN_WITHOUT_ENCODER );
 
 		if (motorReversed) motor.setDirection( DcMotorSimple.Direction.REVERSE );
 
@@ -38,5 +39,9 @@ public class Climber {
 
 	public double getPower() {
 		return motor.getPower();
+	}
+
+	public DcMotorSimple.Direction getDirection() {
+		return motor.getDirection();
 	}
 }

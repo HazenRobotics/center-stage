@@ -64,6 +64,11 @@ public class Intake{
     public void setAdjustIncrement(double increment) {
         adjustIncrement = increment;
     }
+
+    public void setDeployPos( DeploymentState state ) {
+        servoPos = state.getPosition();
+        deploymentServo.setPosition( servoPos );
+    }
     public void setDeployPos( double pos ) {
         servoPos = Range.clip( pos, DeploymentState.FULLY_DEPLOYED.getPosition(), DeploymentState.FOLDED.getPosition());
         deploymentServo.setPosition( servoPos );
