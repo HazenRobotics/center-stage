@@ -6,29 +6,27 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.vision.processors.PropProcessor;
+import org.firstinspires.ftc.teamcode.vision.processors.RedPropProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 @Autonomous
 public class PropDetectionOpMode extends LinearOpMode {
 	VisionPortal visionPortal;
-	PropProcessor propProcessor;
+	RedPropProcessor redPropProcessor;
 	@Override
 	public void runOpMode( ) throws InterruptedException {
-		propProcessor = new PropProcessor();
-
-		propProcessor.setPropColor( PropProcessor.PropColor.BLUE );
+		redPropProcessor = new RedPropProcessor();
 
 		visionPortal = new VisionPortal.Builder()
 				.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-				.addProcessor(propProcessor)
+				.addProcessor( redPropProcessor )
 				.setCameraResolution(new Size(640, 360))
 				.setStreamFormat(VisionPortal.StreamFormat.YUY2)
 				.setAutoStopLiveView(true)
 				.build();
 
 		while( opModeInInit() && !opModeIsActive() ) {
-			telemetry.addData( "position", propProcessor.getPiecePosition() );
+			telemetry.addData( "position", redPropProcessor.getPiecePosition() );
 			telemetry.update();
 		}
 	}

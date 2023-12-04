@@ -27,11 +27,11 @@ public class PositionPIDTuning extends LinearOpMode {
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
-		robot.setupTracker( new Pose2D( 0, 0, new AngleDegrees( 0 ).getTheta()) );
-		telemetry.setMsTransmissionInterval( 25 );
+		robot.setupAutoTracker( new Pose2D( 0, 0, new AngleDegrees( 0 ).getTheta()) );
+//		telemetry.setMsTransmissionInterval( 25 );
 
 		dashboard = FtcDashboard.getInstance();
-		dashboard.setTelemetryTransmissionInterval(25);
+//		dashboard.setTelemetryTransmissionInterval(25);
 
 		telemetry = new MultipleTelemetry( telemetry, FtcDashboard.getInstance( ).getTelemetry( ) );
 
@@ -52,9 +52,9 @@ public class PositionPIDTuning extends LinearOpMode {
 
 			switch(mode) {
 				case PID_TUNING:
-					robot.XController.setPID( Fp, Fi, Fd );
-					robot.YController.setPID( Fp, Fi, Fd );
-					robot.headingController.setPID( Hp, Hi, Hd );
+//					robot.XController.setPID( Fp, Fi, Fd );
+//					robot.YController.setPID( Fp, Fi, Fd );
+//					robot.headingController.setPID( Hp, Hi, Hd );
 					robot.goToPoint( x, y, Math.toRadians( heading ) );
 					break;
 				case DRIVER_CONTROLLED:

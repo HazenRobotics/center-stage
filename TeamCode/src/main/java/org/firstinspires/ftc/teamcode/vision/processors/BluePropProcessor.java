@@ -12,33 +12,19 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-public class PropProcessor implements VisionProcessor {
+public class BluePropProcessor implements VisionProcessor {
 
 	public enum PropPosition {
 		LEFT, RIGHT, MIDDLE, NOT_FOUND
 	}
-	public enum PropColor {
-		RED, BLUE
-	}
-	PropColor propColor = PropColor.RED;
 	PropPosition propPosition;
 
-	public Rect leftPos = new Rect( 5, 100, 40, 83 );
-	public Rect midPos = new Rect( 325, 120, 42, 63 );
-	public Rect rightPos = new Rect( 600, 100, 32, 80 );
-
-	private Scalar redLowerBound = new Scalar( 0, 100, 40 );
-	private Scalar redUpperBound = new Scalar( 5, 255, 255 );
-	private Scalar redLowerBound2 = new Scalar( 175, 100, 40 );
-	private Scalar redUpperBound2 = new Scalar( 180, 255, 255 );
+	public Rect midPos = new Rect( 240, 175, 100, 100 );
+	public Rect rightPos = new Rect( 530, 155, 105, 125 );
 	private Scalar blueLowerBound = new Scalar( 100, 60, 40 );
 	private Scalar blueUpperBound = new Scalar( 130, 255, 255 );
-
-	Mat matRed = new Mat( );
-	Mat matRed2 = new Mat( );
 	Mat matBlue = new Mat( );
-
-	Mat left;
+	Mat temp = new Mat();
 	Mat middle;
 	Mat right;
 
@@ -48,41 +34,30 @@ public class PropProcessor implements VisionProcessor {
 
 	@Override
 	public Object processFrame( Mat frame, long captureTimeNanos ) {
-		Imgproc.cvtColor( frame, frame, Imgproc.COLOR_RGB2HSV );
+		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2HSV );
 
-		if (propColor == PropColor.BLUE) {
-			Core.inRange( frame, blueLowerBound, blueUpperBound, matBlue );
-			matBlue.copyTo(frame);
-		} else if( propColor == PropColor.RED ) {
-			Core.inRange( frame, redLowerBound, redUpperBound, matRed );
-			Core.inRange( frame, redLowerBound2, redUpperBound2, matRed2 );
-			Core.bitwise_or( matRed, matRed2, matRed );
-			matRed.copyTo(frame);
-		}
+		Core.inRange( temp, blueLowerBound, blueUpperBound, matBlue );
+		matBlue.copyTo(temp);
 
-		final double percentColorThreshold = 0.02 * 255; //Percent value on left, 255 for max amount of color
+		final double percentColorThreshold = 0.1 * 255; //Percent value on left, 255 for max amount of color
 
-		left = frame.submat( leftPos );
-		middle = frame.submat( midPos );
-		right = frame.submat( rightPos );
+		right = temp.submat( rightPos );
+		middle = temp.submat( midPos );
 
-		double leftValue = Core.sumElems( left ).val[0] / leftPos.area( );
-		double middleValue = Core.sumElems( middle ).val[0] / midPos.area( );
 		double rightValue = Core.sumElems( right ).val[0] / rightPos.area( );
+		double middleValue = Core.sumElems( middle ).val[0] / midPos.area( );
 
-		double maxValue = Math.max( leftValue, Math.max( middleValue, rightValue ) );
+		double maxValue = Math.max( rightValue, middleValue );
 
-		left.release( );
-		middle.release( );
 		right.release( );
+		middle.release( );
 
 		if (maxValue > percentColorThreshold) {
-			if( maxValue == leftValue ) return PropPosition.LEFT;
-			if( maxValue == middleValue ) return PropPosition.MIDDLE;
 			if( maxValue == rightValue ) return PropPosition.RIGHT;
+			if( maxValue == middleValue ) return PropPosition.MIDDLE;
 		}
 
-		return PropPosition.NOT_FOUND;
+		return PropPosition.LEFT;
 	}
 
 	@Override
@@ -98,31 +73,22 @@ public class PropProcessor implements VisionProcessor {
 		nonSelectedPaint.setStyle( Paint.Style.STROKE );
 		nonSelectedPaint.setStrokeWidth( scaleCanvasDensity * 4 );
 
-		android.graphics.Rect drawRectangleLeft = makeGraphicsRect( leftPos, scaleBmpPxToCanvasPx );
-		android.graphics.Rect drawRectangleMiddle = makeGraphicsRect( midPos, scaleBmpPxToCanvasPx );
 		android.graphics.Rect drawRectangleRight = makeGraphicsRect( rightPos, scaleBmpPxToCanvasPx );
+		android.graphics.Rect drawRectangleMiddle = makeGraphicsRect( midPos, scaleBmpPxToCanvasPx );
 
 		propPosition = (PropPosition) userContext;
 		switch( propPosition ) {
 			case LEFT:
-				canvas.drawRect( drawRectangleLeft, selectedPaint );
-				canvas.drawRect( drawRectangleMiddle, nonSelectedPaint );
 				canvas.drawRect( drawRectangleRight, nonSelectedPaint );
+				canvas.drawRect( drawRectangleMiddle, nonSelectedPaint );
 				break;
 			case MIDDLE:
-				canvas.drawRect( drawRectangleLeft, nonSelectedPaint );
-				canvas.drawRect( drawRectangleMiddle, selectedPaint );
 				canvas.drawRect( drawRectangleRight, nonSelectedPaint );
+				canvas.drawRect( drawRectangleMiddle, selectedPaint );
 				break;
 			case RIGHT:
-				canvas.drawRect( drawRectangleLeft, nonSelectedPaint );
-				canvas.drawRect( drawRectangleMiddle, nonSelectedPaint );
 				canvas.drawRect( drawRectangleRight, selectedPaint );
-				break;
-			case NOT_FOUND:
-				canvas.drawRect( drawRectangleLeft, nonSelectedPaint );
 				canvas.drawRect( drawRectangleMiddle, nonSelectedPaint );
-				canvas.drawRect( drawRectangleRight, nonSelectedPaint );
 				break;
 		}
 	}
@@ -138,9 +104,5 @@ public class PropProcessor implements VisionProcessor {
 
 	public PropPosition getPiecePosition( ) {
 		return propPosition;
-	}
-
-	public void setPropColor( PropColor color ) {
-		propColor = color;
 	}
 }

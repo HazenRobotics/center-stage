@@ -96,7 +96,7 @@ public class Lift {
 	}
 
 	public void updatePID( ) {
-		motor.setPower( controller.calculate( motor.getCurrentPosition(), target ) );
+		motor.setPower( controller.calculate( encoder.getCurrentPosition(), target ) );
 	}
 
 	public void setPIDValues(double p, double i, double d) {

@@ -47,8 +47,6 @@ import java.util.List;
 public class KhepriBot {
 	HardwareMap hw;
 	Telemetry telemetry;
-	TelemetryPacket packet;
-	Canvas field;
 
 	public CoaxialSwerveDrive drive;
 	public ThreeWheelTracker tracker;
@@ -63,6 +61,7 @@ public class KhepriBot {
 	public PIDController headingController;
 	public List<LynxModule> hubs;
 	Pose2D poseEstimate;
+	public static double normalizedPowerMultiplier;
 
 	public enum DriveSpeeds {
 		DRIVE(0.7, 1), STRAFE(0.7, 1), ROTATE(0.5, 1);
@@ -83,9 +82,6 @@ public class KhepriBot {
 	public KhepriBot ( HardwareMap hw, Telemetry t) {
 		this.hw = hw;
 		telemetry = new MultipleTelemetry( t, FtcDashboard.getInstance( ).getTelemetry( ) );
-
-		packet = new TelemetryPacket();
-		field = packet.fieldOverlay();
 
 		hubs = hw.getAll( LynxModule.class );
 		for( LynxModule hub : hubs ) hub.setBulkCachingMode( LynxModule.BulkCachingMode.MANUAL );
@@ -117,7 +113,7 @@ public class KhepriBot {
 		));
 	}
 
-	public void setupTracker( Pose2D startPose ) {
+	public void setupAutoTracker( Pose2D startPose ) {
 		tracker = new InsistentThreeWheelTracker(
 				startPose.subtract( 0, 0, new AngleDegrees( 90 ) ),
 				new WheeledTrackerConstants.ThreeWheeledTrackerConstants(
@@ -135,7 +131,25 @@ public class KhepriBot {
 				20
 
 		);
+		updateTracker();
+	}
 
+	public void setupTeleOpTracker( Pose2D startPose ) {
+		tracker = new ThreeWheelTracker(
+				startPose.subtract( 0, 0, new AngleDegrees( 90 ) ),
+				new WheeledTrackerConstants.ThreeWheeledTrackerConstants(
+						new Vector2D( 1.2745623, -0.2857706 ),
+						0.996350989966,
+						0.998798735882,
+						new EncoderTicksConverter(1769.9, Units.MILLIMETER),
+						new EncoderTicksConverter(1768.22592593, Units.MILLIMETER),
+						new EncoderTicksConverter( 1742.38148148, Units.MILLIMETER ),
+						11.144846156),
+				new Encoder( hw.get( DcMotorEx.class, "FLM/paraLEnc" ) ).setDirection( Encoder.Direction.FORWARD ),
+				new Encoder( hw.get( DcMotorEx.class, "BRM/paraREnc" ) ).setDirection( Encoder.Direction.FORWARD ),
+				new Encoder( hw.get( DcMotorEx.class, "BLM/perpEnc" ) ).setDirection( Encoder.Direction.FORWARD )
+
+		);
 		updateTracker();
 	}
 
@@ -147,6 +161,9 @@ public class KhepriBot {
 		tracker.updatePose();
 		poseEstimate = tracker.getPose2D().add( 0, 0, new AngleDegrees( 90 ) );
 
+		TelemetryPacket packet = new TelemetryPacket();
+		Canvas field = packet.fieldOverlay();
+
 		int robotRadius = 8;
 		double fy = poseEstimate.getY();
 		double fx = poseEstimate.getX();
@@ -156,20 +173,22 @@ public class KhepriBot {
 		double x1 = fx, y1 = fy;
 		double x2 = fx + arrowX, y2 = fy+ arrowY;
 		field.strokeLine(x1, y1, x2, y2);
+		FtcDashboard.getInstance().sendTelemetryPacket(packet);
 	}
 
 	public void goToPoint( double x, double y, double heading, double travelMultiplier, double rotationMultiplier ) {
-		double headingError = findShortestAngularTravel( heading, poseEstimate.getTheta().getRadians() );
-		double normalizedPowerMultiplier = 12.0 / hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS );
+		telemetry.addData( "target", "X: " + x + " Y: " + y + " heading: " + heading );
+		double headingError = findShortestAngularTravel( Math.toRadians( heading ), poseEstimate.getTheta().getRadians() );
+		pollNormalizedPowerMultiplier();
+		telemetry.addData( "heading error", headingError );
 
 		drive.fieldCentricDrive(
 				YController.calculate(poseEstimate.getY(), y) * normalizedPowerMultiplier * (YController.getPositionError() > 2 ? travelMultiplier : 1) ,
 				XController.calculate(poseEstimate.getX(), x) * normalizedPowerMultiplier * (XController.getPositionError() > 2 ? travelMultiplier : 1),
-				headingController.calculate( headingError, 0 ) * normalizedPowerMultiplier * (headingError > 0.1 ? rotationMultiplier : 1),
+				headingController.calculate( headingError, 0 ) * normalizedPowerMultiplier,
 				poseEstimate.getTheta().getRadians() - (Math.PI / 2)
 		);
 
-		field.strokeCircle(x, y, 2);
 	}
 
 	public void goToPoint( double x, double y, double heading ) {
@@ -179,11 +198,7 @@ public class KhepriBot {
 	public void update() {
 		clearBulkCache( );
 		updateTracker( );
-		FtcDashboard.getInstance().sendTelemetryPacket(packet);
 		telemetry.update();
-
-		packet = new TelemetryPacket();
-		field = packet.fieldOverlay();
 	}
 
 	public void clearBulkCache( ) {
@@ -196,5 +211,9 @@ public class KhepriBot {
 
 	public void addTelemetryData( String label, Object data ) {
 		telemetry.addData( label, data );
+	}
+
+	public void pollNormalizedPowerMultiplier() {
+		normalizedPowerMultiplier = 12.0 / hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS );
 	}
 }

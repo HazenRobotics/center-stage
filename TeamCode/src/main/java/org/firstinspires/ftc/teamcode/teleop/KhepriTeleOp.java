@@ -32,7 +32,7 @@ public class KhepriTeleOp extends LinearOpMode {
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
-		robot.setupTracker( new Pose2D( 0, 0, new AngleDegrees( 0 ).getTheta() ) );
+		robot.setupTeleOpTracker( new Pose2D( 0, 0, new AngleDegrees( 0 ).getTheta() ) );
 		controller1 = new GamepadEvents( gamepad1 );
 		controller2 = new GamepadEvents( gamepad2 );
 		telemetry.setMsTransmissionInterval( 20 );
@@ -128,7 +128,7 @@ public class KhepriTeleOp extends LinearOpMode {
 	}
 
 	public void launcherControl() {
-		if( gamepad2.options ) {
+		if( gamepad2.a ) {
 			endGame = true;
 			robot.launcher.release( );
 		}

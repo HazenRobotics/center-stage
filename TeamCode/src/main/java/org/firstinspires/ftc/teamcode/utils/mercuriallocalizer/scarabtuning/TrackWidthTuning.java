@@ -18,7 +18,7 @@ public class TrackWidthTuning extends LinearOpMode {
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
-		robot.setupTracker( new Pose2D(0, 0 , Math.toRadians( 90 )) );
+		robot.setupAutoTracker( new Pose2D(0, 0 , Math.toRadians( 90 )) );
 
 		currentHeading = robot.tracker.getPose2D().getTheta().toAngleDegrees();
 		lastHeading = currentHeading;

@@ -4,10 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.vision.processors.PixelProcessor;
-import org.firstinspires.ftc.teamcode.vision.processors.PropProcessor;
+import org.firstinspires.ftc.teamcode.vision.processors.RedPropProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.opencv.core.Point;
 
 @Autonomous
 public class TestVisionOpMode extends LinearOpMode {
@@ -15,7 +13,7 @@ public class TestVisionOpMode extends LinearOpMode {
     /**
      * The variable to store our instance of the AprilTag processor.
      */
-    private PropProcessor propProcessor;
+    private RedPropProcessor redPropProcessor;
 
     /**
      * The variable to store our instance of the vision portal.
@@ -24,10 +22,10 @@ public class TestVisionOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        propProcessor = new PropProcessor();
+        redPropProcessor = new RedPropProcessor();
 
         visionPortal = VisionPortal.easyCreateWithDefaults(
-                    hardwareMap.get(WebcamName.class, "Webcam 1"), propProcessor);
+                    hardwareMap.get(WebcamName.class, "Webcam 1"), redPropProcessor );
 
         telemetry.addData(">", "Touch Play to start OpMode");
         telemetry.update();
@@ -36,7 +34,7 @@ public class TestVisionOpMode extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            PropProcessor.PropPosition position = propProcessor.getPiecePosition( );
+            RedPropProcessor.PropPosition position = redPropProcessor.getPiecePosition( );
             telemetry.update();
         }
 

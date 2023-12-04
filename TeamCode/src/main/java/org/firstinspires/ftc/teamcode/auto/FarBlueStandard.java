@@ -12,14 +12,15 @@ import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleDegrees;
+import org.firstinspires.ftc.teamcode.vision.processors.BluePropProcessor;
 import org.firstinspires.ftc.teamcode.vision.processors.RedPropProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 @Autonomous
-public class FarRedStandard extends LinearOpMode {
+public class FarBlueStandard extends LinearOpMode {
 
 	KhepriBot robot;
-	RedPropProcessor redPropProcessor;
+	BluePropProcessor bluePropProcessor;
 	VisionPortal visionPortal;
 	ElapsedTime timer;
 
@@ -44,9 +45,7 @@ public class FarRedStandard extends LinearOpMode {
 
 	AutoStates autoState = AutoStates.INIT_SCANNING;
 	SpikeMarkScoringStates spikeState = SpikeMarkScoringStates.DRIVE_TO_SCORING_POS;
-	RedPropProcessor.PropPosition position;
-
-	Pose2D targetPoint = new Pose2D();
+	BluePropProcessor.PropPosition position;
 
 	@Override
 	public void runOpMode( ) throws InterruptedException {
@@ -60,20 +59,20 @@ public class FarRedStandard extends LinearOpMode {
 		//drop pixel, go under drive to score pixel on back, park on left side
 
 		robot = new KhepriBot( hardwareMap, telemetry );
-		robot.setupAutoTracker( new Pose2D( -38.5, -63.5, new AngleDegrees( 90 ).getTheta( ) ) );
-		robot.deposit.setReleasePosition( Deposit.ReleaseStates.DROP_ONE );
-		redPropProcessor = new RedPropProcessor();
+		robot.setupAutoTracker( new Pose2D( -38.5, 63.5, new AngleDegrees( 270 ).getTheta( ) ) );
+		robot.deposit.setReleasePosition( Deposit.ReleaseStates.EXTENDED );
+		bluePropProcessor = new BluePropProcessor();
 
 		visionPortal = new VisionPortal.Builder()
 				.setCamera(hardwareMap.get( WebcamName.class, "front"))
-				.addProcessor( redPropProcessor )
+				.addProcessor( bluePropProcessor )
 				.setCameraResolution(new Size(640, 480))
 				.setStreamFormat(VisionPortal.StreamFormat.MJPEG)
 				.setAutoStopLiveView(true)
 				.build();
 
 		while( opModeInInit( ) && !opModeIsActive( ) ) {
-			position = redPropProcessor.getPiecePosition();
+			position = bluePropProcessor.getPiecePosition();
 			robot.addTelemetryData( "position", position );
 			robot.update();
 		}
@@ -81,9 +80,9 @@ public class FarRedStandard extends LinearOpMode {
 		waitForStart( );
 
 		ElapsedTime timer = new ElapsedTime( );
-		boolean isLeft = position == RedPropProcessor.PropPosition.LEFT;
-		boolean isMiddle = position == RedPropProcessor.PropPosition.MIDDLE;
-		boolean isRight = position == RedPropProcessor.PropPosition.RIGHT;
+		boolean isLeft = position == BluePropProcessor.PropPosition.LEFT;
+		boolean isMiddle = position == BluePropProcessor.PropPosition.MIDDLE;
+		boolean isRight = position == BluePropProcessor.PropPosition.RIGHT;
 		visionPortal.stopStreaming();
 
 		while( opModeIsActive( ) ) {
@@ -94,33 +93,36 @@ public class FarRedStandard extends LinearOpMode {
 				case SPIKE_MARK_SCORING:
 					switch( spikeState ) {
 						case DRIVE_TO_SCORING_POS:
-							if (isLeft)
-								robot.goToPoint( -46, -18, 90, 1, 1 );
+							if (isRight)
+								robot.goToPoint( -46, 18, 270, 1, 1 );
 							else if (isMiddle)
-								robot.goToPoint( -36, -14, 90, 1, 1 );
-							else if (isRight)
-								robot.goToPoint( -36, -36, 90, 1, 1 );
-							if( timer.seconds( ) > 3 ) {
+								robot.goToPoint( -36, 14, 270, 1, 1 );
+							else if (isLeft)
+								robot.goToPoint( -36, 36, 270, 1, 1 );
+							if( timer.seconds( ) > 4 ) {
 								timer.reset( );
 								spikeState = SpikeMarkScoringStates.ROTATE_TO_SCORE;
 							}
 							break;
 						case ROTATE_TO_SCORE:
-							if (isLeft || isMiddle)
+							if (isRight || isMiddle)
 								spikeState = SpikeMarkScoringStates.SCORE;
-							else if( isRight )
-								robot.goToPoint( -36, -36, 180, 1, 1 );
-
+							else if( isLeft )
+								robot.goToPoint( -36, 36, 180, 1, 1 );
+//sus
 							if( timer.seconds( ) > 2 ) {
 								timer.reset( );
 								spikeState = SpikeMarkScoringStates.SCORE;
 							}
 							break;
 						case SCORE:
-							if(isRight)
+							if(isLeft)
 								robot.intake.setIntakeMotorPower( -0.5 * KhepriBot.normalizedPowerMultiplier );
-							else
+							else if(isMiddle)
+								robot.intake.setIntakeMotorPower( -0.6 * KhepriBot.normalizedPowerMultiplier );
+							else if( isRight ) {
 								robot.intake.setIntakeMotorPower( -0.75 * KhepriBot.normalizedPowerMultiplier );
+							}
 							if( timer.seconds( ) > 2 ) {
 								robot.intake.setIntakeMotorPower( 0 );
 								robot.intake.setDeployPos( Intake.DeploymentState.FOLDED );
@@ -131,10 +133,10 @@ public class FarRedStandard extends LinearOpMode {
 					}
 					break;
 				case DRIVE_TO_COMMON_POINT:
-					if (isLeft || isMiddle)
-						robot.goToPoint( -40, -12, 90, 1, 1 );
-					else if( isRight )
-						robot.goToPoint( -40, -12, 180, 1, 1 );
+					if (isRight || isMiddle)
+						robot.goToPoint( -40, 12, 270, 1, 1 );
+					else if( isLeft )
+						robot.goToPoint( -40, 12, 180, 1, 1 );
 
 					if( timer.seconds( ) > 3 ) {
 						timer.reset( );
@@ -142,7 +144,7 @@ public class FarRedStandard extends LinearOpMode {
 					}
 					break;
 				case ROTATE_TOWARDS_BACKDROP:
-					robot.goToPoint( -40, -12, 0, 1, 1 );
+					robot.goToPoint( -40, 12, 0, 1, 1 );
 
 					if( timer.seconds( ) > 2 ) {
 						timer.reset( );
@@ -150,36 +152,36 @@ public class FarRedStandard extends LinearOpMode {
 					}
 					break;
 				case DRIVE_NEXT_TO_BACKDROP:
-					robot.goToPoint( 44, -12, 0 );
+					robot.goToPoint( 44, 12, 0 );
 					if( timer.seconds( ) > 5 ) {
 						timer.reset( );
 						robot.lift.setTarget( 175 );
 						robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
 						robot.deposit.setReleasePosition( Deposit.ReleaseStates.HOLD_ONE );
-						autoState = AutoStates.DRIVE_INFRONT_OF_BACKDROP;
+						autoState = AutoStates.DRIVE_TO_BACKDROP;
 					}
 					break;
 				case DRIVE_INFRONT_OF_BACKDROP:
-					if( isRight )
-						robot.goToPoint( 44, -45, 0 );
-					if( isMiddle )
-						robot.goToPoint( 44, -36, 0 );
 					if( isLeft )
-						robot.goToPoint( 44, -28, 0 );
+						robot.goToPoint( 44, 45, 0 );
+					if( isMiddle )
+						robot.goToPoint( 44, 36, 0 );
+					if( isRight )
+						robot.goToPoint( 44, 29, 0 );
 					if( timer.seconds( ) > 2 ) {
 						timer.reset( );
 						autoState = AutoStates.DRIVE_TO_BACKDROP;
 					}
 					break;
 				case DRIVE_TO_BACKDROP:
-					if( isRight )
-						robot.goToPoint( 49, -45, 0 );
-					if( isMiddle )
-						robot.goToPoint( 49, -36, 0 );
 					if( isLeft )
-						robot.goToPoint( 49, -2, 0 );
+						robot.goToPoint( 49, 45, 0 );
+					if( isMiddle )
+						robot.goToPoint( 49, 36, 0 );
+					if( isRight )
+						robot.goToPoint( 49, 29, 0 );
 
-					if( timer.seconds( ) > 3 ) {
+					if( timer.seconds( ) > 5 ) {
 						timer.reset( );
 						autoState = AutoStates.SCORE_ON_BACKDROP;
 						robot.deposit.setReleasePosition( Deposit.ReleaseStates.RETRACTED );
@@ -194,19 +196,19 @@ public class FarRedStandard extends LinearOpMode {
 					}
 					break;
 				case BACK_UP_A_BIT:
-					if( isRight )
-						robot.goToPoint( 46, -44, 0 );
-					if( isMiddle )
-						robot.goToPoint( 46, -36, 0 );
 					if( isLeft )
-						robot.goToPoint( 46, -28, 0 );
+						robot.goToPoint( 46, 45, 0 );
+					if( isMiddle )
+						robot.goToPoint( 46, 36, 0 );
+					if( isRight )
+						robot.goToPoint( 46, 29, 0 );
 					if( timer.seconds( ) > 1.5 ) {
 						timer.reset( );
 						autoState = AutoStates.PARK;
 					}
 					break;
 				case PARK:
-					robot.goToPoint( 46, -12, 0 );
+					robot.goToPoint( 46, 12, 0 );
 					break;
 			}
 			robot.addTelemetryData( "autoState", autoState );

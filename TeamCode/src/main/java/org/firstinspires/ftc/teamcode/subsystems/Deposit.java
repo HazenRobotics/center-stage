@@ -9,7 +9,8 @@ public class Deposit {
     public enum ReleaseStates {
         RETRACTED(0.241),
         EXTENDED(0.4),
-        DROP_ONE(0.296);
+        DROP_ONE(0.296),
+        HOLD_ONE(0.33);
         private final double position;
         ReleaseStates (double pos) {
             position = pos;
