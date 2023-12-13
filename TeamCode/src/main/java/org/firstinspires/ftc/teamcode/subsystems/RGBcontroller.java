@@ -1,17 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.teamcode.utils.RGBLights;
 
 public class RGBcontroller extends RGBLights{
 
 
-    private static final com.qualcomm.robotcore.hardware.HardwareMap HardwareMap = ;
     RGBLights rgbSignal;
 
-    public RGBcontroller(String name)
+    public RGBcontroller(String name,HardwareMap hw)
     {
-        super(HardwareMap, name);
+        super(hw, name);
 
     }
 
@@ -20,8 +21,9 @@ public class RGBcontroller extends RGBLights{
 
     public void autoColor()
     {
-       // change colors every 5 seconds
-        // private static int everyLoop;
+       /* NOT COMPLETE
+         change colors every 5 second
+        private static int everyLoop; */
 
             rgbSignal.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
 
