@@ -220,7 +220,7 @@ public class ConceptAprilTag extends OpMode {
             telemetry.addData("tag",detections.get(0).id);
             double sinBearing = Math.sin(Math.toRadians(pose.bearing));
             telemetry.addData("yaw",Math.tan(Math.toRadians(pose.yaw))*pose.range * sinBearing);
-            return new Point3( pose.range * Math.cos(Math.toRadians(pose.bearing)), (pose.range * sinBearing)+(Math.tan(Math.toRadians(pose.yaw))*pose.range * sinBearing), 0
+            return new Point3( pose.range * Math.cos(Math.toRadians(pose.bearing)), (pose.range * sinBearing)+(Math.tan(Math.toRadians(pose.yaw))*pose.range * Math.cos(Math.toRadians(pose.bearing))*pose.range), 0
             );
         }
 
