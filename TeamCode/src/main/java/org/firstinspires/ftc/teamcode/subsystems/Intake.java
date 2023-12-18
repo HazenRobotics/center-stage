@@ -10,6 +10,9 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingCRServo;
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingDcMotorEX;
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingServo;
 
 public class Intake{
     Telemetry telemetry;
@@ -44,10 +47,10 @@ public class Intake{
     }
 
     public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName) {
-        intakeMotor = hw.get(DcMotorEx.class, motorName);
+        intakeMotor = new CachingDcMotorEX( hw.get(DcMotorEx.class, motorName) );
 //        intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
-        deploymentServo = hw.get(Servo.class, deploymentServoName);
-        wheelServo = hw.get( CRServo.class, "wheelServo");
+        deploymentServo = new CachingServo( hw.get(Servo.class, deploymentServoName) );
+        wheelServo = new CachingCRServo( hw.get( CRServo.class, "wheelServo") );
 //        wheelServo.setDirection( DcMotorSimple.Direction.REVERSE );
         telemetry = t;
         adjustIncrement = 0.02;

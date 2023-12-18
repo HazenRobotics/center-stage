@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingDcMotorEX;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.Encoder;
 
 public class Climber {
@@ -15,7 +16,7 @@ public class Climber {
 	}
 
 	public Climber ( HardwareMap hw, String motorName, boolean motorReversed ) {
-		motor = hw.get( DcMotorEx.class, motorName );
+		motor = new CachingDcMotorEX( hw.get( DcMotorEx.class, motorName ) );
 		motor.setMode( DcMotor.RunMode.STOP_AND_RESET_ENCODER );
 		motor.setMode( DcMotor.RunMode.RUN_WITHOUT_ENCODER );
 

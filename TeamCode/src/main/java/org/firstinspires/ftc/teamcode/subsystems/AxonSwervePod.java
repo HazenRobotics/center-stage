@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.utils.SwervePDController;
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingCRServo;
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingDcMotorEX;
 
 public class AxonSwervePod {
 
@@ -25,13 +27,13 @@ public class AxonSwervePod {
 
 	public AxonSwervePod( HardwareMap hw, String motorName, boolean motorReversed, String servoName, boolean servoReversed,
 						  String encoderName, double encoderOffset, double encoderVoltage, double[] pid, double PPR ) {
-		motor = hw.get( DcMotorEx.class, motorName );
+		motor = new CachingDcMotorEX( hw.get( DcMotorEx.class, motorName ) );
 		if( motorReversed ) reverseMotor( );
 
 		motor.setMode( DcMotor.RunMode.RUN_WITHOUT_ENCODER );
 		motor.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.BRAKE );
 
-		crServo = hw.get( CRServo.class, servoName );
+		crServo = new CachingCRServo( hw.get( CRServo.class, servoName ) );
 		if( servoReversed ) crServo.setDirection( DcMotorSimple.Direction.REVERSE );
 
 		encoder = new AxonAbsolutePositionEncoder( hw, encoderName, encoderOffset, encoderVoltage );
@@ -106,8 +108,8 @@ public class AxonSwervePod {
 		controller.setKs( s );
 	}
 
-	public double getError ( ) {
-		return controller.getError();
+	public double getError( ) {
+		return controller.getError( );
 	}
 
 	public void update( ) {
@@ -115,6 +117,7 @@ public class AxonSwervePod {
 
 		setRotatePower( results[0] );
 	}
+
 	public void update( double motorPower ) {
 		double[] results = controller.update( getAngle( ) );
 

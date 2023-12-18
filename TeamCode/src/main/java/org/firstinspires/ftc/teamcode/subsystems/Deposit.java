@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingServo;
+
 public class Deposit {
     Servo angler, release;
 
@@ -44,8 +46,8 @@ public class Deposit {
         this(hw, "release", "pivot");
     }
     public Deposit( HardwareMap hw, String releaseName, String anglerName) {
-        release = hw.get(Servo.class, releaseName);
-        angler = hw.get(Servo.class, anglerName);
+        release = new CachingServo( hw.get(Servo.class, releaseName) );
+        angler = new CachingServo( hw.get(Servo.class, anglerName) );
     }
 
     /**

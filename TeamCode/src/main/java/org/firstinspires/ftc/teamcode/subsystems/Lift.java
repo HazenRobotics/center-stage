@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.robots.KhepriBot;
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingDcMotorEX;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.Encoder;
 
 public class Lift {
@@ -33,7 +34,7 @@ public class Lift {
 	public Lift( HardwareMap hardwareMap ) {
 		this( hardwareMap, "lift", true, "FRM/liftEnc", 0,
 				0.5, 0, AngleUnit.DEGREES, 103.8, 1,
-				new PIDController(0.02,0,0.001) );
+				new PIDController( 0.02, 0, 0.001 ) );
 	}
 
 	/**
@@ -46,10 +47,10 @@ public class Lift {
 	 */
 	public Lift( HardwareMap hardwareMap, String motorName, boolean reverseMotor, String encoderName, double posOffset,
 				 double spoolRadius, double liftAngle, AngleUnit angleUnit, double PPR, double gearRatio, PIDController controller ) {
-		motor = hardwareMap.get( DcMotorEx.class, motorName );
+		motor = new CachingDcMotorEX( hardwareMap.get( DcMotorEx.class, motorName ) );
 		motor.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.BRAKE );
-		encoder = new Encoder( hardwareMap.get(DcMotorEx.class, encoderName ));
-		encoder.reset();
+		encoder = new Encoder( hardwareMap.get( DcMotorEx.class, encoderName ) );
+		encoder.reset( );
 
 
 		if( reverseMotor ) {
@@ -97,10 +98,10 @@ public class Lift {
 	}
 
 	public void updatePID( ) {
-		motor.setPower( controller.calculate( encoder.getCurrentPosition(), target ) * KhepriBot.normalizedPowerMultiplier );
+		motor.setPower( controller.calculate( encoder.getCurrentPosition( ), target ) * KhepriBot.normalizedPowerMultiplier );
 	}
 
-	public void setPIDValues(double p, double i, double d) {
+	public void setPIDValues( double p, double i, double d ) {
 		controller.setPID( p, i, d );
 	}
 
@@ -160,6 +161,7 @@ public class Lift {
 	public void setPower( double power ) {
 		motor.setPower( power );
 	}
+
 	public double getPower( ) {
 		return motor.getPower( );
 	}
