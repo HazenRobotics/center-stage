@@ -22,6 +22,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.drivetrains.CoaxialSwerveDrive;
 import org.firstinspires.ftc.teamcode.robots.KhepriBot;
+import org.firstinspires.ftc.teamcode.subsystems.Deposit;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 import org.firstinspires.ftc.teamcode.utils.HeadingPDController;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
@@ -35,7 +37,7 @@ public class BaseSwerve extends LinearOpMode {
 	KhepriBot robot;
 	GamepadEvents controller1;
 	PIDController headingController;
-	double drive, strafe, rotate, loop, prevTime, heading, error, adjustedHeading;
+	double drive, strafe, rotate, loop, prevTime, heading, error, intakeDeployAngle = 0.215;
 	public static double target, startHeading = Math.toRadians( 90 );
 	Pose2D poseEstimate;
 	boolean headingLock = false;
@@ -57,27 +59,16 @@ public class BaseSwerve extends LinearOpMode {
 			poseEstimate = robot.getPose();
 			heading = poseEstimate.getTheta().getRadians();
 
-			if( controller1.x.onPress( ) ) {
-				headingLock = !headingLock;
-				if( headingLock )
-					target = heading;
-			}
-
 			drive = -gamepad1.left_stick_y * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.DRIVE.getFast( ) : KhepriBot.DriveSpeeds.DRIVE.getNorm( ));
 			strafe = gamepad1.left_stick_x * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.STRAFE.getFast( ) : KhepriBot.DriveSpeeds.STRAFE.getNorm( ));
 			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( ));
 
-			if( headingLock ) {
-				error = findShortestAngularTravel( target, heading );
-				rotate += headingController.calculate( error, 0 );
-			}
-
 			robot.drive.fieldCentricDrive( drive, strafe, rotate, heading - (Math.PI / 2));
 
-			robot.tracker.updatePose();
+
 			displayTelemetry();
-			controller1.update( );
-			robot.clearBulkCache();
+			robot.update();
+			controller1.update();
 		}
 	}
 
@@ -102,7 +93,29 @@ public class BaseSwerve extends LinearOpMode {
 //		double x2 = x + arrowX, y2 = y + arrowY;
 //		field.strokeLine(x1, y1, x2, y2);
 //		FtcDashboard.getInstance().sendTelemetryPacket(packet);
+	}
 
-		telemetry.update( );
+	public void intakeControl() {
+		if( controller1.right_bumper.onPress( ) ) {
+			robot.intake.deployIntake( KhepriBot.normalizedPowerMultiplier );
+			robot.deposit.setReleasePosition( Deposit.ReleaseStates.RETRACTED );
+			robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
+		} else if( controller1.left_bumper.onPress( ) )
+			robot.intake.foldIntake( );
+
+		if (controller1.dpad_up.onPress()) {
+			intakeDeployAngle += 0.03;
+		}
+		if (controller1.dpad_down.onPress()) {
+			intakeDeployAngle -= 0.03;
+		}
+
+		if (controller1.dpad_up.onPress()) {
+			robot.intake.adjustUp();
+		} else if (controller1.dpad_down.onPress()) {
+			robot.intake.adjustDown();
+		} else if (controller1.dpad_right.onPress()) {
+			robot.intake.setDeployPos( Intake.DeploymentState.TOP_TWO );
+		}
 	}
 }

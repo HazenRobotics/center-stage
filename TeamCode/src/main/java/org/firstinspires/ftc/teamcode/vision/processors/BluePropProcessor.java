@@ -19,14 +19,14 @@ public class BluePropProcessor implements VisionProcessor {
 	}
 	PropPosition propPosition;
 
-	public Rect midPos = new Rect( 240, 175, 100, 100 );
-	public Rect rightPos = new Rect( 530, 155, 105, 125 );
-	private Scalar blueLowerBound = new Scalar( 100, 60, 40 );
-	private Scalar blueUpperBound = new Scalar( 130, 255, 255 );
+	public Rect leftPos = new Rect( 290, 320, 250, 230 );
+	public Rect midPos = new Rect( 930, 340, 200, 200 );
+	public Rect rightPos = new Rect( 1500, 320, 300, 250 );
+	private final Scalar blueLowerBound = new Scalar( 100, 60, 40 );
+	private final Scalar blueUpperBound = new Scalar( 130, 255, 255 );
 	Mat matBlue = new Mat( );
 	Mat temp = new Mat();
-	Mat middle;
-	Mat right;
+	Mat left, middle, right;
 
 	@Override
 	public void init( int width, int height, CameraCalibration calibration ) {
@@ -36,28 +36,32 @@ public class BluePropProcessor implements VisionProcessor {
 	public Object processFrame( Mat frame, long captureTimeNanos ) {
 		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2HSV );
 
-		Core.inRange( temp, blueLowerBound, blueUpperBound, matBlue );
-		matBlue.copyTo(temp);
+		Core.inRange( temp, blueLowerBound, blueUpperBound, temp );
+//		frame.copyTo(temp);
 
 		final double percentColorThreshold = 0.1 * 255; //Percent value on left, 255 for max amount of color
 
-		right = temp.submat( rightPos );
+		left = temp.submat( leftPos );
 		middle = temp.submat( midPos );
+		right = temp.submat( rightPos );
 
-		double rightValue = Core.sumElems( right ).val[0] / rightPos.area( );
+		double leftValue = Core.sumElems( left ).val[0] / leftPos.area( );
 		double middleValue = Core.sumElems( middle ).val[0] / midPos.area( );
+		double rightValue = Core.sumElems( right ).val[0] / rightPos.area( );
 
-		double maxValue = Math.max( rightValue, middleValue );
+		double maxValue = Math.max( rightValue, Math.max( middleValue, leftValue ) );
 
-		right.release( );
+		left.release();
 		middle.release( );
+		right.release();
 
 		if (maxValue > percentColorThreshold) {
-			if( maxValue == rightValue ) return PropPosition.RIGHT;
+			if( maxValue == leftValue ) return PropPosition.LEFT;
 			if( maxValue == middleValue ) return PropPosition.MIDDLE;
+			if( maxValue == rightValue ) return PropPosition.RIGHT;
 		}
 
-		return PropPosition.LEFT;
+		return PropPosition.NOT_FOUND;
 	}
 
 	@Override
@@ -73,23 +77,31 @@ public class BluePropProcessor implements VisionProcessor {
 		nonSelectedPaint.setStyle( Paint.Style.STROKE );
 		nonSelectedPaint.setStrokeWidth( scaleCanvasDensity * 4 );
 
-		android.graphics.Rect drawRectangleRight = makeGraphicsRect( rightPos, scaleBmpPxToCanvasPx );
+		android.graphics.Rect drawRectangleLeft = makeGraphicsRect( leftPos, scaleBmpPxToCanvasPx );
 		android.graphics.Rect drawRectangleMiddle = makeGraphicsRect( midPos, scaleBmpPxToCanvasPx );
+		android.graphics.Rect drawRectangleRight = makeGraphicsRect( rightPos, scaleBmpPxToCanvasPx );
 
 		propPosition = (PropPosition) userContext;
 		switch( propPosition ) {
 			case LEFT:
-				canvas.drawRect( drawRectangleRight, nonSelectedPaint );
+				canvas.drawRect( drawRectangleLeft, selectedPaint );
 				canvas.drawRect( drawRectangleMiddle, nonSelectedPaint );
+				canvas.drawRect( drawRectangleRight, nonSelectedPaint );
 				break;
 			case MIDDLE:
-				canvas.drawRect( drawRectangleRight, nonSelectedPaint );
+				canvas.drawRect( drawRectangleLeft, nonSelectedPaint );
 				canvas.drawRect( drawRectangleMiddle, selectedPaint );
+				canvas.drawRect( drawRectangleRight, nonSelectedPaint );
 				break;
 			case RIGHT:
-				canvas.drawRect( drawRectangleRight, selectedPaint );
+				canvas.drawRect( drawRectangleLeft, nonSelectedPaint );
 				canvas.drawRect( drawRectangleMiddle, nonSelectedPaint );
+				canvas.drawRect( drawRectangleRight, selectedPaint );
 				break;
+			case NOT_FOUND:
+				canvas.drawRect( drawRectangleLeft, nonSelectedPaint );
+				canvas.drawRect( drawRectangleMiddle, nonSelectedPaint );
+				canvas.drawRect( drawRectangleRight, nonSelectedPaint );
 		}
 	}
 

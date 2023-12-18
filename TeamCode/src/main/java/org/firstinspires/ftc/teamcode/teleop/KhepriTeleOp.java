@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import static org.firstinspires.ftc.teamcode.utils.SwervePDController.findShortestAngularTravel;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -18,11 +19,16 @@ import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.An
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleRadians;
 
 @TeleOp
+@Config
 public class KhepriTeleOp extends LinearOpMode {
 
 	KhepriBot robot;
 	GamepadEvents controller1, controller2;
-	double drive, strafe, rotate, liftPos, liftPower, climbPos, climbPower = 0, numLoops, normalizedPowerMultiplier, heading, target, error;
+	double drive, strafe, rotate, liftPos,
+			liftPower, climbPos, climbPower = 0,
+			numLoops, heading, target, error, intakeDeployAngle = 0.215,
+			currentHz, averageHz, loop, prevTime;
+	public static double ff = 0;
 	ElapsedTime timer;
 	Pose2D poseEstimate;
 	boolean headingLock, climbAboveHeight = false, climbBelowHeight = false;
@@ -44,8 +50,7 @@ public class KhepriTeleOp extends LinearOpMode {
 		timer.reset( );
 
 		while( opModeIsActive( ) ) {
-			normalizedPowerMultiplier = 12.0 / robot.hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS );
-
+			calculateHz();
 			endGamePolling();
 
 			driveControl( );
@@ -70,6 +75,8 @@ public class KhepriTeleOp extends LinearOpMode {
 		telemetry.addData( "lift pos", liftPos );
 		telemetry.addData( "release pos", robot.deposit.getReleasePosition( ) );
 		telemetry.addData( "angler pos", robot.deposit.getAnglePosition( ) );
+		telemetry.addData( "intake angle", robot.intake.getAngle( ) );
+		telemetry.addData( "intake deploy angle", intakeDeployAngle );
 //		telemetry.addData( "STATE", robot.drive.getWheelState( ) );
 //		telemetry.addData( "heading", heading );
 //		telemetry.addData( "climb dir", robot.climber.getDirection() );
@@ -85,8 +92,8 @@ public class KhepriTeleOp extends LinearOpMode {
 //		telemetry.addData( "intake current draw", robot.intake.getMotorCurrent() );
 //		telemetry.addData( "intake servo power", robot.intake.getIntakeServoPower() );
 		telemetry.addData( "pose", poseEstimate );
-		numLoops++;
-		telemetry.addData( "hz ", numLoops / timer.seconds( ) );
+		telemetry.addData( "current hz", currentHz );
+		telemetry.addData( "average hz", averageHz );
 //		robot.drive.displayWheelAngles( telemetry );
 
 		telemetry.update( );
@@ -98,18 +105,19 @@ public class KhepriTeleOp extends LinearOpMode {
 
 		if( controller1.y.onPress( ) ) {
 			headingLock = !headingLock;
-			if( headingLock )
-				target = heading;
+//			if( headingLock )
+//				target = heading;
 		}
 
 		drive = -gamepad1.left_stick_y * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.DRIVE.getFast( ) : KhepriBot.DriveSpeeds.DRIVE.getNorm( ));
 		strafe = gamepad1.left_stick_x * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.STRAFE.getFast( ) : KhepriBot.DriveSpeeds.STRAFE.getNorm( ));
-		rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( ));
 
 		if( headingLock ) {
+//			target = Math.atan2( gamepad1.ri )
 			error = findShortestAngularTravel( target, heading );
-			rotate += robot.headingController.calculate( error, 0 );
-		}
+//			rotate += robot.teleOpHeadingController.calculate( error, 0 );
+		} else
+			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( ));
 
 		robot.drive.fieldCentricDrive( drive, strafe, rotate, heading - (Math.PI / 2) );
 	}
@@ -136,19 +144,17 @@ public class KhepriTeleOp extends LinearOpMode {
 
 	public void intakeControl() {
 		if( controller1.right_bumper.onPress( ) ) {
-			robot.intake.deployIntake( normalizedPowerMultiplier );
+			robot.intake.deployIntake( KhepriBot.normalizedPowerMultiplier );
+			robot.intake.setDeployPos( intakeDeployAngle );
 			robot.deposit.setReleasePosition( Deposit.ReleaseStates.RETRACTED );
 			robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
 		} else if( controller1.left_bumper.onPress( ) )
 			robot.intake.foldIntake( );
 
-		if (controller1.dpad_up.onPress()) {
-			robot.intake.adjustUp();
-		} else if (controller1.dpad_down.onPress()) {
-			robot.intake.adjustDown();
-		} else if (controller1.dpad_right.onPress()) {
-			robot.intake.setDeployPos( Intake.DeploymentState.TOP_TWO );
-		}
+		if (controller1.dpad_up.onPress())
+			intakeDeployAngle += 0.01;
+		else if (controller1.dpad_down.onPress())
+			intakeDeployAngle -= 0.01;
 	}
 
 	public void depositControl() {
@@ -178,8 +184,20 @@ public class KhepriTeleOp extends LinearOpMode {
 
 	public void liftControl() {
 		liftPos = robot.lift.getPosition( );
-		liftPower = gamepad1.right_trigger - (gamepad1.left_trigger * 0.6);
+		liftPower = (gamepad1.right_trigger - (gamepad1.left_trigger * 0.7))
+				+ (liftPos > 50 ? ((1 - (liftPos / 800)) * ff) * KhepriBot.normalizedPowerMultiplier : 0);
 
 		robot.lift.setPower( liftPower );
+	}
+
+	public void calculateHz() {
+		//more sporadic hz calculation
+		loop = System.currentTimeMillis( );
+		currentHz = 1000 / (loop - prevTime);
+		prevTime = loop;
+
+		//more general/consistent hz calculation
+		numLoops++;
+		averageHz = numLoops / timer.seconds( );
 	}
 }

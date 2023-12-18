@@ -58,7 +58,8 @@ public class KhepriBot {
 	public IMU_EX imu;
 	public PIDController XController;
 	public PIDController YController;
-	public PIDController headingController;
+	public PIDController autoHeadingController;
+	public PIDController teleOpHeadingController;
 	public List<LynxModule> hubs;
 	Pose2D poseEstimate;
 	public static double normalizedPowerMultiplier;
@@ -99,7 +100,8 @@ public class KhepriBot {
 
 		XController = new PIDController( 0.2, 0 , 0.03 );
 		YController = new PIDController( 0.2, 0 , 0.03 );
-		headingController = new PIDController( 5, 0, 0.4 );
+		autoHeadingController = new PIDController( 5, 0, 0.4 );
+		teleOpHeadingController = new PIDController( 1, 0, 0.1 );
 	}
 
 
@@ -179,13 +181,12 @@ public class KhepriBot {
 	public void goToPoint( double x, double y, double heading, double travelMultiplier, double rotationMultiplier ) {
 		telemetry.addData( "target", "X: " + x + " Y: " + y + " heading: " + heading );
 		double headingError = findShortestAngularTravel( Math.toRadians( heading ), poseEstimate.getTheta().getRadians() );
-		pollNormalizedPowerMultiplier();
 		telemetry.addData( "heading error", headingError );
 
 		drive.fieldCentricDrive(
 				YController.calculate(poseEstimate.getY(), y) * normalizedPowerMultiplier * (YController.getPositionError() > 2 ? travelMultiplier : 1) ,
 				XController.calculate(poseEstimate.getX(), x) * normalizedPowerMultiplier * (XController.getPositionError() > 2 ? travelMultiplier : 1),
-				headingController.calculate( headingError, 0 ) * normalizedPowerMultiplier,
+				autoHeadingController.calculate( headingError, 0 ) * normalizedPowerMultiplier * (autoHeadingController.getPositionError() > 0.1 ? rotationMultiplier : 1),
 				poseEstimate.getTheta().getRadians() - (Math.PI / 2)
 		);
 
@@ -196,6 +197,7 @@ public class KhepriBot {
 	}
 
 	public void update() {
+		pollNormalizedPowerMultiplier();
 		clearBulkCache( );
 		updateTracker( );
 		telemetry.update();

@@ -45,10 +45,10 @@ public class Intake{
 
     public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName) {
         intakeMotor = hw.get(DcMotorEx.class, motorName);
-        intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
-        wheelServo = hw.get( CRServo.class, "wheelServo ");
-        wheelServo.setDirection( DcMotorSimple.Direction.REVERSE );
+//        intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
         deploymentServo = hw.get(Servo.class, deploymentServoName);
+        wheelServo = hw.get( CRServo.class, "wheelServo");
+//        wheelServo.setDirection( DcMotorSimple.Direction.REVERSE );
         telemetry = t;
         adjustIncrement = 0.02;
     }
@@ -59,6 +59,10 @@ public class Intake{
 
     public DeploymentState getDeploymentState() {
         return deploymentState;
+    }
+
+    public double getAngle() {
+        return deploymentServo.getPosition();
     }
 
     public void setAdjustIncrement(double increment) {
@@ -85,7 +89,7 @@ public class Intake{
         setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
         reverse = !reverse;
         setIntakeMotorPower( (reverse ? -0.8 : 0.8) * powerMultiplier );
-        wheelServo.setPower( (reverse ? -1 : 0.8) * powerMultiplier);
+        wheelServo.setPower( (reverse ? -1 : 0.8) );
     }
 
     public void adjustUp() {

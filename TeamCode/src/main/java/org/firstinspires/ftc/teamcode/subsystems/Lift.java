@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.robots.KhepriBot;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.Encoder;
 
 public class Lift {
@@ -96,7 +97,7 @@ public class Lift {
 	}
 
 	public void updatePID( ) {
-		motor.setPower( controller.calculate( encoder.getCurrentPosition(), target ) );
+		motor.setPower( controller.calculate( encoder.getCurrentPosition(), target ) * KhepriBot.normalizedPowerMultiplier );
 	}
 
 	public void setPIDValues(double p, double i, double d) {

@@ -21,7 +21,7 @@ public class Deposit {
     }
 
     public enum AngleStates {
-        GRAB( 0.265 ),
+        GRAB( 0.27 ),
         DROP_FLOOR( 0.363 ),
         DROP_FLOOR_AUTO( 0.42 ),
         DROP_BACKDROP( 0.583 ),

@@ -68,7 +68,7 @@ public class PositionPIDTuning extends LinearOpMode {
 
 			telemetry.addData( "x error", robot.XController.getPositionError() );
 			telemetry.addData( "y error", robot.YController.getPositionError() );
-			telemetry.addData( "heading error", Math.toDegrees( robot.headingController.getPositionError() ) );
+			telemetry.addData( "heading error", Math.toDegrees( robot.autoHeadingController.getPositionError() ) );
 			telemetry.update();
 		}
 	}
