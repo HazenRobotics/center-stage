@@ -59,8 +59,6 @@ import java.util.ArrayList;
 public class ConceptAprilTag extends OpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
-    public static final double Y_OFFSET = -1.96875;
-    public static final double X_OFFSET = -8.34375;
 
     /**
      * The variable to store our instance of the AprilTag processor.
@@ -90,7 +88,7 @@ public class ConceptAprilTag extends OpMode {
 
     /**
      * The variable to store our instance of the vision portal.
-     */
+     **/
 
     /**
      * Initialize the AprilTag processor.
@@ -245,7 +243,7 @@ public class ConceptAprilTag extends OpMode {
         if (backVP.getProcessorEnabled(backATP)) {
             detections.addAll(backATP.getDetections());
         }
-        if (backVP.getProcessorEnabled(frontATP)) {
+        if (frontVP.getProcessorEnabled(frontATP)) {
             detections.addAll(frontATP.getDetections());
         }
         if (detections.isEmpty()) {
@@ -253,8 +251,8 @@ public class ConceptAprilTag extends OpMode {
         } else {
             AprilTagPoseFtc pose = detections.get(0).ftcPose;
             Point3 tagpos = getTagPosition(detections.get(0).id);
-            double x = 0;
-            double y = 0;
+            double x;
+            double y;
             if (tagpos.x > 0) {
                 x = tagpos.x - pose.x;
             } else {
