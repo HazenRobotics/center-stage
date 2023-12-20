@@ -10,19 +10,19 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class SwervePDController {
 
 
-	double Kp, Kd, lastError, error;
-	double Ks = 0.03;
+	double Kp, Kd, Ks, lastError, error;
 	ElapsedTime timer;
 
 	double targetAngle;
 	double motorDirection;
 
 	public SwervePDController( ) {
-		this( 0, 0 );
+		this( 0, 0, 0 );
 	}
 
-	public SwervePDController( double p, double d ) {
+	public SwervePDController( double p, double d, double ks ) {
 		setPD( p, d );
+		setKs( ks );
 		timer = new ElapsedTime( );
 		targetAngle = 0;
 	}

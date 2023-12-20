@@ -22,11 +22,11 @@ public class AxonSwervePod {
 
 	public AxonSwervePod( HardwareMap hw, String motorName, String servoName, String encoderName ) {
 		this( hw, motorName, false, servoName, false, encoderName,
-				0, 3.3, new double[]{ 0, 0 }, 28 * 8 );
+				0, 3.3, new double[]{ 0, 0 }, 28 * 8, 0 );
 	}
 
 	public AxonSwervePod( HardwareMap hw, String motorName, boolean motorReversed, String servoName, boolean servoReversed,
-						  String encoderName, double encoderOffset, double encoderVoltage, double[] pid, double PPR ) {
+						  String encoderName, double encoderOffset, double encoderVoltage, double[] pid, double PPR, double kStatic ) {
 		motor = new CachingDcMotorEX( hw.get( DcMotorEx.class, motorName ) );
 		if( motorReversed ) reverseMotor( );
 
@@ -37,7 +37,7 @@ public class AxonSwervePod {
 		if( servoReversed ) crServo.setDirection( DcMotorSimple.Direction.REVERSE );
 
 		encoder = new AxonAbsolutePositionEncoder( hw, encoderName, encoderOffset, encoderVoltage );
-		controller = new SwervePDController( pid[0], pid[1] );
+		controller = new SwervePDController( pid[0], pid[1], kStatic );
 
 		motorPPR = PPR;
 	}

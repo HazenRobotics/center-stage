@@ -26,8 +26,8 @@ public class CoaxialSwerveDrive {
 	public CoaxialSwerveDrive( HardwareMap hw ) {
 		this( hw, new String[]{ "FLM/paraLEnc", "BLM/perpEnc", "FRM/liftEnc", "BRM/paraREnc" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
-				new String[]{ "FLE", "BLE", "FRE", "BRE" }, encoderOffsets,
-				3.3, 12.334646, 12.334646, new double[]{ 0.5, 0.0065 }, 28 * 8 );
+				new String[]{ "FLE", "BLE", "FRE", "BRE" }, encoderOffsets, 3.3,
+				12.334646, 12.334646, new double[]{ 0.5, 0.0065 }, 28 * 8, new double[]{0,0,0,0} );
 	}
 
 	/**
@@ -42,10 +42,13 @@ public class CoaxialSwerveDrive {
 	 * @param wheelbase           length of base (distance from front wheels to back wheels)
 	 * @param trackwidth          width of track (distance from left wheels to right wheels)
 	 */
-	public CoaxialSwerveDrive( HardwareMap hw, String[] motorNames, boolean[] motorReverse, String[] servoNames, boolean[] servoReversed, String[] servoEncoderNames, double[] servoEncoderOffsets, double servoEncoderVoltage, double wheelbase, double trackwidth, double[] PID, double wheelPPR ) {
+	public CoaxialSwerveDrive( HardwareMap hw, String[] motorNames, boolean[] motorReverse,
+							   String[] servoNames, boolean[] servoReversed, String[] servoEncoderNames,
+							   double[] servoEncoderOffsets, double servoEncoderVoltage, double wheelbase,
+							   double trackwidth, double[] PID, double wheelPPR, double[] KStatics ) {
 		for( int i = 0; i < swervePods.length; i++ )
 			swervePods[i] = new AxonSwervePod( hw, motorNames[i], motorReverse[i], servoNames[i], servoReversed[i],
-					servoEncoderNames[i], servoEncoderOffsets[i], servoEncoderVoltage, PID, wheelPPR );
+					servoEncoderNames[i], servoEncoderOffsets[i], servoEncoderVoltage, PID, wheelPPR, KStatics[i] );
 
 		this.wheelbase = wheelbase;
 		this.trackwidth = trackwidth;
