@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleDegrees;
 import org.firstinspires.ftc.teamcode.vision.processors.BluePropProcessor;
-import org.firstinspires.ftc.teamcode.vision.processors.RedPropProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 @Autonomous
@@ -60,7 +59,7 @@ public class FarBlueStandard extends LinearOpMode {
 
 		robot = new KhepriBot( hardwareMap, telemetry );
 		robot.setupAutoTracker( new Pose2D( -38.5, 63.5, new AngleDegrees( 270 ).getTheta( ) ) );
-		robot.deposit.setReleasePosition( Deposit.ReleaseStates.EXTENDED );
+		robot.deposit.setReleaseState( Deposit.ReleaseStates.EXTENDED );
 		bluePropProcessor = new BluePropProcessor();
 
 		visionPortal = new VisionPortal.Builder()
@@ -109,7 +108,6 @@ public class FarBlueStandard extends LinearOpMode {
 								spikeState = SpikeMarkScoringStates.SCORE;
 							else if( isLeft )
 								robot.goToPoint( -36, 36, 180, 1, 1 );
-//sus
 							if( timer.seconds( ) > 2 ) {
 								timer.reset( );
 								spikeState = SpikeMarkScoringStates.SCORE;
@@ -156,8 +154,8 @@ public class FarBlueStandard extends LinearOpMode {
 					if( timer.seconds( ) > 5 ) {
 						timer.reset( );
 						robot.lift.setTarget( 175 );
-						robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
-						robot.deposit.setReleasePosition( Deposit.ReleaseStates.HOLD_ONE );
+						robot.deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
+						robot.deposit.setReleaseState( Deposit.ReleaseStates.HOLD_ONE );
 						autoState = AutoStates.DRIVE_TO_BACKDROP;
 					}
 					break;
@@ -184,12 +182,12 @@ public class FarBlueStandard extends LinearOpMode {
 					if( timer.seconds( ) > 5 ) {
 						timer.reset( );
 						autoState = AutoStates.SCORE_ON_BACKDROP;
-						robot.deposit.setReleasePosition( Deposit.ReleaseStates.RETRACTED );
+						robot.deposit.setReleaseState( Deposit.ReleaseStates.RETRACTED );
 					}
 					break;
 				case SCORE_ON_BACKDROP:
 					if( timer.seconds( ) > 1.5 ) {
-						robot.deposit.setAnglePosition( Deposit.AngleStates.GRAB );
+						robot.deposit.setAngleState( Deposit.AngleStates.GRAB );
 						robot.lift.setTarget( 0 );
 						timer.reset( );
 						autoState = AutoStates.BACK_UP_A_BIT;

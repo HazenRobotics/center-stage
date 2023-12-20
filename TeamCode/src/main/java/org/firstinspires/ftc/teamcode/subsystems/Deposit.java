@@ -1,18 +1,22 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingServo;
 
+@Config
+
 public class Deposit {
     Servo angler, release;
+    public static double dropBackDrop = 0.583;
 
     public enum ReleaseStates {
-        RETRACTED(0.241),
-        EXTENDED(0.4),
-        DROP_ONE(0.296),
-        HOLD_ONE(0.33);
+        RETRACTED(0),
+        EXTENDED(0.158),
+        DROP_ONE(0.06),
+        HOLD_ONE(0.14);
         private final double position;
         ReleaseStates (double pos) {
             position = pos;
@@ -23,11 +27,11 @@ public class Deposit {
     }
 
     public enum AngleStates {
-        GRAB( 0.27 ),
+        GRAB( 0.423 ),
         DROP_FLOOR( 0.363 ),
         DROP_FLOOR_AUTO( 0.42 ),
-        DROP_BACKDROP( 0.583 ),
-        FIX_BUCKET(0.22);
+        DROP_BACKDROP( 0.741 ),
+        FIX_BUCKET(0.37);
         private final double position;
 
         AngleStates( double pos ) {
@@ -57,24 +61,30 @@ public class Deposit {
     public void releaseToggle() {
         switch( releaseState ) {
             case RETRACTED:
-                setReleasePosition( ReleaseStates.EXTENDED );
+                setReleaseState( ReleaseStates.EXTENDED );
                 break;
             case EXTENDED:
-                setReleasePosition( ReleaseStates.DROP_ONE );
+                setReleaseState( ReleaseStates.DROP_ONE );
                 break;
             case DROP_ONE:
-                setReleasePosition( ReleaseStates.RETRACTED );
+                setReleaseState( ReleaseStates.RETRACTED );
                 break;
         }
     }
 
-    public void setReleasePosition (ReleaseStates state) {
+    public void setReleaseState( ReleaseStates state) {
         releaseState = state;
-        release.setPosition(releaseState.getPosition());
+        setReleasePosition(releaseState.getPosition());
     }
-    public void setAnglePosition (AngleStates state) {
+    public void setReleasePosition (double position) {
+        release.setPosition(position);
+    }
+    public void setAngleState( AngleStates state) {
         angleState = state;
-        angler.setPosition(angleState.getPosition());
+        setAnglePosition(angleState.getPosition());
+    }
+    public void setAnglePosition (double position) {
+        angler.setPosition(position);
     }
 
     public double getReleasePosition() {

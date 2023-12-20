@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingCRServo
 import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingDcMotorEX;
 import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingServo;
 
+@Config
 public class Intake{
     Telemetry telemetry;
     DcMotorEx intakeMotor;
@@ -25,6 +27,7 @@ public class Intake{
     private double adjustIncrement;
     private double servoPos;
     private boolean reverse = true;
+    public static double servoPower = 0.8;
 
     DeploymentState deploymentState = DeploymentState.FOLDED;
 
@@ -83,16 +86,23 @@ public class Intake{
     public void foldIntake( ) {
         deploymentState = DeploymentState.FOLDED;
         setDeployPos( DeploymentState.FOLDED.getPosition() );
-        reverse = true;
+        reverse = false;
         setIntakeMotorPower( 0 );
         wheelServo.setPower( 0 );
     }
     public void deployIntake( double powerMultiplier ) {
-        deploymentState = DeploymentState.FULLY_DEPLOYED;
+        if (deploymentState == DeploymentState.FOLDED)
+            deploymentState = DeploymentState.FULLY_DEPLOYED;
+        else
+            reverse = !reverse;
+
         setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
-        reverse = !reverse;
         setIntakeMotorPower( (reverse ? -0.8 : 0.8) * powerMultiplier );
-        wheelServo.setPower( (reverse ? -1 : 0.8) );
+        wheelServo.setPower( (reverse ? -1 : servoPower) );
+    }
+
+    public boolean isReversed( ) {
+        return reverse;
     }
 
     public void adjustUp() {

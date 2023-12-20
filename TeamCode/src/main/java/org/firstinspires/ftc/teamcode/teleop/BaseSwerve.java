@@ -1,35 +1,16 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import static org.firstinspires.ftc.teamcode.utils.SwervePDController.findShortestAngularTravel;
-import static org.firstinspires.ftc.teamcode.utils.SwervePDController.normalizeRadians;
-
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.arcrobotics.ftclib.geometry.Rotation2d;
-import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.drivetrains.CoaxialSwerveDrive;
 import org.firstinspires.ftc.teamcode.robots.KhepriBot;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
-import org.firstinspires.ftc.teamcode.utils.HeadingPDController;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleRadians;
-
-import java.util.List;
 
 @TeleOp
 @Config
@@ -98,8 +79,8 @@ public class BaseSwerve extends LinearOpMode {
 	public void intakeControl() {
 		if( controller1.right_bumper.onPress( ) ) {
 			robot.intake.deployIntake( KhepriBot.normalizedPowerMultiplier );
-			robot.deposit.setReleasePosition( Deposit.ReleaseStates.RETRACTED );
-			robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
+			robot.deposit.setReleaseState( Deposit.ReleaseStates.RETRACTED );
+			robot.deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
 		} else if( controller1.left_bumper.onPress( ) )
 			robot.intake.foldIntake( );
 

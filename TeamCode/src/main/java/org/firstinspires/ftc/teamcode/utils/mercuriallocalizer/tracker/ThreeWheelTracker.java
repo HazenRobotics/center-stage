@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.Encoder;
 
 public class ThreeWheelTracker extends WheeledTracker {
 	private final Encoder left, right, middle;
-	private double deltaLeft, deltaRight, deltaMiddle;
+	private double deltaLeft, deltaRight, deltaMiddle, deltaTheta;
 
 	public ThreeWheelTracker( Pose2D initialPose, WheeledTrackerConstants.ThreeWheeledTrackerConstants trackerConstants, Encoder left, Encoder right, Encoder middle) {
 		super(initialPose, trackerConstants);
@@ -52,7 +52,12 @@ public class ThreeWheelTracker extends WheeledTracker {
 	 */
 	@Override
 	protected double findDeltaTheta() {
-		return (deltaRight - deltaLeft) / ((WheeledTrackerConstants.ThreeWheeledTrackerConstants) getTrackerConstants()).getTrackWidth();
+		deltaTheta = (deltaRight - deltaLeft) / ((WheeledTrackerConstants.ThreeWheeledTrackerConstants) getTrackerConstants()).getTrackWidth();
+		return deltaTheta;
+	}
+
+	public double getDeltaTheta() {
+		return deltaTheta;
 	}
 
 	@Override

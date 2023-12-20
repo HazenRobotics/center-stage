@@ -38,9 +38,9 @@ public class OuttakeTest extends LinearOpMode {
 			// to go back to bucket, go back up to 9, bucketAngle, go down
 
 			if ( liftPower <= -0.3 && liftPos > 180 || liftPos < 100 )
-				deposit.setAnglePosition( Deposit.AngleStates.GRAB );
+				deposit.setAngleState( Deposit.AngleStates.GRAB );
 			else
-				deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
+				deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
 
 			telemetry.addData( "lift pos", liftPos );
 			telemetry.addData( "release pos", deposit.getReleasePosition( ) );

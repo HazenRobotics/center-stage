@@ -61,7 +61,7 @@ public class FarRedStandard extends LinearOpMode {
 
 		robot = new KhepriBot( hardwareMap, telemetry );
 		robot.setupAutoTracker( new Pose2D( -38.5, -63.5, new AngleDegrees( 90 ).getTheta( ) ) );
-		robot.deposit.setReleasePosition( Deposit.ReleaseStates.DROP_ONE );
+		robot.deposit.setReleaseState( Deposit.ReleaseStates.DROP_ONE );
 		redPropProcessor = new RedPropProcessor();
 
 		visionPortal = new VisionPortal.Builder()
@@ -154,8 +154,8 @@ public class FarRedStandard extends LinearOpMode {
 					if( timer.seconds( ) > 5 ) {
 						timer.reset( );
 						robot.lift.setTarget( 175 );
-						robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
-						robot.deposit.setReleasePosition( Deposit.ReleaseStates.HOLD_ONE );
+						robot.deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
+						robot.deposit.setReleaseState( Deposit.ReleaseStates.HOLD_ONE );
 						autoState = AutoStates.DRIVE_INFRONT_OF_BACKDROP;
 					}
 					break;
@@ -182,12 +182,12 @@ public class FarRedStandard extends LinearOpMode {
 					if( timer.seconds( ) > 3 ) {
 						timer.reset( );
 						autoState = AutoStates.SCORE_ON_BACKDROP;
-						robot.deposit.setReleasePosition( Deposit.ReleaseStates.RETRACTED );
+						robot.deposit.setReleaseState( Deposit.ReleaseStates.RETRACTED );
 					}
 					break;
 				case SCORE_ON_BACKDROP:
 					if( timer.seconds( ) > 1.5 ) {
-						robot.deposit.setAnglePosition( Deposit.AngleStates.GRAB );
+						robot.deposit.setAngleState( Deposit.AngleStates.GRAB );
 						robot.lift.setTarget( 0 );
 						timer.reset( );
 						autoState = AutoStates.BACK_UP_A_BIT;

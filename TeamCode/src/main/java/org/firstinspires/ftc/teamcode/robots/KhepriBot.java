@@ -66,7 +66,7 @@ public class KhepriBot {
 
 	public enum DriveSpeeds {
 		DRIVE(0.7, 1), STRAFE(0.7, 1), ROTATE(0.5, 1);
-		double norm, fast;
+		final double norm, fast;
 
 		DriveSpeeds( double norm, double fast ) {
 			this.norm = norm;
