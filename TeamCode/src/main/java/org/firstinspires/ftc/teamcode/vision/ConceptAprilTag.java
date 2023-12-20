@@ -42,13 +42,10 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
-import org.firstinspires.ftc.vision.apriltag.AprilTagPoseRaw;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.opencv.core.Point;
 import org.opencv.core.Point3;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /*
  * This OpMode illustrates the basics of AprilTag recognition and pose estimation,
@@ -68,51 +65,75 @@ public class ConceptAprilTag extends OpMode {
     /**
      * The variable to store our instance of the AprilTag processor.
      */
-    private AprilTagProcessor aprilTag;
+    private AprilTagProcessor frontATP;
+    private AprilTagProcessor backATP;
+    private VisionPortal backVP;
+    private VisionPortal frontVP;
 
-    final static Point3 APIRL_TAG_BOARD_POSTIONS[] = {
-            new Point3(  60.25f, 41.41f,  4f),
-            new Point3( 60.25f,  35.41f,  4f),
-            new Point3(  60.25f,  29.41f,  4f),
-            new Point3(  60.25f,  -29.41f,  4f),
-            new Point3(  60.25f,  -35.41f,  4f),
-            new Point3(  60.25f,  -41.41f,  4f),
+
+    final static Point3[] APIRL_TAG_BOARD_POSTIONS = {
+            new Point3(60.25f, 41.41f, 4f),
+            new Point3(60.25f, 35.41f, 4f),
+            new Point3(60.25f, 29.41f, 4f),
+            new Point3(60.25f, -29.41f, 4f),
+            new Point3(60.25f, -35.41f, 4f),
+            new Point3(60.25f, -41.41f, 4f),
     };
     //Bigs are the 5.5s and 4s are the small
-    final static Point3 APIRL_TAG_WALL_POSTIONS[] = {
-            new Point3(  -70.25f,  -40.625f,  5.5f),
-            new Point3(  -70.25f,  -35.125f,  4f),
-            new Point3(  -70.25f,  35.125f,  4f),
-            new Point3(  -70.25f,  40.625f,  5.5f),
+    final static Point3[] APIRL_TAG_WALL_POSTIONS = {
+            new Point3(-70.25f, -40.625f, 5.5f),
+            new Point3(-70.25f, -35.125f, 4f),
+            new Point3(-70.25f, 35.125f, 4f),
+            new Point3(-70.25f, 40.625f, 5.5f),
     };
 
 
     /**
      * The variable to store our instance of the vision portal.
      */
-    private VisionPortal visionPortal;
 
     /**
      * Initialize the AprilTag processor.
      */
     public static Point3 getTagPosition(int i) {
-        if(i>APIRL_TAG_BOARD_POSTIONS.length-1) {
-            i=i-APIRL_TAG_BOARD_POSTIONS.length;
-            return APIRL_TAG_WALL_POSTIONS[i-1];
+        if (i > APIRL_TAG_BOARD_POSTIONS.length - 1) {
+            i = i - APIRL_TAG_BOARD_POSTIONS.length;
+            return APIRL_TAG_WALL_POSTIONS[i - 1];
         } else {
-            return APIRL_TAG_BOARD_POSTIONS[i-1];
+            return APIRL_TAG_BOARD_POSTIONS[i - 1];
         }
     }
+
     private void initAprilTag() {
 
         // Create the AprilTag processor.
-        aprilTag = new AprilTagProcessor.Builder()
+        frontATP = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
                 .setDrawTagOutline(true)
                 .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
                 .setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
                 .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+                .setLensIntrinsics(627.866405467, 627.866405467, 367.632040506, 237.041562849
+                )
+
+                // == CAMERA CALIBRATION ==
+                // If you do not manually specify calibration parameters, the SDK will attempt
+                // to load a predefined calibration for your camera.
+                //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
+
+                // ... these parameters are fx, fy, cx, cy.
+
+                .build();
+        backATP = new AprilTagProcessor.Builder()
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagOutline(true)
+                .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+                .setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+                .setLensIntrinsics(627.866405467, 627.866405467, 367.632040506, 237.041562849
+                )
 
                 // == CAMERA CALIBRATION ==
                 // If you do not manually specify calibration parameters, the SDK will attempt
@@ -124,17 +145,24 @@ public class ConceptAprilTag extends OpMode {
                 .build();
 
         // Create the vision portal by using a builder.
-        VisionPortal.Builder builder = new VisionPortal.Builder();
+        VisionPortal.Builder backVPB = new VisionPortal.Builder();
+        VisionPortal.Builder frontVPB = new VisionPortal.Builder();
 
         // Set the camera (webcam vs. built-in RC phone camera).
         if (USE_WEBCAM) {
-            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+            backVPB.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
         } else {
-            builder.setCamera(BuiltinCameraDirection.BACK);
+            backVPB.setCamera(BuiltinCameraDirection.BACK);
+        }
+        if (USE_WEBCAM) {
+            frontVPB.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+        } else {
+            frontVPB.setCamera(BuiltinCameraDirection.BACK);
         }
 
         // Choose a camera resolution. Not all cameras support all resolutions.
-        builder.setCameraResolution(new Size(640, 480));
+        frontVPB.setCameraResolution(new Size(640, 480));
+        backVPB.setCameraResolution(new Size(640, 480));
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
         //builder.enableCameraMonitoring(true);
@@ -148,10 +176,12 @@ public class ConceptAprilTag extends OpMode {
         //builder.setAutoStopLiveView(false);
 
         // Set and enable the processor.
-        builder.addProcessor(aprilTag);
+        backVPB.addProcessor(backATP);
+        frontVPB.addProcessor(backATP);
 
         // Build the Vision Portal, using the above settings.
-        visionPortal = builder.build();
+        backVP = backVPB.build();
+        frontVP = frontVPB.build();
 
         // Disable or re-enable the aprilTag processor at any time.
         //visionPortal.setProcessorEnabled(aprilTag, true);
@@ -185,7 +215,7 @@ public class ConceptAprilTag extends OpMode {
 //        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
 //        telemetry.addLine("RBE = Range, Bearing & Elevation");
         Point3 point = getPositionBasedOnTag();
-        telemetry.addLine("Distance X:"+point.x+" Y: "+point.y+" Z: "+point.z);
+        telemetry.addLine("Distance X:" + point.x + " Y: " + point.y + " Z: " + point.z);
 
     }   // end method telemetryAprilTag()
 
@@ -211,19 +241,33 @@ public class ConceptAprilTag extends OpMode {
     }
 
     public Point3 getPositionBasedOnTag() {
-        Point3 fromBoard;
-        ArrayList<AprilTagDetection> detections = aprilTag.getDetections();
-        if(detections.isEmpty()) {
-            return new Point3(0,0,0);
+        ArrayList<AprilTagDetection> detections = new ArrayList<>();
+        if (backVP.getProcessorEnabled(backATP)) {
+            detections.addAll(backATP.getDetections());
+        }
+        if (backVP.getProcessorEnabled(frontATP)) {
+            detections.addAll(frontATP.getDetections());
+        }
+        if (detections.isEmpty()) {
+            return new Point3(0, 0, 0);
         } else {
             AprilTagPoseFtc pose = detections.get(0).ftcPose;
-            telemetry.addData("tag",detections.get(0).id);
-            double sinBearing = Math.sin(Math.toRadians(pose.bearing));
-            telemetry.addData("yaw",Math.tan(Math.toRadians(pose.yaw))*pose.range * sinBearing);
-            return new Point3( pose.range * Math.cos(Math.toRadians(pose.bearing)), (pose.range * sinBearing)+(Math.tan(Math.toRadians(pose.yaw))*pose.range * Math.cos(Math.toRadians(pose.bearing))*pose.range), 0
-            );
-        }
+            Point3 tagpos = getTagPosition(detections.get(0).id);
+            double x = 0;
+            double y = 0;
+            if (tagpos.x > 0) {
+                x = tagpos.x - pose.x;
+            } else {
+                x = tagpos.x + pose.x;
+            }
+            if (tagpos.y > 0) {
+                y = tagpos.y - pose.y;
+            } else {
+                y = tagpos.y + pose.y;
+            }
 
+            return new Point3(x, y, 0);
+        }
 
     }
 }   // end class
