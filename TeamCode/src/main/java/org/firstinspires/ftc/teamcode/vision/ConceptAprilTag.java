@@ -67,6 +67,7 @@ public class ConceptAprilTag extends OpMode {
     private AprilTagProcessor backATP;
     private VisionPortal backVP;
     private VisionPortal frontVP;
+    private final double TAG_ANGLE_OFFSET =1.59807621135;
 
 
     final static Point3[] APIRL_TAG_BOARD_POSTIONS = {
@@ -94,7 +95,7 @@ public class ConceptAprilTag extends OpMode {
      * Initialize the AprilTag processor.
      */
     public static Point3 getTagPosition(int i) {
-        if (i > APIRL_TAG_BOARD_POSTIONS.length - 1) {
+        if (i > APIRL_TAG_BOARD_POSTIONS.length ) {
             i = i - APIRL_TAG_BOARD_POSTIONS.length;
             return APIRL_TAG_WALL_POSTIONS[i - 1];
         } else {
@@ -175,7 +176,7 @@ public class ConceptAprilTag extends OpMode {
 
         // Set and enable the processor.
         backVPB.addProcessor(backATP);
-        frontVPB.addProcessor(backATP);
+        frontVPB.addProcessor(frontATP);
 
         // Build the Vision Portal, using the above settings.
         backVP = backVPB.build();
@@ -254,15 +255,20 @@ public class ConceptAprilTag extends OpMode {
             double x;
             double y;
             if (tagpos.x > 0) {
-                x = tagpos.x - pose.x;
+                x = tagpos.x - pose.y;
             } else {
-                x = tagpos.x + pose.x;
+                x = tagpos.x + pose.y;
             }
             if (tagpos.y > 0) {
-                y = tagpos.y - pose.y;
+                y = tagpos.y - pose.x;
             } else {
-                y = tagpos.y + pose.y;
+                y = tagpos.y + pose.x;
             }
+            if(detections.get(0).id>7) {
+                x-=TAG_ANGLE_OFFSET;
+            }
+            telemetry.addData("x",pose.x);
+            telemetry.addData("y",pose.y-TAG_ANGLE_OFFSET);
 
             return new Point3(x, y, 0);
         }
