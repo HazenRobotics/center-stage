@@ -42,7 +42,7 @@ public class InterleagueCyclingAutoRed extends LinearOpMode {
 	SpikeMarkStates spikeState = SpikeMarkStates.DRIVE_TO_MARK;
 	PickupStackState pickupStackState = PickupStackState.DRIVE_TO_STACK;
 	BackdropScoringStates backdropScoringStates = BackdropScoringStates.DRIVE_TO_BACKDROP;
-	CycleStates cycleStates = CycleStates.DRIVE_TO_STACK
+	CycleStates cycleStates = CycleStates.DRIVE_TO_STACK;
 	RedPropProcessor.PropPosition position;
 	@Override
 	public void runOpMode( ) throws InterruptedException {
