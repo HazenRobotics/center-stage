@@ -48,7 +48,7 @@ public class SwervePDController {
 
 		timer.reset( );
 
-		return new double[]{ (Kp * error) + (Kd * derivative) + (Math.abs(error) < 0.1 ? Ks * signum( error ) : 0 ), motorDirection };
+		return new double[]{ (Kp * error) + (Kd * derivative) + /*(Math.abs(error) < 0.1 ? */Ks * signum( error ) /*: 0 )*/, motorDirection };
 	}
 
 	public void setTargetAngle( double angle ) {

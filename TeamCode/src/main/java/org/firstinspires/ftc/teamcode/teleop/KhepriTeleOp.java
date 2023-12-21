@@ -204,8 +204,12 @@ public class KhepriTeleOp extends LinearOpMode {
 		telemetry.addData( "current hz", currentHz );
 		telemetry.addData( "average hz", averageHz );
 //		robot.drive.displayWheelAngles( telemetry );
-		telemetry.addData( "deltaPositionVector", robot.tracker.getDeltaPositionVector() );
-		telemetry.addData( "deltaTheta", robot.tracker.getDeltaTheta() );
+		telemetry.addData( "deltaTheta (my way)", robot.tracker.getDeltaTheta() );
+		telemetry.addData( "deltaTheta (\"correct way\")",
+				robot.tracker.getPreviousPose2D().getTheta().findShortestDistance(
+						robot.tracker.getPose2D().getTheta()
+				)
+		);
 
 		telemetry.update( );
 	}
