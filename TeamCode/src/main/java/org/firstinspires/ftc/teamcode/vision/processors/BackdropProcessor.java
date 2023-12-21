@@ -34,10 +34,11 @@ public class BackdropProcessor implements VisionProcessor {
     public final static double APRIL_Y_THRESHOLD_HIGH = 450;
     public final static double APRIL_Y_THRESHOLD_LOW = 0;
     public final static int NEAR_SIZE_TORLANCE = 10;
-    private int[] gridRow6s = new int[7];
-    private int[] gridColumns6 = new int[7];
-    private int[] gridRows7 = new int[7];
-    private int[] gridColumns7 = new int[7];
+
+    private final int[] gridRows6 = new int[6];
+    private final int[] gridColumns6 = new int[6];
+    private final int[] gridRows7 = new int[7];
+    private final int[] gridColumns7 = new int[7];
 
 
     public Scalar holeLowerBound = new Scalar(0, 0, 0);
@@ -149,32 +150,50 @@ public class BackdropProcessor implements VisionProcessor {
     }
 
     public void createGrid() {
-        gridColumns6[0] = holeRects.get(0).y + holeRects.get(0).height;
-        for (int i = 1; i > gridColumns6.length; i++) {
-
+        gridColumns6[0] = holeRects.get(0).y;
+        ArrayList<Rect> colounmRects6 = inRow(holeRects.get(0));
+        for (int i = 1; i > colounmRects6.size(); i++) {
+            gridColumns6[i] = colounmRects6.get(i).x;
+            ArrayList<Rect> rowRects6 = inColum(colounmRects6.get(i));
+            for (int j = 0; j > rowRects6.size(); j++) {
+                gridRows6[j] = rowRects6.get(j).x;
+            }
+        }
+        if (holeRects.size() > colounmRects6.size()) {
+            gridColumns7[0] = holeRects.get(colounmRects6.size()).y;
+            ArrayList<Rect> colounmRects7 = inRow(holeRects.get(0));
+            for (int i = 1; i > colounmRects7.size(); i++) {
+                gridColumns7[i] = colounmRects7.get(i).x;
+                ArrayList<Rect> rowRects7 = inColum(colounmRects7.get(i));
+                for (int j = 0; j > rowRects7.size(); j++) {
+                    gridRows7[j] = colounmRects7.get(j).x;
+                }
+            }
         }
 
     }
 
     public boolean outOfGrid(Rect rect) {
-        return inColum(rect.y).isEmpty() && inRow(rect).isEmpty();
+        return inColum(rect).isEmpty() && inRow(rect).isEmpty();
     }
 
-    public ArrayList<Rect> inRow(Rect r1) {
+    public ArrayList<Rect> inRow(Rect targetRectangle) {
         ArrayList<Rect> rects = new ArrayList<>();
-        for (Rect rect : holeRects) {
-            if ((rect.x <= r1.x) && (r1.x < rect.x + rect.width) && rect.equals(r1)) {
-                rects.add(rect);
+        for (Rect currentRectangle : holeRects) {
+            if (((targetRectangle.y - (targetRectangle.height / 2)) <= (currentRectangle.y + NEAR_SIZE_TORLANCE)) ||
+                    ((targetRectangle.y - (targetRectangle.height / 2)) >= (currentRectangle.y - NEAR_SIZE_TORLANCE))) {
+                rects.add(currentRectangle);
             }
         }
         return rects;
     }
 
-    public ArrayList<Rect> inColum(int y) {
+    public ArrayList<Rect> inColum(Rect targetRectangle) {
         ArrayList<Rect> rects = new ArrayList<>();
-        for (Rect rect : holeRects) {
-            if ((rect.y <= y) && (y < rect.y + rect.height)) {
-                rects.add(rect);
+        for (Rect currentRectangle : holeRects) {
+            if (((targetRectangle.x - (targetRectangle.width / 2)) <= (currentRectangle.x + NEAR_SIZE_TORLANCE)) ||
+                    ((targetRectangle.x - (targetRectangle.width / 2)) >= (currentRectangle.x - NEAR_SIZE_TORLANCE))) {
+                rects.add(currentRectangle);
             }
         }
         return rects;
@@ -212,4 +231,6 @@ public class BackdropProcessor implements VisionProcessor {
     public ArrayList<Rect> getHoleRects() {
         return holeRects;
     }
+
+
 }
