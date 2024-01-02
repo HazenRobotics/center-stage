@@ -78,6 +78,7 @@ public class PixelBucketProcessor implements VisionProcessor {
         Core.inRange(bucket, purpleLowerBound, purpleUpperBound, purple);
         Core.inRange(bucket, yellowLowerBound, yellowUpperBound, yellow);
 //		Core.inRange( temp, whiteLowerBound, whiteUpperBound, white );
+
     return frame;
     }
 

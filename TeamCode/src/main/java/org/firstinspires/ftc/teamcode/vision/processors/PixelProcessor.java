@@ -20,21 +20,20 @@ import java.util.List;
 
 public class PixelProcessor implements VisionProcessor {
 
+    public Scalar greenLowerBoundHSV = new Scalar(39.7, 49.6, 60.9);
+    public Scalar greenUpperBoundHSV = new Scalar(79, 255, 255);
+    public Scalar purpleLowerBoundHSV = new Scalar(100, 23, 102);
+    public Scalar purpleUpperBoundHSV = new Scalar(157, 111, 255);
+    public Scalar yellowLowerBoundHSV = new Scalar(8, 100, 175);
+    public Scalar yellowUpperBoundHSV = new Scalar(45, 255, 255);
     public enum PixelColor {
         GREEN, PURPLE, YELLOW, WHITE
     }
 
-    PixelColor color = PixelColor.GREEN;
-    public Scalar greenLowerBoundHSV = new Scalar(40, 85, 40);
-    public Scalar greenUpperBoundHSV = new Scalar(50, 255, 255);
-    Scalar greenLowerBoundLAB = new Scalar(0, 74, 149);
-    Scalar greenUpperBoundLAB = new Scalar(255, 118, 255);
-    Scalar purpleLowerBound = new Scalar(122, 23, 102);
-    Scalar purpleUpperBound = new Scalar(157, 111, 255);
-    Scalar yellowLowerBound = new Scalar(8, 135, 179);
-    Scalar yellowUpperBound = new Scalar(45, 255, 255);
-    Scalar whiteLowerBound = new Scalar(0, 0, 181);
-    Scalar whiteUpperBound = new Scalar(76, 14, 255);
+
+
+
+
 
     Mat temp = new Mat();
     Mat green = new Mat();
@@ -62,16 +61,14 @@ public class PixelProcessor implements VisionProcessor {
         Imgproc.morphologyEx(temp, temp, Imgproc.MORPH_DILATE, kernel, new Point(0, 0), 4);
 
         Core.inRange(temp, greenLowerBoundHSV, greenUpperBoundHSV, green);
-        Core.inRange(temp, purpleLowerBound, purpleUpperBound, purple);
-        Core.inRange(temp, yellowLowerBound, yellowUpperBound, yellow);
-//		Core.inRange( temp, whiteLowerBound, whiteUpperBound, white );
+        Core.inRange(temp, purpleLowerBoundHSV, purpleUpperBoundHSV, purple);
+        Core.inRange(temp, yellowLowerBoundHSV, yellowUpperBoundHSV, yellow);
 
         List<MatOfPoint> contours = new ArrayList<>();
 
         findBoundingBoxes(green, greenRects, contours);
         findBoundingBoxes(purple, purpleRects, contours);
         findBoundingBoxes(yellow, yellowRects, contours);
-//		findBoundingBoxes( white, whiteRects, contours );
 
         return frame;
     }

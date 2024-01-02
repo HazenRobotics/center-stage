@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.teamcode.vision.Pixel;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -16,41 +17,46 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class BackdropProcessor implements VisionProcessor {
 
-    public enum PixelColor {
-        GREEN, PURPLE, YELLOW, WHITE
-    }
 
-    public final static double PIXEL_SQUARE_THRESHOLD = 1.5;
-    public final static double PIXEL_SIZE_THRESHOLD_LOW = 10;
-    public final static double PIXEL_SIZE_THRESHOLD_HIGH = 40;
-    public final static double APRIL_SQUARE_THRESHOLD_LOW = 1.1;
-    public final static double APRIL_SQUARE_THRESHOLD_HIGH = 2;
-    public final static double APRIL_SIZE_THRESHOLD_LOW = 40;
-    public final static double APRIL_SIZE_THRESHOLD_HIGH = 100;
-    public final static double APRIL_Y_THRESHOLD_HIGH = 450;
-    public final static double APRIL_Y_THRESHOLD_LOW = 0;
-    public final static int NEAR_SIZE_TORLANCE = 10;
-
-    private final int[] gridRows6 = new int[6];
-    private final int[] gridColumns6 = new int[6];
-    private final int[] gridRows7 = new int[7];
-    private final int[] gridColumns7 = new int[7];
-
-
+    public static int PIXEL_SIZE_THRESHOLD_LOW = 5;
+    public static int PIXEL_SIZE_THRESHOLD_HIGH = 40;
+    public Scalar greenLowerBound = new Scalar(44, 41.1, 47);
+    public Scalar greenUpperBound = new Scalar(93.5, 255, 255);
+    public Scalar purpleLowerBound = new Scalar(122, 23, 102);
+    public Scalar purpleUpperBound = new Scalar(157, 111, 255);
+    public Scalar yellowLowerBound = new Scalar(8, 135, 179);
+    public Scalar yellowUpperBound = new Scalar(45, 255, 255);
+    Scalar whiteLowerBound = new Scalar(0, 0, 181);
+    Scalar whiteUpperBound = new Scalar(76, 14, 255);
     public Scalar holeLowerBound = new Scalar(0, 0, 0);
-    public Scalar holeUpperBound = new Scalar(255, 255, 120);
-    Mat pixels = new Mat();
+    public Scalar holeUpperBound = new Scalar(255, 255, 153);
+
+    Mat temp = new Mat();
+    Mat green = new Mat();
+    Mat purple = new Mat();
+    Mat yellow = new Mat();
+    Mat white = new Mat();
 
     Mat kernel = Mat.ones(3, 3, CvType.CV_32F);
 
-    ArrayList<Rect> holeRects = new ArrayList<>();
-    ArrayList<Rect> aprilRects = new ArrayList<>();
+    ArrayList<Rect> greenRects = new ArrayList<>();
+    ArrayList<Rect> purpleRects = new ArrayList<>();
+    ArrayList<Rect> yellowRects = new ArrayList<>();
+    ArrayList<Rect> whiteRects = new ArrayList<>();
+
+
+    Mat pixels = new Mat();
+
+    ArrayList<Pixel> pixelArrayList = new ArrayList<>();
+    Rect zoneRect = new Rect();
+
     ArrayList<Rect> noiseRects = new ArrayList<>();
-    ArrayList<Rect> allRects = new ArrayList<>();
+    ArrayList<Rect> badRects = new ArrayList<>();
 
     @Override
     public void init(int width, int height, CameraCalibration calibration) {
@@ -59,43 +65,56 @@ public class BackdropProcessor implements VisionProcessor {
 
     @Override
     public Object processFrame(Mat frame, long captureTimeNanos) {
-        Imgproc.cvtColor(frame, pixels, Imgproc.COLOR_RGB2HSV);
 
+        Imgproc.cvtColor(frame, temp, Imgproc.COLOR_RGB2HSV);
 
-        Core.inRange(pixels, holeLowerBound, holeUpperBound, pixels);
+        Imgproc.morphologyEx(temp, temp, Imgproc.MORPH_ERODE, kernel, new Point(0, 0), 3);
+        Imgproc.morphologyEx(temp, temp, Imgproc.MORPH_DILATE, kernel, new Point(0, 0), 4);
 
-        Imgproc.morphologyEx(pixels, pixels, Imgproc.MORPH_ERODE, kernel, new Point(0, 0), 3);
-        Imgproc.morphologyEx(pixels, pixels, Imgproc.MORPH_DILATE, kernel, new Point(0, 0), 3);
+        Core.inRange(temp, holeLowerBound, holeUpperBound, pixels);
+        Core.inRange(temp, greenLowerBound, greenUpperBound, green);
+        Core.inRange(temp, purpleLowerBound, purpleUpperBound, purple);
+        Core.inRange(temp, yellowLowerBound, yellowUpperBound, yellow);
+		Core.inRange( temp, whiteLowerBound, whiteUpperBound, white );
+
 
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
+        findBoundingBoxes(green, greenRects, contours);
+        findBoundingBoxes(purple, purpleRects, contours);
+        findBoundingBoxes(yellow, yellowRects, contours);
+        findBoundingBoxes( white, whiteRects, contours );
         Imgproc.findContours(pixels, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        holeRects.clear();
-        aprilRects.clear();
+        pixelArrayList.clear();
         noiseRects.clear();
-        allRects.clear();
-        int highestY = 0;
-        int lowestY = 1000000;
+
+        zoneRect = new Rect();
         for (int i = 0; i < contours.size(); i++) {
             Rect boundingRect = Imgproc.boundingRect(contours.get(i));
-            allRects.add(boundingRect);
-            if (boundingRect.height < boundingRect.width * PIXEL_SQUARE_THRESHOLD && boundingRect.width < boundingRect.height * PIXEL_SQUARE_THRESHOLD && boundingRect.width < PIXEL_SIZE_THRESHOLD_HIGH && boundingRect.width > PIXEL_SIZE_THRESHOLD_LOW && boundingRect.height < PIXEL_SIZE_THRESHOLD_HIGH && boundingRect.height > PIXEL_SIZE_THRESHOLD_LOW) {
-                holeRects.add(boundingRect);
-                if (boundingRect.y > highestY) {
-                    highestY = boundingRect.y;
-                }
-                if (boundingRect.y < lowestY) {
-                    lowestY = boundingRect.y;
-                }
+            if (boundingRect.area() > zoneRect.area() && boundingRect.height < 500 && boundingRect.width < 600) {
+                zoneRect = boundingRect;
+            }
+        }
 
-            } else if (boundingRect.height > boundingRect.width * APRIL_SQUARE_THRESHOLD_LOW && boundingRect.height < boundingRect.width * APRIL_SQUARE_THRESHOLD_HIGH && boundingRect.width < APRIL_SIZE_THRESHOLD_HIGH && boundingRect.width > APRIL_SIZE_THRESHOLD_LOW && boundingRect.y > APRIL_Y_THRESHOLD_LOW && boundingRect.x < APRIL_Y_THRESHOLD_HIGH) {
-                aprilRects.add(boundingRect);
-            } else {
+        for (int i = 0; i < contours.size(); i++) {
+            Rect boundingRect = Imgproc.boundingRect(contours.get(i));
+            if (zoneRect.contains(boundingRect.tl()) && zoneRect.contains(boundingRect.br()) && !zoneRect.equals(boundingRect) && (boundingRect.height > PIXEL_SIZE_THRESHOLD_LOW && boundingRect.height < PIXEL_SIZE_THRESHOLD_HIGH)) {
+                pixelArrayList.add(new Pixel(boundingRect, greenRects, purpleRects, yellowRects,whiteRects));
+            } else if (!zoneRect.equals(boundingRect)) {
                 noiseRects.add(boundingRect);
             }
         }
-        removeBadPixels(allRects);
+        removeBadPixels(pixelArrayList);
+
+        ArrayList<ArrayList<Pixel>> grid = grid(pixelArrayList);
+        for(int i=0; i<grid.size(); i++) {
+            for(int j=0; j<grid.get(i).size(); j++) {
+                if(!pixelArrayList.contains( grid.get(i).get(j))) {
+                    pixelArrayList.add(grid.get(i).get(j));
+                }
+            }
+        }
+
         return frame;
     }
 
@@ -103,14 +122,17 @@ public class BackdropProcessor implements VisionProcessor {
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight,
                             float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
         Paint paint = new Paint();
-        paint.setColor(Color.GREEN);
+        paint.setColor(Color.BLUE);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(scaleCanvasDensity * 4);
-        displayRects(holeRects, Color.GREEN, paint, canvas, scaleBmpPxToCanvasPx);
+        canvas.drawRect(makeGraphicsRect(zoneRect, scaleBmpPxToCanvasPx), paint);
+        displayPixels(pixelArrayList, paint, canvas, scaleBmpPxToCanvasPx);
         displayRects(noiseRects, Color.RED, paint, canvas, scaleBmpPxToCanvasPx);
-        displayRects(aprilRects, Color.BLUE, paint, canvas, scaleBmpPxToCanvasPx);
-
-
+        displayRects(badRects, Color.RED, paint, canvas, scaleBmpPxToCanvasPx);
+        displayRects(greenRects, Color.CYAN, paint, canvas, scaleBmpPxToCanvasPx);
+        displayRects(purpleRects, Color.CYAN, paint, canvas, scaleBmpPxToCanvasPx);
+        displayRects(yellowRects, Color.CYAN, paint, canvas, scaleBmpPxToCanvasPx);
+        displayRects(whiteRects, Color.CYAN, paint, canvas, scaleBmpPxToCanvasPx);
     }
 
     private android.graphics.Rect makeGraphicsRect(Rect rect, float scaleBmpPxToCanvasPx) {
@@ -121,116 +143,124 @@ public class BackdropProcessor implements VisionProcessor {
         return new android.graphics.Rect(left, top, right, bottom);
     }
 
-    private Rect pointToPointRect(int x1, int x2, int y1, int y2) {
-        return new Rect(x1, y1, x2 - x1, y2 - y1);
-    }
 
-    public void removeSmallerPixel(Rect r1, Rect r2) {
-
-        Rect removeRect = r1;
-        if (aprilRects.contains(r1)) {
-            removeRect = r2;
-        } else if (aprilRects.contains(r2)) {
-        } else if (noiseRects.contains(r1)) {
-        } else if (noiseRects.contains(r2)) {
-            removeRect = r2;
-        } else if (r1.area() > r2.area()) {
-            removeRect = r2;
+    public void removeSmallerPixel(Pixel p1, Pixel p2) {
+        if (p1.getRect().area() > p2.getRect().area()) {
+            pixelArrayList.remove(p2);
+            badRects.add(p2.getRect());
+        } else {
+            pixelArrayList.remove(p1);
+            badRects.add(p1.getRect());
         }
-        holeRects.remove(removeRect);
-
 
     }
 
-    public boolean isNear(Rect r1, Rect r2) {
-        r1 = new Rect(r1.x, r1.y, r1.width + NEAR_SIZE_TORLANCE, r1.height + NEAR_SIZE_TORLANCE);
-        r2 = new Rect(r2.x, r2.y, r2.width + NEAR_SIZE_TORLANCE, r2.height + NEAR_SIZE_TORLANCE);
 
-        return (r1.x <= r2.x) && (r2.x < r1.x + r1.width) && (r2.y <= r1.y) && (r1.y < r2.y + r2.width) || (r2.x <= r1.x) && (r1.x < r2.x + r2.width) && (r2.y <= r1.y) && (r1.y < r2.y + r2.width);
-    }
-
-    public void createGrid() {
-        gridColumns6[0] = holeRects.get(0).y;
-        ArrayList<Rect> colounmRects6 = inRow(holeRects.get(0));
-        for (int i = 1; i > colounmRects6.size(); i++) {
-            gridColumns6[i] = colounmRects6.get(i).x;
-            ArrayList<Rect> rowRects6 = inColum(colounmRects6.get(i));
-            for (int j = 0; j > rowRects6.size(); j++) {
-                gridRows6[j] = rowRects6.get(j).x;
-            }
-        }
-        if (holeRects.size() > colounmRects6.size()) {
-            gridColumns7[0] = holeRects.get(colounmRects6.size()).y;
-            ArrayList<Rect> colounmRects7 = inRow(holeRects.get(0));
-            for (int i = 1; i > colounmRects7.size(); i++) {
-                gridColumns7[i] = colounmRects7.get(i).x;
-                ArrayList<Rect> rowRects7 = inColum(colounmRects7.get(i));
-                for (int j = 0; j > rowRects7.size(); j++) {
-                    gridRows7[j] = colounmRects7.get(j).x;
+    public void removeBadPixels(ArrayList<Pixel> pixels) {
+        badRects.clear();
+            for (int i = 0; i < pixels.size(); i++) {
+                pixels.size();
+                if (pixels.get(i).isTouchingBorder(zoneRect)) {
+                    badRects.add(pixels.get(i).getRect());
+                    pixels.remove(pixels.get(i));
                 }
+
             }
-        }
-
-    }
-
-    public boolean outOfGrid(Rect rect) {
-        return inColum(rect).isEmpty() && inRow(rect).isEmpty();
-    }
-
-    public ArrayList<Rect> inRow(Rect targetRectangle) {
-        ArrayList<Rect> rects = new ArrayList<>();
-        for (Rect currentRectangle : holeRects) {
-            if (((targetRectangle.y - (targetRectangle.height / 2)) <= (currentRectangle.y + NEAR_SIZE_TORLANCE)) ||
-                    ((targetRectangle.y - (targetRectangle.height / 2)) >= (currentRectangle.y - NEAR_SIZE_TORLANCE))) {
-                rects.add(currentRectangle);
-            }
-        }
-        return rects;
-    }
-
-    public ArrayList<Rect> inColum(Rect targetRectangle) {
-        ArrayList<Rect> rects = new ArrayList<>();
-        for (Rect currentRectangle : holeRects) {
-            if (((targetRectangle.x - (targetRectangle.width / 2)) <= (currentRectangle.x + NEAR_SIZE_TORLANCE)) ||
-                    ((targetRectangle.x - (targetRectangle.width / 2)) >= (currentRectangle.x - NEAR_SIZE_TORLANCE))) {
-                rects.add(currentRectangle);
-            }
-        }
-        return rects;
-    }
-
-    public void removeBadPixels(ArrayList<Rect> rects) {
-        for (int i = 0; i < rects.size(); i++) {
-            for (int j = 0; j < rects.size(); j++) {
-                Rect r1 = rects.get(j);
-                Rect r2 = rects.get(i);
-                if (isNear(r1, r2) && !r2.equals(r1)) {
-                    if (holeRects.contains(r1) && outOfGrid(r1)) {
-                        holeRects.remove(r1);
-                    } else {
+            for (int i = 0; i < pixels.size(); i++) {
+                for (int j = 0; j < pixels.size(); j++) {
+                    while (i >= pixels.size()) i--;
+                    Pixel r1 = pixels.get(j);
+                    Pixel r2 = pixels.get(i);
+                    if (r1.isNear(r2.getRect()) && !r2.equals(r1)) {
                         removeSmallerPixel(r1, r2);
                     }
 
                 }
 
-            }
         }
 
     }
 
-    public void displayRects(ArrayList<Rect> rects, int color, Paint paint, Canvas canvas, float scaleBmpPxToCanvasPx) {
+
+    public void displayRects(ArrayList<Rect> rects, int color, Paint paint, Canvas canvas,
+                             float scaleBmpPxToCanvasPx) {
         paint.setColor(color);
-        for (int i = 0; i < rects.size(); i++) {
-            if (rects.get(i) != null) {
-                canvas.drawRect(makeGraphicsRect(rects.get(i), scaleBmpPxToCanvasPx), paint);
+        if (!rects.isEmpty()) {
+            for (int i = 0; i < rects.size(); i++) {
+                if (rects.get(i) != null) {
+
+                    canvas.drawRect(makeGraphicsRect(rects.get(i), scaleBmpPxToCanvasPx), paint);
+                }
             }
         }
-
     }
 
-    public ArrayList<Rect> getHoleRects() {
-        return holeRects;
+    public void displayPixels(ArrayList<Pixel> pixels, Paint paint, Canvas canvas, float scaleBmpPxToCanvasPx) {
+        if (!pixels.isEmpty()) {
+            for (int i=0; i<pixels.size(); i++) {
+                Pixel pixel = pixels.get(i);
+                if (pixel != null) {
+                    paint.setColor(pixel.getGraphicColor());
+                    canvas.drawRect(makeGraphicsRect(pixel.getRect(), scaleBmpPxToCanvasPx), paint);
+                }
+            }
+        }
+    }
+    public ArrayList<ArrayList<Pixel>> getGrid() {
+        return grid(pixelArrayList);
     }
 
 
+    public ArrayList<ArrayList<Pixel>> grid(ArrayList<Pixel> pixels) {
+        ArrayList<ArrayList<Pixel>> arr1 = new ArrayList<>();
+        int maxItems = 7;
+        while (!pixels.isEmpty()) {
+            ArrayList<Pixel> neighbors = pixels.get(0).rowNeighbors(pixels);
+            neighbors.add(pixels.get(0));
+            pixels.sort(Comparator.comparingDouble(p -> p.getRect().x));
+            maxItems = (maxItems == 6) ? 7 : 6;
+
+            if (neighbors.size() > maxItems) {
+                neighbors.subList(maxItems, neighbors.size()).clear(); // Ensure neighbors does not exceed maxItems
+            } else if (neighbors.size() < maxItems) {
+                for (int j = 0; j < neighbors.size() - 1; j++) {
+                    int gap = neighbors.get(j + 1).getRect().x - (neighbors.get(j).getRect().x + neighbors.get(j).getRect().width);
+                    if (gap > 35) {
+                        int newX = neighbors.get(j).getRect().x + neighbors.get(j).getRect().width + 25;
+                        neighbors.add(new Pixel(new Rect(newX, neighbors.get(j).getRect().y, 20, 20), greenRects, purpleRects, yellowRects, whiteRects));
+                    }
+                }
+            }
+
+            arr1.add(neighbors);
+            pixels.removeAll(neighbors);
+        }
+
+        return arr1;
+    }
+
+
+    private void findBoundingBoxes(Mat mat, ArrayList<Rect> rects, List<MatOfPoint> contourList) {
+        Imgproc.findContours(mat, contourList, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        rects.clear();
+        for (int i = 0; i < contourList.size(); i++) {
+            MatOfPoint point = contourList.get(i);
+            Rect boundingRect = Imgproc.boundingRect(point);
+            if(boundingRect.area()>500) {
+                rects.add(changeScale(boundingRect,0.5));
+            }
+        }
+        contourList.clear();
+    }
+    public static Rect changeScale(Rect rect, double factor) {
+        // Calculate the new width and height
+        int newWidth = (int)(rect.width * factor);
+        int newHeight = (int)(rect.height * factor);
+        // The top-left point changes
+        int newX = rect.x + (rect.width - newWidth);
+        int newY = rect.y + (rect.height - newHeight);
+        // Create and return the new Rect
+        return new Rect(newX, newY, newWidth, newHeight);
+    }
 }
