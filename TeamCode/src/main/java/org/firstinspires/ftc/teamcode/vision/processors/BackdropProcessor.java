@@ -6,6 +6,7 @@ import android.graphics.Paint;
 
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.vision.Pixel;
+import org.firstinspires.ftc.teamcode.vision.PixelColor;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -25,29 +26,29 @@ public class BackdropProcessor implements VisionProcessor {
 
     public static int PIXEL_SIZE_THRESHOLD_LOW = 5;
     public static int PIXEL_SIZE_THRESHOLD_HIGH = 40;
-    public Scalar greenLowerBound = new Scalar(44, 41.1, 47);
-    public Scalar greenUpperBound = new Scalar(93.5, 255, 255);
-    public Scalar purpleLowerBound = new Scalar(122, 23, 102);
-    public Scalar purpleUpperBound = new Scalar(157, 111, 255);
-    public Scalar yellowLowerBound = new Scalar(8, 135, 179);
-    public Scalar yellowUpperBound = new Scalar(45, 255, 255);
-    Scalar whiteLowerBound = new Scalar(0, 0, 181);
-    Scalar whiteUpperBound = new Scalar(76, 14, 255);
+    public Scalar greenLowerBound = new Scalar(41, 29.8, 73);
+    public Scalar greenUpperBound = new Scalar(55, 114, 141);
+    public Scalar purpleLowerBound = new Scalar(120, 41, 121);
+    public Scalar purpleUpperBound = new Scalar(125, 67, 161);
+    public Scalar yellowLowerBound = new Scalar(0, 109, 141);
+    public Scalar yellowUpperBound = new Scalar(42, 148, 208);
+
     public Scalar holeLowerBound = new Scalar(0, 0, 0);
-    public Scalar holeUpperBound = new Scalar(255, 255, 153);
+    public Scalar holeUpperBound = new Scalar(255, 213, 139);
+    public Scalar  zoneLowerBound = new Scalar(0, 0, 0);
+    public Scalar zoneUpperBound = new Scalar(255, 255, 153);
 
     Mat temp = new Mat();
     Mat green = new Mat();
     Mat purple = new Mat();
     Mat yellow = new Mat();
-    Mat white = new Mat();
+    Mat zone = new Mat();
 
     Mat kernel = Mat.ones(3, 3, CvType.CV_32F);
 
     ArrayList<Rect> greenRects = new ArrayList<>();
     ArrayList<Rect> purpleRects = new ArrayList<>();
     ArrayList<Rect> yellowRects = new ArrayList<>();
-    ArrayList<Rect> whiteRects = new ArrayList<>();
 
 
     Mat pixels = new Mat();
@@ -75,22 +76,24 @@ public class BackdropProcessor implements VisionProcessor {
         Core.inRange(temp, greenLowerBound, greenUpperBound, green);
         Core.inRange(temp, purpleLowerBound, purpleUpperBound, purple);
         Core.inRange(temp, yellowLowerBound, yellowUpperBound, yellow);
-		Core.inRange( temp, whiteLowerBound, whiteUpperBound, white );
-
+        Core.inRange(temp, zoneLowerBound, zoneUpperBound, zone);
 
         List<MatOfPoint> contours = new ArrayList<>();
+        List<MatOfPoint> zones = new ArrayList<>();
         Mat hierarchy = new Mat();
+
         findBoundingBoxes(green, greenRects, contours);
         findBoundingBoxes(purple, purpleRects, contours);
         findBoundingBoxes(yellow, yellowRects, contours);
-        findBoundingBoxes( white, whiteRects, contours );
         Imgproc.findContours(pixels, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(zone, zones, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+
         pixelArrayList.clear();
         noiseRects.clear();
-
         zoneRect = new Rect();
-        for (int i = 0; i < contours.size(); i++) {
-            Rect boundingRect = Imgproc.boundingRect(contours.get(i));
+
+        for (int i = 0; i < zones.size(); i++) {
+            Rect boundingRect = Imgproc.boundingRect(zones.get(i));
             if (boundingRect.area() > zoneRect.area() && boundingRect.height < 500 && boundingRect.width < 600) {
                 zoneRect = boundingRect;
             }
@@ -99,7 +102,7 @@ public class BackdropProcessor implements VisionProcessor {
         for (int i = 0; i < contours.size(); i++) {
             Rect boundingRect = Imgproc.boundingRect(contours.get(i));
             if (zoneRect.contains(boundingRect.tl()) && zoneRect.contains(boundingRect.br()) && !zoneRect.equals(boundingRect) && (boundingRect.height > PIXEL_SIZE_THRESHOLD_LOW && boundingRect.height < PIXEL_SIZE_THRESHOLD_HIGH)) {
-                pixelArrayList.add(new Pixel(boundingRect, greenRects, purpleRects, yellowRects,whiteRects));
+                pixelArrayList.add(new Pixel(boundingRect, greenRects, purpleRects, yellowRects));
             } else if (!zoneRect.equals(boundingRect)) {
                 noiseRects.add(boundingRect);
             }
@@ -132,7 +135,6 @@ public class BackdropProcessor implements VisionProcessor {
         displayRects(greenRects, Color.CYAN, paint, canvas, scaleBmpPxToCanvasPx);
         displayRects(purpleRects, Color.CYAN, paint, canvas, scaleBmpPxToCanvasPx);
         displayRects(yellowRects, Color.CYAN, paint, canvas, scaleBmpPxToCanvasPx);
-        displayRects(whiteRects, Color.CYAN, paint, canvas, scaleBmpPxToCanvasPx);
     }
 
     private android.graphics.Rect makeGraphicsRect(Rect rect, float scaleBmpPxToCanvasPx) {
@@ -217,19 +219,11 @@ public class BackdropProcessor implements VisionProcessor {
         while (!pixels.isEmpty()) {
             ArrayList<Pixel> neighbors = pixels.get(0).rowNeighbors(pixels);
             neighbors.add(pixels.get(0));
-            pixels.sort(Comparator.comparingDouble(p -> p.getRect().x));
+            pixels.sort(Comparator.comparingDouble(p -> -p.getRect().x));
             maxItems = (maxItems == 6) ? 7 : 6;
 
             if (neighbors.size() > maxItems) {
                 neighbors.subList(maxItems, neighbors.size()).clear(); // Ensure neighbors does not exceed maxItems
-            } else if (neighbors.size() < maxItems) {
-                for (int j = 0; j < neighbors.size() - 1; j++) {
-                    int gap = neighbors.get(j + 1).getRect().x - (neighbors.get(j).getRect().x + neighbors.get(j).getRect().width);
-                    if (gap > 35) {
-                        int newX = neighbors.get(j).getRect().x + neighbors.get(j).getRect().width + 25;
-                        neighbors.add(new Pixel(new Rect(newX, neighbors.get(j).getRect().y, 20, 20), greenRects, purpleRects, yellowRects, whiteRects));
-                    }
-                }
             }
 
             arr1.add(neighbors);

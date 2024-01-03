@@ -13,9 +13,9 @@ public class Pixel {
         rect=r;
         color=c;
     }
-    public Pixel(Rect r,ArrayList<Rect> greenRects,ArrayList<Rect> purpleRects,ArrayList<Rect> yellowRects,ArrayList<Rect> whiteRects) {
+    public Pixel(Rect r,ArrayList<Rect> greenRects,ArrayList<Rect> purpleRects,ArrayList<Rect> yellowRects) {
         rect=r;
-        color=this.getPixelColor(greenRects,purpleRects,yellowRects,whiteRects);
+        color=this.getPixelColor(greenRects,purpleRects,yellowRects);
     }
     public boolean isNear(Rect r2) {
         double centerXDistance = Math.abs((rect.x + rect.width / 2.0) - (r2.x + r2.width / 2.0));
@@ -43,7 +43,7 @@ public class Pixel {
         return leftDistance <= 10 || rightDistance <= 10 ||
                 topDistance <= 10 || bottomDistance <= 10;
     }
-    public  PixelColor getPixelColor(ArrayList<Rect> greenRects,ArrayList<Rect> purpleRects,ArrayList<Rect> yellowRects,ArrayList<Rect> whiteRects) {
+    public  PixelColor getPixelColor(ArrayList<Rect> greenRects,ArrayList<Rect> purpleRects,ArrayList<Rect> yellowRects) {
         for (int i = 0; i < greenRects.size(); i++) {
             if (isTouching(greenRects.get(i))) {
                 return PixelColor.GREEN;
@@ -59,12 +59,8 @@ public class Pixel {
                 return PixelColor.YELLOW;
             }
         }
-        for (int i = 0; i < whiteRects.size(); i++) {
-            if (isTouching(whiteRects.get(i))) {
-                return PixelColor.WHITE;
-            }
-        }
-        return PixelColor.BLANK;
+
+        return PixelColor.WHITE;
     }
     public int getGraphicColor() {
         if(color == PixelColor.GREEN) {
@@ -76,10 +72,11 @@ public class Pixel {
         if(color == PixelColor.YELLOW) {
             return Color.YELLOW;
         }
-        if(color==PixelColor.WHITE) {
+        if(color == PixelColor.WHITE) {
             return Color.WHITE;
         }
         return Color.BLACK;
+
     }
     public ArrayList<Pixel> rowNeighbors(ArrayList<Pixel> pixels) {
         ArrayList<Pixel> neighbor = new ArrayList<>();
