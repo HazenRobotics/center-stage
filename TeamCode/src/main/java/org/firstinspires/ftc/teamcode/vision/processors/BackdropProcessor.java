@@ -35,7 +35,7 @@ public class BackdropProcessor implements VisionProcessor {
 
     public Scalar holeLowerBound = new Scalar(0, 0, 0);
     public Scalar holeUpperBound = new Scalar(255, 213, 139);
-    public Scalar  zoneLowerBound = new Scalar(0, 0, 0);
+    public Scalar zoneLowerBound = new Scalar(0, 0, 0);
     public Scalar zoneUpperBound = new Scalar(255, 255, 153);
 
     Mat temp = new Mat();
@@ -110,9 +110,9 @@ public class BackdropProcessor implements VisionProcessor {
         removeBadPixels(pixelArrayList);
 
         ArrayList<ArrayList<Pixel>> grid = grid(pixelArrayList);
-        for(int i=0; i<grid.size(); i++) {
-            for(int j=0; j<grid.get(i).size(); j++) {
-                if(!pixelArrayList.contains( grid.get(i).get(j))) {
+        for (int i = 0; i < grid.size(); i++) {
+            for (int j = 0; j < grid.get(i).size(); j++) {
+                if (!pixelArrayList.contains(grid.get(i).get(j))) {
                     pixelArrayList.add(grid.get(i).get(j));
                 }
             }
@@ -160,24 +160,24 @@ public class BackdropProcessor implements VisionProcessor {
 
     public void removeBadPixels(ArrayList<Pixel> pixels) {
         badRects.clear();
-            for (int i = 0; i < pixels.size(); i++) {
-                pixels.size();
-                if (pixels.get(i).isTouchingBorder(zoneRect)) {
-                    badRects.add(pixels.get(i).getRect());
-                    pixels.remove(pixels.get(i));
+        for (int i = 0; i < pixels.size(); i++) {
+            pixels.size();
+            if (pixels.get(i).isTouchingBorder(zoneRect)) {
+                badRects.add(pixels.get(i).getRect());
+                pixels.remove(pixels.get(i));
+            }
+
+        }
+        for (int i = 0; i < pixels.size(); i++) {
+            for (int j = 0; j < pixels.size(); j++) {
+                while (i >= pixels.size()) i--;
+                Pixel r1 = pixels.get(j);
+                Pixel r2 = pixels.get(i);
+                if (r1.isNear(r2.getRect()) && !r2.equals(r1)) {
+                    removeSmallerPixel(r1, r2);
                 }
 
             }
-            for (int i = 0; i < pixels.size(); i++) {
-                for (int j = 0; j < pixels.size(); j++) {
-                    while (i >= pixels.size()) i--;
-                    Pixel r1 = pixels.get(j);
-                    Pixel r2 = pixels.get(i);
-                    if (r1.isNear(r2.getRect()) && !r2.equals(r1)) {
-                        removeSmallerPixel(r1, r2);
-                    }
-
-                }
 
         }
 
@@ -199,7 +199,7 @@ public class BackdropProcessor implements VisionProcessor {
 
     public void displayPixels(ArrayList<Pixel> pixels, Paint paint, Canvas canvas, float scaleBmpPxToCanvasPx) {
         if (!pixels.isEmpty()) {
-            for (int i=0; i<pixels.size(); i++) {
+            for (int i = 0; i < pixels.size(); i++) {
                 Pixel pixel = pixels.get(i);
                 if (pixel != null) {
                     paint.setColor(pixel.getGraphicColor());
@@ -208,6 +208,7 @@ public class BackdropProcessor implements VisionProcessor {
             }
         }
     }
+
     public ArrayList<ArrayList<Pixel>> getGrid() {
         return grid(pixelArrayList);
     }
@@ -229,8 +230,32 @@ public class BackdropProcessor implements VisionProcessor {
             arr1.add(neighbors);
             pixels.removeAll(neighbors);
         }
-
+        positionGird(arr1);
         return arr1;
+    }
+
+    public void positionGird(ArrayList<ArrayList<Pixel>> grid) {
+        int maxItems = 7;
+        for (int i = 0; i < grid.size(); i++) {
+            maxItems = (maxItems == 6) ? 7 : 6;
+            for (int j = 0; j < grid.get(i).size() && !(grid.get(i).size() == maxItems); j++) {
+                int realPostion = 0;
+                if (maxItems == 6) {
+                    int segmentsize = (zoneRect.width - 40) / 6;
+                    while (grid.get(i).get(j).getRect().x < zoneRect.x + (segmentsize * realPostion) + 20)
+                        realPostion++;
+                }
+                if (maxItems == 7) {
+                    int segmentsize = zoneRect.width / 7;
+                    while (grid.get(i).get(j).getRect().x < zoneRect.x + (segmentsize * realPostion))
+                        realPostion++;
+                }
+                while (realPostion>j) {
+                    grid.get(i).add(new Pixel(new Rect(0,0,10,10), PixelColor.BLANK));
+                    i++;
+                }
+            }
+        }
     }
 
 
@@ -241,16 +266,17 @@ public class BackdropProcessor implements VisionProcessor {
         for (int i = 0; i < contourList.size(); i++) {
             MatOfPoint point = contourList.get(i);
             Rect boundingRect = Imgproc.boundingRect(point);
-            if(boundingRect.area()>500) {
-                rects.add(changeScale(boundingRect,0.5));
+            if (boundingRect.area() > 500) {
+                rects.add(changeScale(boundingRect, 0.5));
             }
         }
         contourList.clear();
     }
+
     public static Rect changeScale(Rect rect, double factor) {
         // Calculate the new width and height
-        int newWidth = (int)(rect.width * factor);
-        int newHeight = (int)(rect.height * factor);
+        int newWidth = (int) (rect.width * factor);
+        int newHeight = (int) (rect.height * factor);
         // The top-left point changes
         int newX = rect.x + (rect.width - newWidth);
         int newY = rect.y + (rect.height - newHeight);
