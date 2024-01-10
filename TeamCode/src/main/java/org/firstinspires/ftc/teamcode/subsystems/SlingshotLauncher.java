@@ -11,11 +11,15 @@ public class SlingshotLauncher {
 
 	public SlingshotLauncher ( HardwareMap hw ) {
 		servo = new CachingServo( hw.get(Servo.class, "droneLaunch" ) );
-		servo.setPosition( 0 );
+		prime();
+	}
+
+	public void prime() {
+		servo.setPosition( 0.52 );
 	}
 
 	public void release() {
-		servo.setPosition( 1 );
+		servo.setPosition( 0.39 );
 	}
 
 	public double getPosition() {

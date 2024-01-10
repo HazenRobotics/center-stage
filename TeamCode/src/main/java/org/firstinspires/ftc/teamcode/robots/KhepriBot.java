@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robots;
 
+import static org.firstinspires.ftc.teamcode.utils.GVF.GVFPath.PathState.FOLLOW_PATH;
 import static org.firstinspires.ftc.teamcode.utils.SwervePDController.findShortestAngularTravel;
 
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -27,6 +29,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.SlingshotLauncher;
+import org.firstinspires.ftc.teamcode.utils.GVF.GVFPath;
+import org.firstinspires.ftc.teamcode.utils.GVF.Vector2;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.encoderticksconverter.EncoderTicksConverter;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.encoderticksconverter.Units;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
@@ -62,6 +66,12 @@ public class KhepriBot {
 	public List<LynxModule> hubs;
 	Pose2D poseEstimate;
 	public static double normalizedPowerMultiplier;
+	public ElapsedTime pathFinishedTimer;
+	public ElapsedTime voltagePollTimer;
+
+	static double loop, loopTime, currentHz, prevTime;
+
+	public static final double robotMass = 34.1;
 
 	public enum DriveSpeeds {
 		DRIVE(0.7, 1), STRAFE(0.7, 1), ROTATE(0.5, 1);
@@ -94,13 +104,17 @@ public class KhepriBot {
 		climber = new Climber( hw );
 		launcher = new SlingshotLauncher( hw );
 
-		setupIMU( RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD );
+		voltagePollTimer = new ElapsedTime();
+
+		setupIMU( RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP );
 		imu.resetYaw();
 
 		XController = new PIDController( 0.2, 0 , 0.03 );
 		YController = new PIDController( 0.2, 0 , 0.03 );
 		autoHeadingController = new PIDController( 5, 0, 0.4 );
 		teleOpHeadingController = new PIDController( 1, 0, 0.1 );
+
+		normalizedPowerMultiplier = 12.0 / hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS );
 	}
 
 
@@ -161,32 +175,19 @@ public class KhepriBot {
 	public void updateTracker () {
 		tracker.updatePose();
 		poseEstimate = tracker.getPose2D().add( 0, 0, new AngleDegrees( 90 ) );
-
-		TelemetryPacket packet = new TelemetryPacket();
-		Canvas field = packet.fieldOverlay();
-
-		int robotRadius = 8;
-		double fy = poseEstimate.getY();
-		double fx = poseEstimate.getX();
-		field.strokeCircle(fx, fy, robotRadius);
-		double heading = poseEstimate.getTheta().getRadians();
-		double arrowX = new Rotation2d(heading).getCos() * robotRadius, arrowY = new Rotation2d(heading).getSin() * robotRadius;
-		double x1 = fx, y1 = fy;
-		double x2 = fx + arrowX, y2 = fy+ arrowY;
-		field.strokeLine(x1, y1, x2, y2);
-		FtcDashboard.getInstance().sendTelemetryPacket(packet);
 	}
 
 	public void goToPoint( double x, double y, double heading, double travelMultiplier, double rotationMultiplier ) {
+		telemetry.addData( "pose", poseEstimate );
 		telemetry.addData( "target", "X: " + x + " Y: " + y + " heading: " + heading );
 		double headingError = findShortestAngularTravel( Math.toRadians( heading ), poseEstimate.getTheta().getRadians() );
 		telemetry.addData( "heading error", headingError );
 
 		drive.fieldCentricDrive(
-				YController.calculate(poseEstimate.getY(), y) * normalizedPowerMultiplier * (YController.getPositionError() > 2 ? travelMultiplier : 1) ,
-				XController.calculate(poseEstimate.getX(), x) * normalizedPowerMultiplier * (XController.getPositionError() > 2 ? travelMultiplier : 1),
-				autoHeadingController.calculate( headingError, 0 ) * normalizedPowerMultiplier * (autoHeadingController.getPositionError() > 0.1 ? rotationMultiplier : 1),
-				poseEstimate.getTheta().getRadians() - (Math.PI / 2)
+				YController.calculate(poseEstimate.getY(), y)/* * normalizedPowerMultiplier * (YController.getPositionError() > 2 ? travelMultiplier : 1)*/ ,
+				XController.calculate(poseEstimate.getX(), x)/* * normalizedPowerMultiplier * (XController.getPositionError() > 2 ? travelMultiplier : 1)*/,
+				autoHeadingController.calculate( headingError, 0 )/* * normalizedPowerMultiplier * (autoHeadingController.getPositionError() > 0.1 ? rotationMultiplier : 1)*/,
+				poseEstimate.getTheta().getRadians()
 		);
 
 	}
@@ -195,11 +196,33 @@ public class KhepriBot {
 		goToPoint( x, y, heading, 1, 1 );
 	}
 
+	public void followPath( GVFPath path, double targetHeading ) {
+		Vector2 currentPos = new Vector2( poseEstimate.getX( ), poseEstimate.getY( ) );
+		double headingError = findShortestAngularTravel( Math.toRadians( targetHeading ), poseEstimate.getTheta( ).getRadians( ) );
+
+		switch( path.evaluateState( currentPos ) ) {
+			case FOLLOW_PATH:
+				Vector2 powerVector = path.calculateGuidanceVector( currentPos );
+				drive.fieldCentricDrive(
+						powerVector.getY( ) * normalizedPowerMultiplier,
+						powerVector.getX( ) * normalizedPowerMultiplier,
+						teleOpHeadingController.calculate( headingError, 0 ),
+						poseEstimate.getTheta( ).getRadians( )
+				);
+				break;
+			case USE_PID:
+			case DONE:
+				goToPoint( path.getEndPoint( ).getX( ), path.getEndPoint( ).getY( ), targetHeading );
+				break;
+		}
+	}
+
 	public void update() {
 		pollNormalizedPowerMultiplier();
 		clearBulkCache( );
 		updateTracker( );
-		telemetry.update();
+		calculateHz();
+//		telemetry.update();
 	}
 
 	public void clearBulkCache( ) {
@@ -215,6 +238,25 @@ public class KhepriBot {
 	}
 
 	public void pollNormalizedPowerMultiplier() {
-		normalizedPowerMultiplier = 12.0 / hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS );
+		if (voltagePollTimer.seconds() > 4) {
+			voltagePollTimer.reset( );
+			normalizedPowerMultiplier = 12.0 / hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS );
+		}
+	}
+
+	public static void calculateHz() {
+		loop = System.nanoTime( );
+		currentHz = 1000000000 / (loop - prevTime);
+		prevTime = loop;
+	}
+
+	public static double getCurrentHz( ) {
+		return currentHz;
+	}
+
+	public Vector2D getCentripetalForceVector( double curvature ) {
+		Vector2D velocityVector = tracker.getDeltaPositionVector().scalarMultiply( currentHz );
+
+		return velocityVector.vectorMultiply( velocityVector ).scalarMultiply( robotMass ).scalarMultiply( curvature );
 	}
 }

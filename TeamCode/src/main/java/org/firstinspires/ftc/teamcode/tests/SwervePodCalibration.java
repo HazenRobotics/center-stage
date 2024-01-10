@@ -40,7 +40,7 @@ public class SwervePodCalibration extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         controller1 = new GamepadEvents(gamepad1);
 
-        motorNames = new String[] {"FLM/paraEnc", "BLM/climbEnc", "FRM", "BRM/perpEnc"};
+        motorNames = new String[] {"FLM/paraLEnc", "BLM/perpEnc", "FRM/liftEnc", "BRM/paraREnc"};
         motorReversed = new boolean[] {false, false, false, false };
         servoNames = new String[] {"FLS", "BLS", "FRS", "BRS"};
         servoReversed = new boolean[] {false, false, false, false };
@@ -95,6 +95,7 @@ public class SwervePodCalibration extends LinearOpMode {
             telemetry.addData(motorNames[i] + " motor speed", pods[i].getDriveVelo());
             telemetry.addData(motorNames[i] +" angle ", pods[i].getAngle());
             telemetry.addData( motorNames[i] + " offset", pods[i].getOffset() );
+            telemetry.addData( motorNames[i] + " amps", pods[i].getDriveAmp() );
             telemetry.addLine();
         }
 

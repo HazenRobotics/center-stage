@@ -151,6 +151,10 @@ public class Vector2D {
 		return fromPolar(getMagnitude() * factor, getHeading());
 	}
 
+	public Vector2D vectorMultiply( Vector2D vector ) {
+		return new Vector2D( x * vector.getX(), y * vector.getY() );
+	}
+
 	/**
 	 * dot product
 	 *

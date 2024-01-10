@@ -88,6 +88,10 @@ public class AxonSwervePod {
 		return motor.getVelocity( );
 	}
 
+	public double getDrivePower( ) {
+		return motor.getPower( );
+	}
+
 	public int getDrivePosition( ) {
 		return motor.getCurrentPosition( );
 	}

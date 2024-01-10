@@ -81,4 +81,8 @@ public class Vector2 {
         double bHead = b.getHeading();
         return polar((1 - t) * aMag + t * bMag, (1 - t) * aHead + t * bHead);
     }
+
+    public String toString() {
+        return String.format("X: " + x + " Y: " + y);
+    }
 }

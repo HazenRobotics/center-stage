@@ -9,6 +9,8 @@ import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
 
 public class CoaxialSwerveDrive {
 
+	public final static double HALF_PI = PI / 2;
+
 	public enum WheelState {
 		DRIVE,
 		DIAMOND,
@@ -117,11 +119,10 @@ public class CoaxialSwerveDrive {
 	}
 
 	public void fieldCentricDrive( double drivePower, double strafePower, double rotatePower, double heading ) {
-		double strafe = strafePower * Math.cos( -heading ) - drivePower * Math.sin( -heading );
-		double drive = strafePower * Math.sin( -heading ) + drivePower * Math.cos( -heading );
+		double strafe = strafePower * Math.sin( heading ) - drivePower * Math.cos( heading );
+		double drive = strafePower * Math.cos( heading ) + drivePower * Math.sin( heading );
 
 		drive(drive, strafe, rotatePower);
-
 	}
 
 	public void setWheelState( WheelState state ) {
