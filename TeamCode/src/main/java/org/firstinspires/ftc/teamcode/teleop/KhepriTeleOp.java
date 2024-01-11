@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 import org.firstinspires.ftc.teamcode.robots.KhepriBot;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 
 @TeleOp
@@ -47,7 +48,7 @@ public class KhepriTeleOp extends LinearOpMode {
 			else if (liftPower > 0 && liftPos > 90)
 				robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
 
-			if(controller1.left_bumper.onPress())
+			if((controller1.left_bumper.onPress() || robot.bucketFull()))
 				robot.intake.foldIntake();
 			else if( controller1.right_bumper.onPress() )
 				robot.intake.deployIntake( normalizedPowerMultiplier );
@@ -59,6 +60,17 @@ public class KhepriTeleOp extends LinearOpMode {
 
 			if (gamepad1.options)
 				robot.launcher.release();
+
+			//deals with the intake sellting the 2nd pixel
+			if(!robot.getBBRamp()) {
+				robot.intake.setIsSettling(true);
+			}
+			else if(!robot.getBBRamp() && robot.isIntakeClear()) {
+				robot.intake.setIsSettling(false);
+			}
+			if(robot.intake.getIsSettling()) {
+				robot.intake.setIntakeMotorPower(Intake.SETTLING_POWER);
+			}
 
 			displayTelemetry();
 			controller1.update( );

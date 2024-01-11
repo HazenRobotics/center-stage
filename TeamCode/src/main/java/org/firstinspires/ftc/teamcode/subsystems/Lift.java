@@ -10,7 +10,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 public class Lift {
-
 	double PULSES_PER_REVOLUTION;
 	double GEAR_RATIO;
 

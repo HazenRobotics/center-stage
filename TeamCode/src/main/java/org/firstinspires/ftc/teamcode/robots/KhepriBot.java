@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.drivetrains.CoaxialSwerveDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.KhepriSwerveDrive;
+import org.firstinspires.ftc.teamcode.subsystems.BreakBeamSensor;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
@@ -33,8 +34,13 @@ public class KhepriBot {
 	public SlingshotLauncher launcher;
 	public IMU imu;
 	public List<LynxModule> hubs;
+	private BreakBeamSensor bottom,top,in,ramp;
 
 	public KhepriBot ( HardwareMap hw, Telemetry t) {
+		bottom = new BreakBeamSensor(hw,t,"bb-Bot");
+		top = new BreakBeamSensor(hw,t,"bb-Top");
+		in = new BreakBeamSensor(hw,t,"bb-In");
+		ramp = new BreakBeamSensor(hw,t," bb-Ramp");
 		this.hw = hw;
 		telemetry = new MultipleTelemetry( t, FtcDashboard.getInstance( ).getTelemetry( ) );
 
@@ -62,4 +68,23 @@ public class KhepriBot {
 	public double getRobotCurrentAmps() {
 		return hubs.get( 0 ).getCurrent( CurrentUnit.AMPS ) + hubs.get( 1 ).getCurrent( CurrentUnit.AMPS );
 	}
+	public boolean isIntakeClear() {
+		return /**getBBin() &&**/ getBBRamp();
+	}
+	public boolean bucketFull() {
+		return getBBTop() && getBBBottom();
+	}
+	public boolean getBBin() {
+		return in.getBeamState();
+	}
+	public boolean getBBTop() {
+		return top.getBeamState();
+	}
+	public boolean getBBBottom() {
+		return bottom.getBeamState();
+	}
+	public boolean getBBRamp() {
+		return ramp.getBeamState();
+	}
+
 }
