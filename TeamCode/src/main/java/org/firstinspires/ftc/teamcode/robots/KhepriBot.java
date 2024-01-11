@@ -190,6 +190,10 @@ public class KhepriBot {
 		goToPoint( x, y, heading, 1, 1 );
 	}
 
+	public void goToPoint( Pose2D pose ) {
+		goToPoint( pose.getX(), pose.getY(), pose.getTheta().getDegrees(), 1, 1 );
+	}
+
 	public void followPath( GVFPath path, double targetHeading ) {
 		Vector2 currentPos = new Vector2( poseEstimate.getX( ), poseEstimate.getY( ) );
 		double headingError = findShortestAngularTravel( Math.toRadians( targetHeading ), poseEstimate.getTheta( ).getRadians( ) );

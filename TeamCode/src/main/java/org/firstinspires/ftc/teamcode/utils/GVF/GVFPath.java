@@ -4,9 +4,9 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class GVFPath {
-    public static double CORRECTION_DISTANCE = 30;
+    public static double CORRECTION_DISTANCE = 15;
     public static double SAVING_THROW_DISTANCE = 100;
-    public static double CURVATURE_CORRECTION_FACTOR = 1;
+    public static double CURVATURE_CORRECTION_FACTOR = 0.3;
     public static int LOOKAHEAD_AMOUNT = 5;
     public static int SAMPLE_RATE = 100;
 
@@ -26,6 +26,8 @@ public class GVFPath {
         USE_PID,
         DONE
     }
+
+    PathState pathState;
 
     public GVFPath(CubicBezierCurve curve) {
         this( curve, 0 );
@@ -152,10 +154,14 @@ public class GVFPath {
 
         double robotToEndDist = getDistanceFromEnd( currentLocation );
 
-        if (robotToEndDist < 1 || (robotToEndDist < 5 && isContinuous)) return PathState.DONE;
-        else if (isContinuous) return PathState.FOLLOW_PATH;
-        else if (robotToEndDist < 15) return PathState.USE_PID;
-        else return PathState.FOLLOW_PATH;
+        if (robotToEndDist < 1 || (robotToEndDist < 5 && isContinuous)) return pathState = PathState.DONE;
+        else if (isContinuous) return pathState = PathState.FOLLOW_PATH;
+        else if (robotToEndDist < 15) return pathState = PathState.USE_PID;
+        else return pathState = PathState.FOLLOW_PATH;
+    }
+
+    public PathState getPathState(  ) {
+        return pathState;
     }
 
     public Vector2 getEndPoint() {

@@ -17,7 +17,7 @@ public class RGBController extends RGBLights {
 
     public RGBController( HardwareMap hw) {
         super(hw);
-        rgbArray = new BlinkinPattern[]{BlinkinPattern.BLUE, BlinkinPattern.BLUE};
+        rgbArray = new BlinkinPattern[]{BlinkinPattern.YELLOW, BlinkinPattern.GREEN};
     }
     public RGBController( HardwareMap hw, String name ) {
         super(hw, name);

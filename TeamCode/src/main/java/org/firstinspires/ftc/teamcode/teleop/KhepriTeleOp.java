@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleDegrees;
 
-@Photon
+//@Photon
 @TeleOp
 @Config
 public class KhepriTeleOp extends LinearOpMode {

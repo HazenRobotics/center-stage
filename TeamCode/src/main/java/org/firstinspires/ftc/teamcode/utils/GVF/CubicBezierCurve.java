@@ -56,6 +56,11 @@ public class CubicBezierCurve {
 		return new CubicBezierCurve( p3, c1, newP2, newP3 );
 	}
 
+	public CubicBezierCurve createReversedCurve( ) {
+		// Return same curve but with swapped starting and ending points
+		return new CubicBezierCurve( p3, p1, p2, p3 );
+	}
+
 	public Vector2 calculate( double t ) {
 		// (1 - t)^3 * P0 + 3 * t * (1 - t)^2 * P1 + 3 * t^2 * (1 - t) * P2 + t^3 * P3
 		double w = 1 - t;
