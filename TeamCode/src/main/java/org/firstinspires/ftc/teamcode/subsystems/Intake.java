@@ -51,7 +51,7 @@ public class Intake{
 
     public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName) {
         intakeMotor = new CachingDcMotorEX( hw.get(DcMotorEx.class, motorName) );
-//        intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
+        intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
         deploymentServo = new CachingServo( hw.get(Servo.class, deploymentServoName) );
         wheelServo = new CachingCRServo( hw.get( CRServo.class, "wheelServo") );
 //        wheelServo.setDirection( DcMotorSimple.Direction.REVERSE );

@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.outoftheboxrobotics.photoncore.Photon;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -33,13 +34,15 @@ public class KhepriTeleOp extends LinearOpMode {
 			endGame = false, releaseAutoControl = true, usingLiftPID, wasUsingPID;
 	final double MAX_CLIMB_HEIGHT = 14384, CONTROLLER_TOLERANCE = 0.01;
 
+	RevBlinkinLedDriver.BlinkinPattern[] signallingColors = new RevBlinkinLedDriver.BlinkinPattern[2];
+	int colorIndex = 0;
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
 		robot.setupTeleOpTracker( new Pose2D( 0, 0, new AngleDegrees( 90 ) ) );
 		controller1 = new GamepadEvents( gamepad1 );
 		controller2 = new GamepadEvents( gamepad2 );
-		telemetry.setMsTransmissionInterval( 20 );
+		telemetry.setMsTransmissionInterval( 100 );
 
 		telemetry = new MultipleTelemetry( telemetry, FtcDashboard.getInstance( ).getTelemetry( ) );
 		positionLockSettlingTimer = new ElapsedTime( );
@@ -57,6 +60,7 @@ public class KhepriTeleOp extends LinearOpMode {
 			intakeControl();
 			climbControl();
 			launcherControl();
+			LEDControl();
 
 			if(controller1.start.onPress()) robot.tracker.resetHeading( );
 
@@ -172,6 +176,19 @@ public class KhepriTeleOp extends LinearOpMode {
 		wasUsingPID = usingLiftPID;
 	}
 
+	public void LEDControl() {
+		if (controller2.a.onPress()) signallingColors[colorIndex++] = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+		if (controller2.b.onPress()) signallingColors[colorIndex++] = RevBlinkinLedDriver.BlinkinPattern.HOT_PINK;
+		if (controller2.y.onPress()) signallingColors[colorIndex++] = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+		if (controller2.x.onPress()) signallingColors[colorIndex++] = RevBlinkinLedDriver.BlinkinPattern.WHITE;
+
+		if ( colorIndex == 2 ) {
+			telemetry.addLine("Writing to driver");
+			colorIndex = 0;
+			robot.rgbController.writeColors( signallingColors );
+		}
+	}
+
 	public void calculateHz() {
 		//more sporadic hz calculation
 		currentHz = robot.getCurrentHz();
@@ -204,6 +221,16 @@ public class KhepriTeleOp extends LinearOpMode {
 		telemetry.addData( "pose", poseEstimate );
 		telemetry.addData( "current hz", currentHz );
 		telemetry.addData( "average hz", averageHz );
+
+		telemetry.addData( "colorIndex", colorIndex );
+
+		telemetry.addData( "color1", signallingColors[0] );
+		telemetry.addData( "color2", signallingColors[1] );
+		telemetry.addData( "color1Controller", robot.rgbController.getRgbArray()[0] );
+		telemetry.addData( "color2Controller", robot.rgbController.getRgbArray()[1] );
+		telemetry.addData( "rgbcontrollerTimer seconds", robot.rgbController.getTimer().seconds() );
+		telemetry.addData( "rgbcontrollerTimer updateRotation", robot.rgbController.getUpdateRotation() );
+
 //		robot.drive.displayWheelAngles( telemetry );
 		telemetry.update( );
 	}

@@ -1,23 +1,16 @@
 package org.firstinspires.ftc.teamcode.robots;
 
-import static org.firstinspires.ftc.teamcode.utils.GVF.GVFPath.PathState.FOLLOW_PATH;
 import static org.firstinspires.ftc.teamcode.utils.SwervePDController.findShortestAngularTravel;
 
-import android.graphics.Color;
-
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -28,6 +21,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.subsystems.RGBController;
 import org.firstinspires.ftc.teamcode.subsystems.SlingshotLauncher;
 import org.firstinspires.ftc.teamcode.utils.GVF.GVFPath;
 import org.firstinspires.ftc.teamcode.utils.GVF.Vector2;
@@ -35,14 +29,11 @@ import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.encoderticksconve
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.encoderticksconverter.Units;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Vector2D;
-import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.Angle;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleDegrees;
-import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleRadians;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.IMU_EX;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.Encoder;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.tracker.InsistentThreeWheelTracker;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.tracker.ThreeWheelTracker;
-import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.tracker.TwoWheelTracker;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.tracker.WheeledTrackerConstants;
 
 import java.util.List;
@@ -58,6 +49,8 @@ public class KhepriBot {
 	public Intake intake;
 	public Climber climber;
 	public SlingshotLauncher launcher;
+
+	public RGBController rgbController;
 	public IMU_EX imu;
 	public PIDController XController;
 	public PIDController YController;
@@ -103,6 +96,7 @@ public class KhepriBot {
 		intake.foldIntake();
 		climber = new Climber( hw );
 		launcher = new SlingshotLauncher( hw );
+		rgbController = new RGBController( hw );
 
 		voltagePollTimer = new ElapsedTime();
 
@@ -222,6 +216,7 @@ public class KhepriBot {
 		clearBulkCache( );
 		updateTracker( );
 		calculateHz();
+		rgbController.update();
 //		telemetry.update();
 	}
 
