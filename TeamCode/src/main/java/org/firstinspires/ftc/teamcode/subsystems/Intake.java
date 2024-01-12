@@ -35,7 +35,7 @@ public class Intake{
         EMPTY, ONE_PIXEL, FULL, OVERFLOW
     }
     public enum DeploymentState {
-        FOLDED(0.655), TOP_TWO(0.334), FULLY_DEPLOYED(0.215);
+        FOLDED(0.655), TOP_TWO(0.334), FULLY_DEPLOYED(0.2);
         public final double position;
         DeploymentState(double pos) {
             position = pos;
@@ -51,7 +51,7 @@ public class Intake{
 
     public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName) {
         intakeMotor = new CachingDcMotorEX( hw.get(DcMotorEx.class, motorName) );
-        intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
+//        intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
         deploymentServo = new CachingServo( hw.get(Servo.class, deploymentServoName) );
         wheelServo = new CachingCRServo( hw.get( CRServo.class, "wheelServo") );
 //        wheelServo.setDirection( DcMotorSimple.Direction.REVERSE );

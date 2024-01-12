@@ -178,9 +178,9 @@ public class KhepriBot {
 		telemetry.addData( "heading error", headingError );
 
 		drive.fieldCentricDrive(
-				YController.calculate(poseEstimate.getY(), y)/* * normalizedPowerMultiplier * (YController.getPositionError() > 2 ? travelMultiplier : 1)*/ ,
-				XController.calculate(poseEstimate.getX(), x)/* * normalizedPowerMultiplier * (XController.getPositionError() > 2 ? travelMultiplier : 1)*/,
-				autoHeadingController.calculate( headingError, 0 )/* * normalizedPowerMultiplier * (autoHeadingController.getPositionError() > 0.1 ? rotationMultiplier : 1)*/,
+				YController.calculate(poseEstimate.getY(), y) * normalizedPowerMultiplier * travelMultiplier,
+				XController.calculate(poseEstimate.getX(), x) * normalizedPowerMultiplier * travelMultiplier,
+				autoHeadingController.calculate( headingError, 0 ) * normalizedPowerMultiplier * rotationMultiplier,
 				poseEstimate.getTheta().getRadians()
 		);
 
@@ -192,6 +192,10 @@ public class KhepriBot {
 
 	public void goToPoint( Pose2D pose ) {
 		goToPoint( pose.getX(), pose.getY(), pose.getTheta().getDegrees(), 1, 1 );
+	}
+
+	public void goToPoint( Pose2D pose, double travelMultiplier, double rotationMultiplier ) {
+		goToPoint( pose.getX(), pose.getY(), pose.getTheta().getDegrees(), travelMultiplier, rotationMultiplier );
 	}
 
 	public void followPath( GVFPath path, double targetHeading ) {

@@ -32,7 +32,7 @@ public class Lift {
 	public int target = 0;
 
 	public Lift( HardwareMap hardwareMap ) {
-		this( hardwareMap, "lift", true, "FRM/liftEnc", 0,
+		this( hardwareMap, "lift", false, "FRM/liftEnc", 0,
 				0.5, 0, AngleUnit.DEGREES, 103.8, 1,
 				new PIDController( 0.02, 0, 0.001 ) );
 	}
@@ -98,7 +98,7 @@ public class Lift {
 	}
 
 	public void updatePID( ) {
-		motor.setPower( controller.calculate( encoder.getCurrentPosition( ), target ) * KhepriBot.normalizedPowerMultiplier );
+		motor.setPower( controller.calculate( getPosition(), target ) * KhepriBot.normalizedPowerMultiplier );
 	}
 
 	public void setPIDValues( double p, double i, double d ) {
@@ -178,7 +178,7 @@ public class Lift {
 	}
 
 	public int getPosition( ) {
-		return encoder.getCurrentPosition( );
+		return -encoder.getCurrentPosition( );
 	}
 
 	public double getMotorPositionInch( ) {

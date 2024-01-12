@@ -31,7 +31,7 @@ public class GVFPath {
 
     public GVFPath(CubicBezierCurve curve) {
         this( curve, 0 );
-        isContinuous = true;
+        isContinuous = false;
     }
 
     public GVFPath(CubicBezierCurve curve, double waitTimeSeconds) {
@@ -154,7 +154,7 @@ public class GVFPath {
 
         double robotToEndDist = getDistanceFromEnd( currentLocation );
 
-        if (robotToEndDist < 1 || (robotToEndDist < 5 && isContinuous)) return pathState = PathState.DONE;
+        if (robotToEndDist < 1) return pathState = PathState.DONE;
         else if (isContinuous) return pathState = PathState.FOLLOW_PATH;
         else if (robotToEndDist < 15) return pathState = PathState.USE_PID;
         else return pathState = PathState.FOLLOW_PATH;
