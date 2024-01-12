@@ -68,8 +68,10 @@ public class ConceptAprilTag extends OpMode {
     private VisionPortal backVP;
     private VisionPortal frontVP;
     private final double TAG_ANGLE_OFFSET =1.59807621135;
-
-
+    private final double BACK_X_OFFSET = 5.5;
+    private final double FRONT_X_OFFSET = -7;
+    private final double BACK_Y_OFFSET = -2.125;
+    private final double FRONT_Y_OFFSET = -7.25;
     final static Point3[] APIRL_TAG_BOARD_POSTIONS = {
             new Point3(60.25f, 41.41f, 4f),
             new Point3(60.25f, 35.41f, 4f),
@@ -241,11 +243,17 @@ public class ConceptAprilTag extends OpMode {
 
     public Point3 getPositionBasedOnTag() {
         ArrayList<AprilTagDetection> detections = new ArrayList<>();
+        double xOffset=0;
+        double yOffest=0;
         if (backVP.getProcessorEnabled(backATP)) {
             detections.addAll(backATP.getDetections());
+            xOffset=BACK_X_OFFSET;
+            yOffest=BACK_Y_OFFSET;
         }
         if (frontVP.getProcessorEnabled(frontATP)) {
             detections.addAll(frontATP.getDetections());
+            xOffset=FRONT_X_OFFSET;
+            yOffest=FRONT_Y_OFFSET;
         }
         if (detections.isEmpty()) {
             return new Point3(0, 0, 0);
@@ -270,7 +278,7 @@ public class ConceptAprilTag extends OpMode {
             telemetry.addData("x",pose.x);
             telemetry.addData("y",pose.y-TAG_ANGLE_OFFSET);
 
-            return new Point3(x, y, 0);
+            return new Point3(x+xOffset, y+yOffest, pose.yaw);
         }
 
     }
