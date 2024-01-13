@@ -31,10 +31,10 @@ public class BaseSwerve extends LinearOpMode {
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
-		Pose2D startPose = new Pose2D(0, 0 , new AngleDegrees( 90 ) );
+//		Pose2D startPose = new Pose2D(0, 0 , new AngleDegrees( 90 ) );
 
 //		robot.setupTeleOpTracker( startPose ); // sets up perfectly
-		robot.setupAutoTracker( startPose ); // offset by like 85 degrees somehow
+//		robot.setupAutoTracker( startPose ); // offset by like 85 degrees somehow
 		target = startHeading;
 
 		controller1 = new GamepadEvents( gamepad1 );
