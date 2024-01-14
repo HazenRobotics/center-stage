@@ -5,8 +5,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.teamcode.vision.DeciderPixel;
 import org.firstinspires.ftc.teamcode.vision.Pixel;
-import org.firstinspires.ftc.teamcode.vision.PixelColor;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -26,17 +26,17 @@ public class BackdropProcessor implements VisionProcessor {
 
     public static int PIXEL_SIZE_THRESHOLD_LOW = 5;
     public static int PIXEL_SIZE_THRESHOLD_HIGH = 40;
-    public Scalar greenLowerBound = new Scalar(41, 29.8, 73);
-    public Scalar greenUpperBound = new Scalar(55, 114, 141);
-    public Scalar purpleLowerBound = new Scalar(120, 41, 121);
-    public Scalar purpleUpperBound = new Scalar(125, 67, 161);
-    public Scalar yellowLowerBound = new Scalar(0, 109, 141);
-    public Scalar yellowUpperBound = new Scalar(42, 148, 208);
+    public final Scalar greenLowerBound = new Scalar(41, 29.8, 73);
+    public final Scalar greenUpperBound = new Scalar(55, 114, 141);
+    public final Scalar purpleLowerBound = new Scalar(120, 41, 121);
+    public final Scalar purpleUpperBound = new Scalar(125, 67, 161);
+    public final Scalar yellowLowerBound = new Scalar(0, 109, 141);
+    public final Scalar yellowUpperBound = new Scalar(42, 148, 208);
 
-    public Scalar holeLowerBound = new Scalar(0, 0, 0);
-    public Scalar holeUpperBound = new Scalar(255, 213, 139);
-    public Scalar zoneLowerBound = new Scalar(0, 0, 0);
-    public Scalar zoneUpperBound = new Scalar(255, 255, 153);
+    public final Scalar holeLowerBound = new Scalar(0, 0, 0);
+    public final Scalar holeUpperBound = new Scalar(255, 213, 139);
+    public final Scalar zoneLowerBound = new Scalar(0, 0, 0);
+    public final Scalar zoneUpperBound = new Scalar(255, 255, 153);
 
     Mat temp = new Mat();
     Mat green = new Mat();
@@ -109,11 +109,11 @@ public class BackdropProcessor implements VisionProcessor {
         }
         removeBadPixels(pixelArrayList);
 
-        ArrayList<ArrayList<Pixel>> grid = grid(pixelArrayList);
+        ArrayList<Pixel[]> grid = grid(pixelArrayList);
         for (int i = 0; i < grid.size(); i++) {
-            for (int j = 0; j < grid.get(i).size(); j++) {
-                if (!pixelArrayList.contains(grid.get(i).get(j))) {
-                    pixelArrayList.add(grid.get(i).get(j));
+            for (int j = 0; j < grid.get(i).length; j++) {
+                if (!pixelArrayList.contains(grid.get(i)[j])) {
+                    pixelArrayList.add(grid.get(i)[j]);
                 }
             }
         }
@@ -209,17 +209,19 @@ public class BackdropProcessor implements VisionProcessor {
         }
     }
 
-    public ArrayList<ArrayList<Pixel>> getGrid() {
+    public ArrayList<Pixel[]> getGrid() {
         return grid(pixelArrayList);
     }
 
 
-    public ArrayList<ArrayList<Pixel>> grid(ArrayList<Pixel> pixels) {
+    public ArrayList<Pixel[]> grid(ArrayList<Pixel> pixels) {
         ArrayList<ArrayList<Pixel>> arr1 = new ArrayList<>();
         int maxItems = 7;
         while (!pixels.isEmpty()) {
             ArrayList<Pixel> neighbors = pixels.get(0).rowNeighbors(pixels);
             neighbors.add(pixels.get(0));
+
+
             pixels.sort(Comparator.comparingDouble(p -> -p.getRect().x));
             maxItems = (maxItems == 6) ? 7 : 6;
 
@@ -230,15 +232,15 @@ public class BackdropProcessor implements VisionProcessor {
             arr1.add(neighbors);
             pixels.removeAll(neighbors);
         }
-        positionGird(arr1);
-        return arr1;
+        return  positionGird(arr1);
     }
 
-    public void positionGird(ArrayList<ArrayList<Pixel>> grid) {
+    public ArrayList<Pixel[]> positionGird(ArrayList<ArrayList<Pixel>> grid) {
+        ArrayList<Pixel[]> pixels =new ArrayList<>();
         int maxItems = 7;
         for (int i = 0; i < grid.size(); i++) {
             maxItems = (maxItems == 6) ? 7 : 6;
-            for (int j = 0; j < grid.get(i).size() && !(grid.get(i).size() == maxItems); j++) {
+            for (int j = 0; j < grid.get(i).size() && !(grid.get(i).size()== maxItems); j++) {
                 int realPostion = 0;
                 if (maxItems == 6) {
                     int segmentsize = (zoneRect.width - 40) / 6;
@@ -251,11 +253,15 @@ public class BackdropProcessor implements VisionProcessor {
                         realPostion++;
                 }
                 while (realPostion>j) {
-                    grid.get(i).add(new Pixel(new Rect(0,0,10,10), PixelColor.BLANK));
+                    grid.get(i).add(new Pixel(new Rect(0,0,10,10), DeciderPixel.Color.NO_PIXEL));
                     i++;
                 }
             }
         }
+        for(int i=0; i<grid.size(); i++) {
+            pixels.add((Pixel[]) grid.stream().toArray());
+        }
+        return  pixels;
     }
 
 

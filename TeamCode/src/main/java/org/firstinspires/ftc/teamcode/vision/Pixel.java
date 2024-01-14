@@ -8,15 +8,18 @@ import java.util.ArrayList;
 
 public class Pixel {
     private Rect rect;
-    private PixelColor color;
-    public Pixel(Rect r, PixelColor c) {
-        rect=r;
-        color=c;
+    private DeciderPixel.Color color;
+
+    public Pixel(Rect r, DeciderPixel.Color c) {
+        rect = r;
+        color = c;
     }
-    public Pixel(Rect r,ArrayList<Rect> greenRects,ArrayList<Rect> purpleRects,ArrayList<Rect> yellowRects) {
-        rect=r;
-        color=this.getPixelColor(greenRects,purpleRects,yellowRects);
+
+    public Pixel(Rect r, ArrayList<Rect> greenRects, ArrayList<Rect> purpleRects, ArrayList<Rect> yellowRects) {
+        rect = r;
+        color = this.getPixelColor(greenRects, purpleRects, yellowRects);
     }
+
     public boolean isNear(Rect r2) {
         double centerXDistance = Math.abs((rect.x + rect.width / 2.0) - (r2.x + r2.width / 2.0));
         double centerYDistance = Math.abs((rect.y + rect.height / 2.0) - (r2.y + r2.height / 2.0));
@@ -25,16 +28,17 @@ public class Pixel {
 
         return centerXDistance <= widthTolerance && centerYDistance <= heightTolerance;
     }
+
     public boolean isTouching(Rect r2) {
         double centerXDistance = Math.abs((rect.x + rect.width / 2.0) - (r2.x + r2.width / 2.0));
         double centerYDistance = Math.abs((rect.y + rect.height / 2.0) - (r2.y + r2.height / 2.0));
-        double widthTolerance = (rect.width + r2.width) / 2.0 ;
+        double widthTolerance = (rect.width + r2.width) / 2.0;
         double heightTolerance = (rect.height + r2.height) / 2.0;
 
         return centerXDistance <= widthTolerance && centerYDistance <= heightTolerance;
     }
 
-    public boolean isTouchingBorder( Rect r2) {
+    public boolean isTouchingBorder(Rect r2) {
         double leftDistance = Math.abs(rect.x - r2.x);
         double rightDistance = Math.abs((rect.x + rect.width) - (r2.x + r2.width));
         double topDistance = Math.abs(rect.y - r2.y);
@@ -43,41 +47,43 @@ public class Pixel {
         return leftDistance <= 10 || rightDistance <= 10 ||
                 topDistance <= 10 || bottomDistance <= 10;
     }
-    public  PixelColor getPixelColor(ArrayList<Rect> greenRects,ArrayList<Rect> purpleRects,ArrayList<Rect> yellowRects) {
+
+    public DeciderPixel.Color getPixelColor(ArrayList<Rect> greenRects, ArrayList<Rect> purpleRects, ArrayList<Rect> yellowRects) {
         for (int i = 0; i < greenRects.size(); i++) {
             if (isTouching(greenRects.get(i))) {
-                return PixelColor.GREEN;
+                return DeciderPixel.Color.GREEN;
             }
         }
         for (int i = 0; i < purpleRects.size(); i++) {
             if (isTouching(purpleRects.get(i))) {
-                return PixelColor.PURPLE;
+                return DeciderPixel.Color.PURPLE;
             }
         }
         for (int i = 0; i < yellowRects.size(); i++) {
             if (isTouching(yellowRects.get(i))) {
-                return PixelColor.YELLOW;
+                return DeciderPixel.Color.YELLOW;
             }
         }
 
-        return PixelColor.WHITE;
+        return DeciderPixel.Color.WHITE;
     }
+
     public int getGraphicColor() {
-        if(color == PixelColor.GREEN) {
+        if (color == DeciderPixel.Color.GREEN) {
             return Color.GREEN;
         }
-        if(color == PixelColor.PURPLE) {
+        if (color == DeciderPixel.Color.PURPLE) {
             return Color.MAGENTA;
         }
-        if(color == PixelColor.YELLOW) {
+        if (color == DeciderPixel.Color.YELLOW) {
             return Color.YELLOW;
         }
-        if(color == PixelColor.WHITE) {
+        if (color == DeciderPixel.Color.WHITE) {
             return Color.WHITE;
         }
         return Color.BLACK;
-
     }
+
     public ArrayList<Pixel> rowNeighbors(ArrayList<Pixel> pixels) {
         ArrayList<Pixel> neighbor = new ArrayList<>();
         for (Pixel currentPixel : pixels) {
@@ -105,7 +111,7 @@ public class Pixel {
         return rect;
     }
 
-    public PixelColor getPixelColor() {
+    public DeciderPixel.Color getPixelColor() {
         return color;
     }
 }
