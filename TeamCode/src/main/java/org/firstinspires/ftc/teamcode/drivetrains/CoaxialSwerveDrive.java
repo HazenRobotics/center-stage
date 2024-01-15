@@ -25,6 +25,8 @@ public class CoaxialSwerveDrive {
 	double[] wheelSpeeds;
 	double[] wheelAngles;
 
+	double maxSpeed = 1;
+
 	public CoaxialSwerveDrive( HardwareMap hw ) {
 		this( hw, new String[]{ "FLM/paraLEnc", "BLM/perpEnc", "FRM/liftEnc", "BRM/paraREnc" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
@@ -114,7 +116,7 @@ public class CoaxialSwerveDrive {
 		for( int i = 0; i < swervePods.length; i++ ) {
 			if( rotatePods )
 				swervePods[i].setAngleTarget( wheelAngles[i] );
-			swervePods[i].update( wheelSpeeds[i] );
+			swervePods[i].update( wheelSpeeds[i] * maxSpeed );
 		}
 	}
 
@@ -122,7 +124,7 @@ public class CoaxialSwerveDrive {
 		double strafe = strafePower * Math.sin( heading ) - drivePower * Math.cos( heading );
 		double drive = strafePower * Math.cos( heading ) + drivePower * Math.sin( heading );
 
-		drive(drive, strafe, rotatePower);
+		drive( drive, strafe, rotatePower );
 	}
 
 	public void setWheelState( WheelState state ) {
@@ -148,5 +150,9 @@ public class CoaxialSwerveDrive {
 		t.addData( "FL error", swervePods[2].getError() );
 		t.addData( "BR", wheelAngles[3] );
 		t.addData( "FL error", swervePods[3].getError() );
+	}
+
+	public void setMaxSpeed( double maxSpeed ) {
+		this.maxSpeed = maxSpeed;
 	}
 }

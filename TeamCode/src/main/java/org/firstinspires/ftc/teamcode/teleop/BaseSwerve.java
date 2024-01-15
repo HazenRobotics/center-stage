@@ -16,6 +16,8 @@ import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleDegrees;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleRadians;
+import org.firstinspires.ftc.teamcode.vision.AprilTagUtil;
+import org.opencv.core.Point3;
 
 @TeleOp
 @Config
@@ -23,6 +25,9 @@ public class BaseSwerve extends LinearOpMode {
 	KhepriBot robot;
 	GamepadEvents controller1;
 	PIDController headingController;
+
+	AprilTagUtil aprilTagUtil;
+
 	double drive, strafe, rotate, loop, prevTime, heading, error, intakeDeployAngle = 0.215;
 	public static double target, startHeading = 90;
 	Pose2D poseEstimate;
@@ -31,9 +36,11 @@ public class BaseSwerve extends LinearOpMode {
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
-//		Pose2D startPose = new Pose2D(0, 0 , new AngleDegrees( 90 ) );
+		Pose2D startPose = new Pose2D(0, 0 , new AngleDegrees( 90 ) );
 
-//		robot.setupTeleOpTracker( startPose ); // sets up perfectly
+		aprilTagUtil = new AprilTagUtil( hardwareMap );
+
+		robot.setupTeleOpTracker( startPose ); // sets up perfectly
 //		robot.setupAutoTracker( startPose ); // offset by like 85 degrees somehow
 		target = startHeading;
 
@@ -56,6 +63,14 @@ public class BaseSwerve extends LinearOpMode {
 
 			displayTelemetry();
 			robot.update();
+
+//			if (robot.getPose().getX() > 30 && robot.getPose().getX() < 48) {
+//				Point3 pose = aprilTagUtil.getPositionBasedOnTag();
+//
+//				if (!pose.equals( new Point3( 0, 0, 0 ) ))
+//					robot.tracker.setPose2D( new Pose2D( pose.x-5, pose.y, robot.tracker.getPose2D().getTheta()) );
+//			}
+
 			controller1.update();
 		}
 	}

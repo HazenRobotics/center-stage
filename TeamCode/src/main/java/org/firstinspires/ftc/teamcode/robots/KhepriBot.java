@@ -59,8 +59,10 @@ public class KhepriBot {
 	public List<LynxModule> hubs;
 	Pose2D poseEstimate;
 	public static double normalizedPowerMultiplier;
-	public ElapsedTime pathFinishedTimer;
 	public ElapsedTime voltagePollTimer;
+
+	public GVFPath currentPath;
+	public Vector2 currentPointTarget;
 
 	static double loop, loopTime, currentHz, prevTime;
 
@@ -81,6 +83,14 @@ public class KhepriBot {
 			return norm;
 		}
 	}
+
+	public enum DriveControlState {
+		GVF,
+		P2P,
+		MANUAL
+	}
+
+	DriveControlState driveControlState = DriveControlState.MANUAL;
 
 	public KhepriBot ( HardwareMap hw, Telemetry t) {
 		this.hw = hw;
@@ -172,15 +182,24 @@ public class KhepriBot {
 	}
 
 	public void goToPoint( double x, double y, double heading, double travelMultiplier, double rotationMultiplier ) {
+		driveControlState = DriveControlState.P2P;
+		currentPointTarget = new Vector2( x, y );
 		telemetry.addData( "pose", poseEstimate );
 		telemetry.addData( "target", "X: " + x + " Y: " + y + " heading: " + heading );
 		double headingError = findShortestAngularTravel( Math.toRadians( heading ), poseEstimate.getTheta().getRadians() );
 		telemetry.addData( "heading error", headingError );
 
+		double yPow = YController.calculate(poseEstimate.getY(), y);
+		double xPow = XController.calculate(poseEstimate.getX(), x);
+
+		if (Math.hypot( YController.getPositionError(), XController.getPositionError() ) > 1) drive.setMaxSpeed( 0.65 );
+		else drive.setMaxSpeed( 1 );
+
+
 		drive.fieldCentricDrive(
-				YController.calculate(poseEstimate.getY(), y) * normalizedPowerMultiplier * travelMultiplier,
-				XController.calculate(poseEstimate.getX(), x) * normalizedPowerMultiplier * travelMultiplier,
-				autoHeadingController.calculate( headingError, 0 ) * normalizedPowerMultiplier * rotationMultiplier,
+				yPow * normalizedPowerMultiplier,
+				xPow * normalizedPowerMultiplier,
+				autoHeadingController.calculate( headingError, 0 ) * normalizedPowerMultiplier,
 				poseEstimate.getTheta().getRadians()
 		);
 
@@ -199,8 +218,13 @@ public class KhepriBot {
 	}
 
 	public void followPath( GVFPath path, double targetHeading ) {
+		driveControlState = DriveControlState.GVF;
+		currentPath = path;
 		Vector2 currentPos = new Vector2( poseEstimate.getX( ), poseEstimate.getY( ) );
 		double headingError = findShortestAngularTravel( Math.toRadians( targetHeading ), poseEstimate.getTheta( ).getRadians( ) );
+
+		if (path.getDistanceFromEnd( currentPos ) > 1) drive.setMaxSpeed( 0.65 );
+		else drive.setMaxSpeed( 1 );
 
 		switch( path.evaluateState( currentPos ) ) {
 			case FOLLOW_PATH:
@@ -217,6 +241,14 @@ public class KhepriBot {
 				goToPoint( path.getEndPoint( ).getX( ), path.getEndPoint( ).getY( ), targetHeading );
 				break;
 		}
+	}
+
+	public GVFPath getCurrentPath( ) {
+		return currentPath;
+	}
+
+	public Vector2 getCurrentPointTarget( ) {
+		return currentPointTarget;
 	}
 
 	public void update() {
@@ -261,5 +293,9 @@ public class KhepriBot {
 		Vector2D velocityVector = tracker.getDeltaPositionVector().scalarMultiply( currentHz );
 
 		return velocityVector.vectorMultiply( velocityVector ).scalarMultiply( robotMass ).scalarMultiply( curvature );
+	}
+
+	public DriveControlState getDriveControlState( ) {
+		return driveControlState;
 	}
 }

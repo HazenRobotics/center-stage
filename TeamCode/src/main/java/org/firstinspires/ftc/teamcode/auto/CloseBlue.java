@@ -16,11 +16,10 @@ import org.firstinspires.ftc.teamcode.utils.GVF.Vector2;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleDegrees;
 import org.firstinspires.ftc.teamcode.vision.processors.PropProcessor;
-import org.firstinspires.ftc.teamcode.vision.processors.RedPropProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 @Autonomous
-public class CloseRed extends LinearOpMode {
+public class CloseBlue extends LinearOpMode {
 
 	KhepriBot robot;
 	PropProcessor propProcessor;
@@ -79,12 +78,12 @@ public class CloseRed extends LinearOpMode {
 		//drop pixel, go under drive to score pixel on back, park on left side
 
 		robot = new KhepriBot( hardwareMap, telemetry );
-		robot.setupAutoTracker( new Pose2D( 15, -63.5, new AngleDegrees( 90 ) ) );
+		robot.setupAutoTracker( new Pose2D( 15, 63.5, new AngleDegrees( 270 ) ) );
 		robot.deposit.setReleaseState( Deposit.ReleaseStates.EXTENDED );
 		robot.deposit.setAngleState( Deposit.AngleStates.GRAB );
 		robot.lift.setTarget( 75 );
 
-		propProcessor = new PropProcessor().setPropColor( PropProcessor.PropColor.RED_CLOSE );
+		propProcessor = new PropProcessor().setPropColor( PropProcessor.PropColor.BLUE_CLOSE );
 
 		visionPortal = new VisionPortal.Builder()
 				.setCamera(hardwareMap.get( WebcamName.class, "front"))
@@ -95,58 +94,58 @@ public class CloseRed extends LinearOpMode {
 				.setAutoStopLiveView(true)
 				.build();
 
-		leftMark = new Pose2D( 12, -36, 0 );
-		middleMark = new Pose2D( 12, -36, 270 );
-		rightMark = new Pose2D( 36, -36, 0 );
-		leftBackdrop = new Pose2D( 49.5, -29, 0 );
-		middleBackdrop = new Pose2D( 49.5, -36, 0 );
-		rightBackdrop = new Pose2D( 49.5, -45, 0 );
-		pickupFromGroundPoint = new Pose2D( -53, -14, 0 );
-		ejectPoint = new Pose2D( -50, -14, 0 );
+		leftMark = new Pose2D( 36, 36, 0 );
+		middleMark = new Pose2D( 12, 36, 90 );
+		rightMark = new Pose2D( 12, -36, 0 );
+		leftBackdrop = new Pose2D( 49.5, 45, 0 );
+		middleBackdrop = new Pose2D( 49.5, 36, 0 );
+		rightBackdrop = new Pose2D( 49.5, 29, 0 );
+		pickupFromGroundPoint = new Pose2D( -53, 14, 0 );
+		ejectPoint = new Pose2D( -50,14, 0 );
 
 
-		leftToStack = new GVFPath(
+		rightToStack = new GVFPath(
 				new CubicBezierCurve(
-						new Vector2( 49, -29 ),
-						new Vector2( 44, -10 ),
-						new Vector2( 56, -11 ),
-						new Vector2( -61, -14 )
+						new Vector2( 49, 29 ),
+						new Vector2( 44, 10 ),
+						new Vector2( 56, 11 ),
+						new Vector2( -61, 14 )
 				)
 		);
 
 		middleToStack = new GVFPath(
 				new CubicBezierCurve(
-						new Vector2( 49, -36 ),
-						new Vector2( 44, -10 ),
-						new Vector2( 56, -11 ),
-						new Vector2( -61, -14 )
+						new Vector2( 49, 36 ),
+						new Vector2( 44, 10 ),
+						new Vector2( 56, 11 ),
+						new Vector2( -61, 14 )
 				)
 		);
 
-		rightToStack = new GVFPath(
+		leftToStack = new GVFPath(
 				new CubicBezierCurve(
-						new Vector2( 49, -45 ),
-						new Vector2( 44, -10 ),
-						new Vector2( 56, -11 ),
-						new Vector2( -61, -14 )
+						new Vector2( 49, 45 ),
+						new Vector2( 44, 10 ),
+						new Vector2( 56, 11 ),
+						new Vector2( -61, 14 )
 				)
 		);
 
 		cycleToLeft = new GVFPath(
 				new CubicBezierCurve(
-						new Vector2( -61, -14 ),
-						new Vector2( 44, -10 ),
-						new Vector2( 56, -11 ),
-						new Vector2( 49.5, -29 )
+						new Vector2( -61, 14 ),
+						new Vector2( 44, 10 ),
+						new Vector2( 56, 11 ),
+						new Vector2( 49.5, 29 )
 				)
 		);
 
 		cycleToMiddle = new GVFPath(
 				new CubicBezierCurve(
-						new Vector2( -61, -14 ),
-						new Vector2( 72, 2 ),
-						new Vector2( 13, -37 ),
-						new Vector2( 49.5, -36 )
+						new Vector2( -61, 14 ),
+						new Vector2( 72, -2 ),
+						new Vector2( 13, 37 ),
+						new Vector2( 49.5, 36 )
 				)
 		);
 
@@ -241,7 +240,8 @@ public class CloseRed extends LinearOpMode {
 								robot.lift.setTarget( 0 );
 								robot.intake.foldIntake( );
 								timer.reset( );
-								autoState = AutoStates.CYCLING;
+//								autoState = AutoStates.CYCLING;
+								autoState = AutoStates.PARK;
 							}
 							break;
 					}
@@ -324,7 +324,7 @@ public class CloseRed extends LinearOpMode {
 					}
 					break;
 				case PARK:
-					robot.goToPoint( 46, -12, 0 );
+					robot.goToPoint( 46, 60, 0 );
 					break;
 			}
 

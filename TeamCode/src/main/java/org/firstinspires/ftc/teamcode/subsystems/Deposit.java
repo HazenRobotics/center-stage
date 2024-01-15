@@ -83,7 +83,16 @@ public class Deposit {
         angleState = state;
         setAnglePosition(angleState.getPosition());
     }
-    public void setAnglePosition (double position) {
+
+    public AngleStates getAngleState( ) {
+        return angleState;
+    }
+
+    public ReleaseStates getReleaseState( ) {
+        return releaseState;
+    }
+
+    public void setAnglePosition ( double position) {
         angler.setPosition(position);
     }
 

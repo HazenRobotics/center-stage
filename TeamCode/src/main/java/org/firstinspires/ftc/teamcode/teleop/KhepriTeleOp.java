@@ -142,7 +142,7 @@ public class KhepriTeleOp extends LinearOpMode {
 		}
 
 		if (releaseAutoControl) {
-			if( liftPos < 50 && liftPower < 0 ) robot.deposit.setAngleState( Deposit.AngleStates.GRAB );
+			if( liftPos < 50 && liftPower < 0 && robot.deposit.getReleaseState() == Deposit.ReleaseStates.RETRACTED ) robot.deposit.setAngleState( Deposit.AngleStates.GRAB );
 			else if( liftPower > 0 && liftPos > 90 ) robot.deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
 		}
 	}

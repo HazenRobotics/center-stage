@@ -44,7 +44,7 @@ public class FarRedStandard extends LinearOpMode {
 
 	AutoStates autoState = AutoStates.INIT_SCANNING;
 	SpikeMarkScoringStates spikeState = SpikeMarkScoringStates.DRIVE_TO_SCORING_POS;
-	RedPropProcessor.PropPosition position;
+	RedPropProcessor.PropPosition position = RedPropProcessor.PropPosition.LEFT;
 
 	Pose2D targetPoint = new Pose2D();
 
@@ -62,18 +62,18 @@ public class FarRedStandard extends LinearOpMode {
 		robot = new KhepriBot( hardwareMap, telemetry );
 		robot.setupAutoTracker( new Pose2D( -38.5, -63.5, new AngleDegrees( 90 ).getTheta( ) ) );
 		robot.deposit.setReleaseState( Deposit.ReleaseStates.DROP_ONE );
-		redPropProcessor = new RedPropProcessor();
-
-		visionPortal = new VisionPortal.Builder()
-				.setCamera(hardwareMap.get( WebcamName.class, "front"))
-				.addProcessor( redPropProcessor )
-				.setCameraResolution(new Size(640, 480))
-				.setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-				.setAutoStopLiveView(true)
-				.build();
+//		redPropProcessor = new RedPropProcessor();
+//
+//		visionPortal = new VisionPortal.Builder()
+//				.setCamera(hardwareMap.get( WebcamName.class, "front"))
+//				.addProcessor( redPropProcessor )
+//				.setCameraResolution(new Size(640, 480))
+//				.setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+//				.setAutoStopLiveView(true)
+//				.build();
 
 		while( opModeInInit( ) && !opModeIsActive( ) ) {
-			position = redPropProcessor.getPiecePosition();
+//			position = redPropProcessor.getPiecePosition();
 			robot.addTelemetryData( "position", position );
 			robot.update();
 		}
@@ -84,7 +84,7 @@ public class FarRedStandard extends LinearOpMode {
 		boolean isLeft = position == RedPropProcessor.PropPosition.LEFT;
 		boolean isMiddle = position == RedPropProcessor.PropPosition.MIDDLE;
 		boolean isRight = position == RedPropProcessor.PropPosition.RIGHT;
-		visionPortal.stopStreaming();
+//		visionPortal.stopStreaming();
 
 		while( opModeIsActive( ) ) {
 			switch( autoState ) {

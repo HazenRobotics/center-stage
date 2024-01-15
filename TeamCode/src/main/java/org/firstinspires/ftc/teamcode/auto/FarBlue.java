@@ -3,9 +3,7 @@ package org.firstinspires.ftc.teamcode.auto;
 import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -19,13 +17,11 @@ import org.firstinspires.ftc.teamcode.utils.GVF.GVFPath;
 import org.firstinspires.ftc.teamcode.utils.GVF.Vector2;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleDegrees;
-import org.firstinspires.ftc.teamcode.vision.AprilTagUtil;
 import org.firstinspires.ftc.teamcode.vision.processors.PropProcessor;
-import org.firstinspires.ftc.teamcode.vision.processors.RedPropProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 @Autonomous
-public class FarRed extends LinearOpMode {
+public class FarBlue extends LinearOpMode {
 
 	KhepriBot robot;
 	PropProcessor propProcessor;
@@ -78,7 +74,7 @@ public class FarRed extends LinearOpMode {
 	Pose2D leftMark, middleMark, rightMark, selectedMark, stackLocation, ejectPoint,
 			middleInitialPixel, leftInitialPixel, rightInitialPixel, selectedWhitePixel, pickupFromGroundPoint;
 	GVFPath leftToStack, middleToStack, rightToStack, selectedStack, selectedBackdrop,
-			cycleToLeft, cycleToMiddle, cycleToRight, selectedCycle, rightToBackdrop;
+			cycleToLeft, cycleToMiddle, cycleToRight, selectedCycle, leftToBackdrop;
 
 	@Override
 	public void runOpMode( ) throws InterruptedException {
@@ -92,13 +88,13 @@ public class FarRed extends LinearOpMode {
 		//drop pixel, go under drive to score pixel on back, park on left side
 
 		robot = new KhepriBot( hardwareMap, telemetry );
-		robot.setupAutoTracker( new Pose2D( -38.5, -63.5, new AngleDegrees( 90 ) ) );
+		robot.setupAutoTracker( new Pose2D( -38.5, 63.5, new AngleDegrees( 270 ) ) );
 		robot.deposit.setAngleState( Deposit.AngleStates.GRAB );
-		robot.deposit.setReleaseState( Deposit.ReleaseStates.EXTENDED );
+		robot.deposit.setReleaseState( Deposit.ReleaseStates.HOLD_ONE );
 		robot.drive.setMaxSpeed( 0.6 );
-//		robot.lift.setTarget( 50 );
+//		robot.lift.setTarget( 100 );
 
-		propProcessor = new PropProcessor().setPropColor( PropProcessor.PropColor.RED_FAR );
+		propProcessor = new PropProcessor().setPropColor( PropProcessor.PropColor.BLUE_FAR );
 
 		visionPortal = new VisionPortal.Builder()
 				.setCamera(hardwareMap.get( WebcamName.class, "front"))
@@ -109,76 +105,76 @@ public class FarRed extends LinearOpMode {
 				.setAutoStopLiveView(true)
 				.build();
 
-		leftMark = new Pose2D( -46, -18, 90 );
-		middleMark = new Pose2D( -36, -14, 90 );
-		rightMark = new Pose2D( -36, -36, 180 );
-		stackLocation = new Pose2D( -58, -14, 0 );
-		ejectPoint = new Pose2D( -50, -14, 0 );
-		pickupFromGroundPoint = new Pose2D( -53, -14, 0 );
-		leftInitialPixel = new Pose2D( 49, -29, 0 );
-		middleInitialPixel = new Pose2D( 49, -36, 0 );
-		rightInitialPixel = new Pose2D( 49, -45, 0 );
+		leftMark = new Pose2D( -36, 36, 180 );
+		middleMark = new Pose2D( -36, 14, 270 );
+		rightMark = new Pose2D( -46, 18, 270 );
+		stackLocation = new Pose2D( -58, 14, 0 );
+		ejectPoint = new Pose2D( -50, 14, 0 );
+		pickupFromGroundPoint = new Pose2D( -53, 14, 0 );
+		leftInitialPixel = new Pose2D( 49, 29, 0 );
+		middleInitialPixel = new Pose2D( 49, 36, 0 );
+		rightInitialPixel = new Pose2D( 49, 45, 0 );
 
 		leftToStack = new GVFPath(
 				new CubicBezierCurve(
-						new Vector2( 49, -29 ),
-						new Vector2( 44, -10 ),
-						new Vector2( 56, -11 ),
-						new Vector2( -58, -14 )
+						new Vector2( 49, 29 ),
+						new Vector2( 44, 10 ),
+						new Vector2( 56, 11 ),
+						new Vector2( -60, 14 )
 				)
 		);
 
 		middleToStack = new GVFPath(
 				new CubicBezierCurve(
-						new Vector2( 49, -36 ),
-						new Vector2( 44, -10 ),
-						new Vector2( 56, -11 ),
-						new Vector2( -58, -14 )
+						new Vector2( 49, 36 ),
+						new Vector2( 44, 10 ),
+						new Vector2( 56, 11 ),
+						new Vector2( -60, 14 )
 				)
 		);
 
 		rightToStack = new GVFPath(
 				new CubicBezierCurve(
-						new Vector2( 49, -45 ),
-						new Vector2( 44, -10 ),
-						new Vector2( 56, -11 ),
-						new Vector2( -58, -14 )
-				)
-		);
-
-		cycleToLeft = new GVFPath(
-				new CubicBezierCurve(
-						new Vector2( -61, -14 ),
-						new Vector2( 44, -10 ),
-						new Vector2( 56, -11 ),
-						new Vector2( 49, -29 )
-				)
-		);
-
-		cycleToMiddle = new GVFPath(
-				new CubicBezierCurve(
-						new Vector2( -61, -14 ),
-						new Vector2( 72, 2 ),
-						new Vector2( 13, -37 ),
-						new Vector2( 49, -36 )
+						new Vector2( 49, 45 ),
+						new Vector2( 44, 10 ),
+						new Vector2( 56, 11 ),
+						new Vector2( -60, 14 )
 				)
 		);
 
 		cycleToRight = new GVFPath(
 				new CubicBezierCurve(
-						new Vector2( -60, -14 ),
-						new Vector2( 80, 4 ),
-						new Vector2( 34, -25 ),
-						new Vector2( 49, -45 )
+						new Vector2( -61, 14 ),
+						new Vector2( 44, 10 ),
+						new Vector2( 56, 11 ),
+						new Vector2( 49.5, 29 )
 				)
 		);
 
-		rightToBackdrop = new GVFPath(
+		cycleToMiddle = new GVFPath(
 				new CubicBezierCurve(
-						new Vector2( -36, -36 ),
-						new Vector2( -80, -2 ),
-						new Vector2( 50, 8 ),
-						new Vector2( 49, -45 )
+						new Vector2( -61, 14 ),
+						new Vector2( 72, -2 ),
+						new Vector2( 13, 37 ),
+						new Vector2( 49.5, 37 )
+				)
+		);
+
+		cycleToLeft = new GVFPath(
+				new CubicBezierCurve(
+						new Vector2( -60, 14 ),
+						new Vector2( 80, -4 ),
+						new Vector2( 34, 25 ),
+						new Vector2( 49.5, 46 )
+				)
+		);
+
+		leftToBackdrop = new GVFPath(
+				new CubicBezierCurve(
+						new Vector2( -36, 36 ),
+						new Vector2( -80, 2 ),
+						new Vector2( 50, -8 ),
+						new Vector2( 49, 45 )
 				)
 		);
 
@@ -200,19 +196,19 @@ public class FarRed extends LinearOpMode {
 
 		if (position == PropProcessor.PropPosition.LEFT) {
 			selectedMark = leftMark;
-			selectedBackdrop = cycleToLeft;
+			selectedBackdrop = leftToBackdrop;
 			selectedStack = leftToStack;
-			selectedCycle = cycleToMiddle;
+			selectedCycle = cycleToRight;
 			selectedWhitePixel = middleInitialPixel;
 		} else if (position == PropProcessor.PropPosition.MIDDLE) {
 			selectedMark = middleMark;
 			selectedBackdrop = cycleToMiddle;
 			selectedStack = middleToStack;
-			selectedCycle = cycleToLeft;
+			selectedCycle = cycleToRight;
 			selectedWhitePixel = leftInitialPixel;
 		} else if (position == PropProcessor.PropPosition.RIGHT) {
 			selectedMark = rightMark;
-			selectedBackdrop = rightToBackdrop;
+			selectedBackdrop = cycleToRight;
 			selectedStack = rightToStack;
 			selectedCycle =  cycleToMiddle;
 			selectedWhitePixel = middleInitialPixel;
@@ -248,7 +244,10 @@ public class FarRed extends LinearOpMode {
 //								timer.reset( );
 							}
 
-							if( timer.seconds( ) > 12 ) autoState = AutoStates.INITIAL_BACKDROP_SCORING;
+							if( timer.seconds( ) > 12 ) {
+								timer.reset();
+								autoState = AutoStates.INITIAL_BACKDROP_SCORING;
+							}
 							break;
 					}
 					break;
@@ -278,7 +277,7 @@ public class FarRed extends LinearOpMode {
 //							if( timer.seconds( ) > 2.5 ) {
 //								robot.intake.setIntakeMotorPower( 0 );
 //								robot.intake.setIntakeServoPower( 0 );
-//								robot.deposit.setAngleState( Deposit.AngleStates.GRAB );
+//								robot.deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
 //								robot.lift.setTarget( 0 );
 //								robot.intake.foldIntake();
 //								timer.reset();
@@ -303,18 +302,16 @@ public class FarRed extends LinearOpMode {
 						case SCORE_ON_BACKDROP_YELLOW:
 							robot.goToPoint( selectedBackdrop.getEndPoint().getX() + 1, selectedBackdrop.getEndPoint().getY(), 0 );
 
-							if (timer.seconds( ) > 1) robot.deposit.setReleaseState( Deposit.ReleaseStates.RETRACTED );
+							if (timer.seconds( ) > 3) robot.deposit.setReleaseState( Deposit.ReleaseStates.RETRACTED );
 
-							if( timer.seconds( ) > 3 ) {
+							if( timer.seconds( ) > 5 ) {
 								timer.reset( );
-								robot.deposit.setAngleState( Deposit.AngleStates.GRAB );
 								robot.lift.setTarget( 0 );
 //								backdropState = BackdropScoringStates.SHIFT_OVER_WHITE;
-//								autoState = AutoStates.CYCLING;
 							}
 							break;
 //						case SHIFT_OVER_WHITE:
-//							robot.goToPoint(selectedWhitePixel );
+//							robot.goToPoint( selectedWhitePixel );
 //							if( timer.seconds( ) > 1 ) {
 //								timer.reset( );
 //								robot.deposit.setReleaseState( Deposit.ReleaseStates.EXTENDED );
@@ -329,7 +326,7 @@ public class FarRed extends LinearOpMode {
 //								robot.lift.setTarget( 0 );
 //								robot.intake.foldIntake( );
 //								timer.reset( );
-//								autoState = AutoStates.PARK;
+//								autoState = AutoStates.CYCLING;
 //							}
 //							break;
 					}
@@ -412,11 +409,11 @@ public class FarRed extends LinearOpMode {
 					}
 					break;
 				case PARK:
-					robot.goToPoint( 46, -12, 0 );
+					robot.goToPoint( 46, 12, 0 );
 					break;
 			}
 
-//			if (autoStopwatch.seconds() > 25 && cyclingStates != CyclingStates.SCORE_ON_BACKDROP && cyclingStates != CyclingStates.DRIVE_TO_BACKDROP  ) autoState = AutoStates.PARK;
+			if (autoStopwatch.seconds() > 25 && cyclingStates != CyclingStates.SCORE_ON_BACKDROP && cyclingStates != CyclingStates.DRIVE_TO_BACKDROP  ) autoState = AutoStates.PARK;
 
 			TelemetryPacket packet = new TelemetryPacket();
 //			Canvas field = packet.fieldOverlay( )

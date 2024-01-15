@@ -33,16 +33,16 @@ import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
@@ -58,21 +58,19 @@ import java.util.ArrayList;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-@TeleOp(name = "Concept: AprilTag")
+@Config
 //@Disabled
-public class ConceptAprilTag extends OpMode {
-
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
-
-    /**
-     * The variable to store our instance of the AprilTag processor.
-     */
+public class AprilTagUtil {
     private AprilTagProcessor frontATP;
-    private AprilTagProcessor backATP;
-    private VisionPortal backVP;
-    private VisionPortal frontVP;
+//    private AprilTagProcessor backATP;
+//    public VisionPortal backVP;
+    public VisionPortal frontVP;
     private final double TAG_ANGLE_OFFSET =1.59807621135;
 
+    public static double FRONT_X_OFFSET = -7;
+    public static double FRONT_Y_OFFSET = /*-2.5*/ 0;
+    public static double BACK_X_OFFSET = /*7*/ 0;
+    public static double BACK_Y_OFFSET = /*-5.5*/ 0;
 
     final static Point3[] APRIL_TAG_BOARD_POSTIONS = {
             new Point3(60.25f, 41.41f, 4f),
@@ -105,7 +103,9 @@ public class ConceptAprilTag extends OpMode {
         } else return APRIL_TAG_BOARD_POSTIONS[i - 1];
     }
 
-    private void initAprilTag() {
+
+
+    public AprilTagUtil( HardwareMap hw ) {
 
         // Create the AprilTag processor.
         frontATP = new AprilTagProcessor.Builder()
@@ -133,7 +133,6 @@ public class ConceptAprilTag extends OpMode {
 //                .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
 //                .setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
 //                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-//                .setLensIntrinsics(627.866405467, 627.866405467, 367.632040506, 237.041562849 )
 //
 //                // == CAMERA CALIBRATION ==
 //                // If you do not manually specify calibration parameters, the SDK will attempt
@@ -165,23 +164,25 @@ public class ConceptAprilTag extends OpMode {
         // Set and enable the processor.
 
 //        backVP = new VisionPortal.Builder()
-//                .setCamera(hardwareMap.get(WebcamName.class, "back"))
+//                .setCamera(hw.get(WebcamName.class, "back"))
 //                .addProcessor(backATP)
 //                .setCameraResolution(new Size(640, 480))
 //                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
 //                .setAutoStopLiveView(true)
+//                .enableLiveView( false )
 //                .build();
 
         frontVP = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "front"))
+                .setCamera(hw.get(WebcamName.class, "front"))
                 .addProcessor(frontATP)
                 .setCameraResolution(new Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                 .setAutoStopLiveView(true)
+                .enableLiveView( true )
                 .build();
 
         // Disable or re-enable the aprilTag processor at any time.
-        //visionPortal.setProcessorEnabled(aprilTag, true);
+//        backVP.setProcessorEnabled(backATP, true);
 
     }   // end method initAprilTag()
 
@@ -189,7 +190,7 @@ public class ConceptAprilTag extends OpMode {
     /**
      * Add telemetry about AprilTag detections.
      */
-    private void telemetryAprilTag() {
+    public void telemetryAprilTag() {
 
 //        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 //        telemetry.addData("# AprilTags Detected", currentDetections.size());
@@ -211,70 +212,45 @@ public class ConceptAprilTag extends OpMode {
 //        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
 //        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
 //        telemetry.addLine("RBE = Range, Bearing & Elevation");
-        Point3 point = getPositionBasedOnTag();
-
-        TelemetryPacket packet = new TelemetryPacket();
-        Canvas field = packet.fieldOverlay( )
-                .drawImage( "/dash/centerstage.webp", 0, 0, 144, 144, Math.toRadians( 180 ), 72, 72, false )
-                .setAlpha( 1.0 )
-                .drawGrid( 0, 0, 144, 144, 7, 7 )
-                .setRotation( Math.toRadians( 270 ) );
-
-        double x = point.x;
-        double y = point.y;
-
-        int robotRadius = 8;
-        field.strokeCircle(x, y, robotRadius);
-//        double arrowX = new Rotation2d(heading).getCos() * robotRadius, arrowY = new Rotation2d(heading).getSin() * robotRadius;
-//        double x1 = x, y1 = y;
-//        double x2 = x + arrowX, y2 = y + arrowY;
-//        field.strokeLine(x1, y1, x2, y2);
-        FtcDashboard.getInstance().sendTelemetryPacket(packet);
-
-        telemetry.addLine("Distance X:" + point.x + " Y: " + point.y + " Z: " + point.z);
 
     }   // end method telemetryAprilTag()
 
-    @Override
-    public void init() {
-        initAprilTag();
-
-        // Wait for the DS start button to be touched.
-        telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
-        telemetry.addData(">", "Touch Play to start OpMode");
-        telemetry.update();
-    }
-
-    @Override
-    public void loop() {
-        telemetryAprilTag();
-
-        // Push telemetry to the Driver Station.
-        telemetry.update();
-
-        // Save CPU resources; can resume streaming when needed.
-
-    }
-
     public Point3 getPositionBasedOnTag() {
         ArrayList<AprilTagDetection> detections = new ArrayList<>();
-//        if (backVP.getProcessorEnabled(backATP)) detections.addAll(backATP.getDetections());
-        if (frontVP.getProcessorEnabled(frontATP)) detections.addAll(frontATP.getDetections());
+
+        double xOffset = 0;
+        double yOffset = 0;
+
+//        if (backVP.getProcessorEnabled(backATP)) {
+//            detections.addAll(backATP.getDetections());
+//            xOffset = BACK_X_OFFSET;
+//            yOffset = BACK_Y_OFFSET;
+//        }
+        if (frontVP.getProcessorEnabled(frontATP)) {
+            detections.addAll(frontATP.getDetections());
+            xOffset = FRONT_X_OFFSET;
+            yOffset = FRONT_Y_OFFSET;
+        }
 
         if (detections.isEmpty()) return new Point3(0, 0, 0);
         else {
-            AprilTagPoseFtc pose = detections.get(0).ftcPose;
-            Point3 tagpos = getTagPosition(detections.get(0).id);
+            double x = 0;
+            double y = 0;
 
-            double x = tagpos.x + (tagpos.x > 0 ? -pose.y : pose.y );
-            double y = tagpos.y + (tagpos.y > 0 ? -pose.x : pose.x );
+            for( int i = 0; i < detections.size(); i++ ) {
+                AprilTagPoseFtc pose = detections.get( i ).ftcPose;
+                Point3 tagpos = getTagPosition( detections.get( i ).id );
 
-            if(detections.get(0).id>7) x -= TAG_ANGLE_OFFSET;
+                x += tagpos.x + (tagpos.x > 0 ? -pose.y : pose.y );
+                y += tagpos.y + (tagpos.y > 0 ? -pose.x : pose.x );
 
-            telemetry.addData("x",pose.x);
-            telemetry.addData("y",pose.y-TAG_ANGLE_OFFSET);
+//                if(detections.get(i).id < 7) x -= TAG_ANGLE_OFFSET;
+            }
 
-            return new Point3(x, y, 0);
+            x /= detections.size();
+            y /= detections.size();
+
+            return new Point3(x + xOffset, y + yOffset, 0);
         }
 
     }
