@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.auto;
 import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.teamcode.vision.processors.BluePropProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 @Autonomous
+@Disabled
 public class FarBlueStandard extends LinearOpMode {
 
 	KhepriBot robot;

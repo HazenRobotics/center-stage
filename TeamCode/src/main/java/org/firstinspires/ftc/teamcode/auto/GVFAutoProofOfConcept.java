@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -20,6 +21,7 @@ import java.util.ListIterator;
 
 //@Photon
 @Autonomous
+@Disabled
 public class GVFAutoProofOfConcept extends LinearOpMode {
 
 	KhepriBot robot;

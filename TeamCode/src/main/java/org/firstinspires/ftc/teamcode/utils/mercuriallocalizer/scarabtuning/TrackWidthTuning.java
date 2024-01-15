@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.scarabtuning;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.An
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleRadians;
 
 @TeleOp
+@Disabled
 public class TrackWidthTuning extends LinearOpMode {
 	KhepriBot robot;
 	AngleDegrees currentHeading, lastHeading;

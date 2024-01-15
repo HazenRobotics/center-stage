@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.robots.KhepriBot;
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.An
 
 @Autonomous
 @Config
+@Disabled
 public class PositionPIDTuning extends LinearOpMode {
 	KhepriBot robot;
 	FtcDashboard dashboard;

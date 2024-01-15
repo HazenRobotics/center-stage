@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.scarabtuning;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.Encoder;
 
 @Autonomous
+@Disabled
 public class ThreeWheelOdoEncoderTuner extends LinearOpMode {
 
 	Encoder left, right, perp;

@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.tests;
 
 import com.arcrobotics.ftclib.geometry.Vector2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(group = "Test")
+@Disabled
 public class JoystickAngle extends OpMode {
 
 	@Override

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.scheduler.configoptions;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.scheduler.OpModeEX;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 @TeleOp(name = "Edit Scheduler Config Options", group = "?") // we use '?' to move it to the bottom of the list
+@Disabled
 public class ChangeSchedulerConfig extends OpModeEX {
 	private int selection, selectionSize;
 	private String selectionString;

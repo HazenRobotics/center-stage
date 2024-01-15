@@ -35,6 +35,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -60,7 +61,7 @@ import java.util.ArrayList;
  */
 @Config
 @TeleOp
-//@Disabled
+@Disabled
 public class AprilTagUtilTester extends OpMode {
 
     AprilTagUtil util;
