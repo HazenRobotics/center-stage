@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.utils.SwervePDController.findShorte
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.outoftheboxrobotics.photoncore.hardware.PhotonLynxVoltageSensor;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -59,8 +60,7 @@ public class KhepriBot {
 	public List<LynxModule> hubs;
 	Pose2D poseEstimate;
 	public static double normalizedPowerMultiplier;
-	public ElapsedTime voltagePollTimer;
-
+	PhotonLynxVoltageSensor photonVoltageSensor;
 	public GVFPath currentPath;
 	public Vector2 currentPointTarget;
 
@@ -108,8 +108,6 @@ public class KhepriBot {
 		launcher = new SlingshotLauncher( hw );
 		rgbController = new RGBController( hw );
 
-		voltagePollTimer = new ElapsedTime();
-
 		setupIMU( RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP );
 		imu.resetYaw();
 
@@ -118,7 +116,8 @@ public class KhepriBot {
 		autoHeadingController = new PIDController( 5, 0, 0.4 );
 		teleOpHeadingController = new PIDController( 1, 0, 0.1 );
 
-		normalizedPowerMultiplier = 12.0 / hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS );
+		photonVoltageSensor = hw.getAll(PhotonLynxVoltageSensor.class).iterator().next();
+		normalizedPowerMultiplier = 12.0 / photonVoltageSensor.getCachedVoltage();
 	}
 
 
@@ -202,7 +201,6 @@ public class KhepriBot {
 				autoHeadingController.calculate( headingError, 0 ) * normalizedPowerMultiplier,
 				poseEstimate.getTheta().getRadians()
 		);
-
 	}
 
 	public void goToPoint( double x, double y, double heading ) {
@@ -252,7 +250,7 @@ public class KhepriBot {
 	}
 
 	public void update() {
-		pollNormalizedPowerMultiplier();
+		normalizedPowerMultiplier = 12.0 / photonVoltageSensor.getCachedVoltage();
 		clearBulkCache( );
 		updateTracker( );
 		calculateHz();
@@ -270,13 +268,6 @@ public class KhepriBot {
 
 	public void addTelemetryData( String label, Object data ) {
 		telemetry.addData( label, data );
-	}
-
-	public void pollNormalizedPowerMultiplier() {
-		if (voltagePollTimer.seconds() > 4) {
-			voltagePollTimer.reset( );
-			normalizedPowerMultiplier = 12.0 / hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS );
-		}
 	}
 
 	public static void calculateHz() {
