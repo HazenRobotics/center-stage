@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 public class KhepriTeleOp extends LinearOpMode {
 	KhepriBot robot;
 	GamepadEvents controller1;
-	Boolean isIntakeServoDisabled;
+	boolean isIntakeServoDisabled;
 	double liftPos, liftPower, loop, loopTime, normalizedPowerMultiplier;
 
 	@Override
