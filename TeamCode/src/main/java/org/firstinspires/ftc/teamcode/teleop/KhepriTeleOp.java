@@ -12,13 +12,14 @@ import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 public class KhepriTeleOp extends LinearOpMode {
 	KhepriBot robot;
 	GamepadEvents controller1;
+	Boolean isIntakeServoDisabled;
 	double liftPos, liftPower, loop, loopTime, normalizedPowerMultiplier;
 
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
 		controller1 = new GamepadEvents( gamepad1 );
-
+		isIntakeServoDisabled = true;
 		waitForStart( );
 
 		while( opModeIsActive( ) ) {
@@ -37,20 +38,28 @@ public class KhepriTeleOp extends LinearOpMode {
 			liftPos = robot.lift.getMotorPosition();
 			liftPower = gamepad1.right_trigger - (gamepad1.left_trigger * 0.6);
 
-			robot.lift.setPower( liftPower );
+				robot.lift.setPower( liftPower );
 
 			if( controller1.a.onPress( ) )
 				robot.deposit.releaseToggle( );
+
 
 			if ( liftPos < 50 && liftPower < 0 )
 				robot.deposit.setAnglePosition( Deposit.AngleStates.GRAB );
 			else if (liftPower > 0 && liftPos > 90)
 				robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
 
-			if(controller1.left_bumper.onPress())
-				robot.intake.foldIntake();
-			else if( controller1.right_bumper.onPress() )
+
+			if(isIntakeServoDisabled = true)
+			{
+				if(controller1.left_bumper.onPress()){
+					robot.intake.foldIntake();
+
+				} else if( controller1.right_bumper.onPress() )
 				robot.intake.deployIntake( normalizedPowerMultiplier );
+				isIntakeServoDisabled = false;
+			}
+
 
 			if ( controller1.dpad_up.onPress() )
 				robot.climber.goUp();
