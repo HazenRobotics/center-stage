@@ -100,12 +100,11 @@ public class Intake {
 //        else
 //            intakeCapacity = IntakeCapacity.EMPTY;
 //    }
-
+//
     public void setIntakeMotorPower(double power) {
         motorPower = power /* * (intakeCapacity == IntakeCapacity.OVERFLOW ? -1 : 1)*/;
         intakeMotor.setPower( motorPower );
     }
-
     public void toggleServo(boolean isIntakeServoDisabled, double value)
     {
         //CRServos are related to motors, so I am assuming that they need to be toggled.
