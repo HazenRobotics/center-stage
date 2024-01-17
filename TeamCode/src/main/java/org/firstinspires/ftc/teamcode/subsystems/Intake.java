@@ -28,6 +28,7 @@ public class Intake{
     private double servoPos;
     private boolean reverse = true;
     public static double servoPower = 0.8;
+    private boolean wheelServoOn = false;
 
     DeploymentState deploymentState = DeploymentState.FOLDED;
 
@@ -90,15 +91,26 @@ public class Intake{
         setIntakeMotorPower( 0 );
         wheelServo.setPower( 0 );
     }
-    public void deployIntake( double powerMultiplier ) {
+    public void deployIntake( double powerMultiplier) {
         if (deploymentState == DeploymentState.FOLDED) deploymentState = DeploymentState.FULLY_DEPLOYED;
         else reverse = !reverse;
 
         setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
         setIntakeMotorPower( (reverse ? -0.8 : 0.8) * powerMultiplier );
         wheelServo.setPower( (reverse ? -1 : servoPower) );
-    }
+        wheelServoOn = true;
 
+    }
+   public void toggleServo()
+   {
+       if(wheelServoOn)
+       {
+           wheelServo.setPower(0);
+           wheelServoOn = !wheelServoOn;
+       }else {
+           wheelServoOn = !wheelServoOn;
+       }
+   }
     public boolean isReversed( ) {
         return reverse;
     }
@@ -141,19 +153,7 @@ public class Intake{
     public void setIntakeServoPower(double power) {
         wheelServo.setPower( power );
     }
-    public void toggleServo(boolean isIntakeServoDisabled, double value)
-    {
-        //CRServos are related to motors, so I am assuming that they need to be toggled.
-            if(isIntakeServoDisabled)
-            {
-                setIntakeMotorPower(value);
-                isIntakeServoDisabled = false;
-            }else {
-                setIntakeMotorPower(0);
-                isIntakeServoDisabled = true;
-            }
 
-    }
 
     public double getIntakeMotorPower() {
         return intakeMotor.getPower( );
