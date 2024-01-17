@@ -108,7 +108,7 @@ public class Intake {
 
     public void toggleServo(boolean isIntakeServoDisabled, double value)
     {
-        //CRServos are related to motors, so I am assuming that they need to be toggled
+        //CRServos are related to motors, so I am assuming that they need to be toggled.
             if(isIntakeServoDisabled)
             {
                 setIntakeMotorPower(value);
