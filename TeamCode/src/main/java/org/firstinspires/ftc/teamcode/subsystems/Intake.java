@@ -106,6 +106,20 @@ public class Intake {
         intakeMotor.setPower( motorPower );
     }
 
+    public void toggleServo(boolean isIntakeServoDisabled, double value)
+    {
+        //CRServos are related to motors, so I am assuming that they need to be toggled
+            if(isIntakeServoDisabled)
+            {
+                setIntakeMotorPower(value);
+                isIntakeServoDisabled = false;
+            }else {
+                setIntakeMotorPower(0);
+                isIntakeServoDisabled = true;
+            }
+
+    }
+
     public double getIntakeMotorPower() {
         return motorPower;
     }

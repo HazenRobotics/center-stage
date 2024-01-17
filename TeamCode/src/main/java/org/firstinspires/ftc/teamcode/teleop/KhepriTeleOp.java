@@ -12,7 +12,9 @@ import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 public class KhepriTeleOp extends LinearOpMode {
 	KhepriBot robot;
 	GamepadEvents controller1;
+	GamepadEvents controller2;
 	boolean isIntakeServoDisabled;
+
 	double liftPos, liftPower, loop, loopTime, normalizedPowerMultiplier;
 
 	@Override
@@ -50,15 +52,18 @@ public class KhepriTeleOp extends LinearOpMode {
 				robot.deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
 
 
-			if(isIntakeServoDisabled = true)
-			{
-				if(controller1.left_bumper.onPress()){
+
+				if(controller1.left_bumper.onPress() ){
 					robot.intake.foldIntake();
 
-				} else if( controller1.right_bumper.onPress() )
+
+				} else if( controller1.right_bumper.onPress())
 				robot.intake.deployIntake( normalizedPowerMultiplier );
-				isIntakeServoDisabled = false;
-			}
+
+			if(controller2.x.onPress())
+				robot.intake.toggleServo(isIntakeServoDisabled, null);
+
+
 
 
 			if ( controller1.dpad_up.onPress() )
