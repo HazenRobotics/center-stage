@@ -68,7 +68,7 @@ public class AprilTagUtil {
     private final double TAG_ANGLE_OFFSET =1.59807621135;
 
     public static double FRONT_X_OFFSET = -7;
-    public static double FRONT_Y_OFFSET = /*-2.5*/ 0;
+    public static double FRONT_Y_OFFSET = -2.5;
     public static double BACK_X_OFFSET = /*7*/ 0;
     public static double BACK_Y_OFFSET = /*-5.5*/ 0;
 

@@ -5,7 +5,6 @@ import static org.firstinspires.ftc.teamcode.utils.SwervePDController.findShorte
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -60,7 +59,7 @@ public class KhepriTeleOp extends LinearOpMode {
 			intakeControl();
 			climbControl();
 			launcherControl();
-			LEDControl();
+			ledControl();
 
 			if(controller1.start.onPress()) robot.tracker.resetHeading( );
 
@@ -172,7 +171,7 @@ public class KhepriTeleOp extends LinearOpMode {
 		wasUsingPID = usingLiftPID;
 	}
 
-	public void LEDControl() {
+	public void ledControl() {
 		if (controller2.a.onPress()) signallingColors[colorIndex++] = RevBlinkinLedDriver.BlinkinPattern.GREEN;
 		if (controller2.b.onPress()) signallingColors[colorIndex++] = RevBlinkinLedDriver.BlinkinPattern.HOT_PINK;
 		if (controller2.y.onPress()) signallingColors[colorIndex++] = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
@@ -228,6 +227,7 @@ public class KhepriTeleOp extends LinearOpMode {
 		telemetry.addData( "rgbcontrollerTimer updateRotation", robot.rgbController.getUpdateRotation() );
 
 //		robot.drive.displayWheelAngles( telemetry );
+		for( int i = 0; i < 4; i++ ) telemetry.addData( "motor " + i, robot.drive.swervePods[i].getDrivePower());
 		telemetry.update( );
 	}
 }

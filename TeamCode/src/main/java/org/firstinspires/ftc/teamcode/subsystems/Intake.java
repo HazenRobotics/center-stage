@@ -91,10 +91,8 @@ public class Intake{
         wheelServo.setPower( 0 );
     }
     public void deployIntake( double powerMultiplier ) {
-        if (deploymentState == DeploymentState.FOLDED)
-            deploymentState = DeploymentState.FULLY_DEPLOYED;
-        else
-            reverse = !reverse;
+        if (deploymentState == DeploymentState.FOLDED) deploymentState = DeploymentState.FULLY_DEPLOYED;
+        else reverse = !reverse;
 
         setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
         setIntakeMotorPower( (reverse ? -0.8 : 0.8) * powerMultiplier );

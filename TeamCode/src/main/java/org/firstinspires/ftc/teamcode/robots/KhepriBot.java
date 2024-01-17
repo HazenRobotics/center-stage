@@ -60,7 +60,8 @@ public class KhepriBot {
 	public List<LynxModule> hubs;
 	Pose2D poseEstimate;
 	public static double normalizedPowerMultiplier;
-	PhotonLynxVoltageSensor photonVoltageSensor;
+	public ElapsedTime voltagePollTimer;
+//	PhotonLynxVoltageSensor photonVoltageSensor;
 	public GVFPath currentPath;
 	public Vector2 currentPointTarget;
 
@@ -116,8 +117,10 @@ public class KhepriBot {
 		autoHeadingController = new PIDController( 5, 0, 0.4 );
 		teleOpHeadingController = new PIDController( 1, 0, 0.1 );
 
-		photonVoltageSensor = hw.getAll(PhotonLynxVoltageSensor.class).iterator().next();
-		normalizedPowerMultiplier = 12.0 / photonVoltageSensor.getCachedVoltage();
+		voltagePollTimer = new ElapsedTime();
+		normalizedPowerMultiplier = 12.0 / hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS );
+//		photonVoltageSensor = hw.getAll(PhotonLynxVoltageSensor.class).iterator().next();
+//		normalizedPowerMultiplier = 12.0 / photonVoltageSensor.getCachedVoltage();
 	}
 
 
@@ -250,7 +253,8 @@ public class KhepriBot {
 	}
 
 	public void update() {
-		normalizedPowerMultiplier = 12.0 / photonVoltageSensor.getCachedVoltage();
+		pollNormalizedPowerMultiplier();
+//		normalizedPowerMultiplier = 12.0 / photonVoltageSensor.getCachedVoltage();
 		clearBulkCache( );
 		updateTracker( );
 		calculateHz();
@@ -268,6 +272,13 @@ public class KhepriBot {
 
 	public void addTelemetryData( String label, Object data ) {
 		telemetry.addData( label, data );
+	}
+
+	public void pollNormalizedPowerMultiplier() {
+		if (voltagePollTimer.seconds() > 4) {
+			voltagePollTimer.reset( );
+			normalizedPowerMultiplier = 12.0 / hubs.get( 0 ).getInputVoltage( VoltageUnit.VOLTS );
+		}
 	}
 
 	public static void calculateHz() {
