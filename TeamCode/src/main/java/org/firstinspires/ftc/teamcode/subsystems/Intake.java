@@ -28,7 +28,7 @@ public class Intake{
     private double servoPos;
     private boolean reverse = true;
     public static double servoPower = 0.8;
-    private boolean wheelServoOn = false;
+    private boolean wheelServoOn = true;
 
     DeploymentState deploymentState = DeploymentState.FOLDED;
 
@@ -97,19 +97,12 @@ public class Intake{
 
         setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
         setIntakeMotorPower( (reverse ? -0.8 : 0.8) * powerMultiplier );
-        wheelServo.setPower( (reverse ? -1 : servoPower) );
-        wheelServoOn = true;
-
+        if (wheelServoOn) wheelServo.setPower( (reverse ? -1 : servoPower) );
     }
-   public void toggleServo()
-   {
-       if(wheelServoOn)
-       {
-           wheelServo.setPower(0);
-           wheelServoOn = !wheelServoOn;
-       }else {
-           wheelServoOn = !wheelServoOn;
-       }
+   public void toggleServo() {
+       wheelServoOn = !wheelServoOn;
+
+       if (!wheelServoOn) wheelServo.setPower(0);
    }
     public boolean isReversed( ) {
         return reverse;

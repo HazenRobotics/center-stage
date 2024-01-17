@@ -130,9 +130,6 @@ public class KhepriTeleOp extends LinearOpMode {
 		if (robot.intake.isReversed()) gamepad1.rumble( 100 );
 
 		if(controller2.x.onPress()) robot.intake.toggleServo();
-
-
-
 	}
 
 	public void depositControl() {
