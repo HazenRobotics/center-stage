@@ -16,6 +16,9 @@ public class RGBLights {
 		CELEBRATION
 	}
 
+	public RGBLights( HardwareMap hw ) {
+		blinkinLedDriver = hw.get(RevBlinkinLedDriver.class, "leds" );
+	}
 	public RGBLights( HardwareMap hw, String name ) {
 		blinkinLedDriver = hw.get(RevBlinkinLedDriver.class, name );
 	}

@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.utils.SwervePDController;
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingCRServo;
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingDcMotorEX;
 
 public class AxonSwervePod {
 
@@ -20,22 +22,22 @@ public class AxonSwervePod {
 
 	public AxonSwervePod( HardwareMap hw, String motorName, String servoName, String encoderName ) {
 		this( hw, motorName, false, servoName, false, encoderName,
-				0, 3.3, new double[]{ 0, 0 }, 28 * 8 );
+				0, 3.3, new double[]{ 0, 0 }, 28 * 8, 0 );
 	}
 
 	public AxonSwervePod( HardwareMap hw, String motorName, boolean motorReversed, String servoName, boolean servoReversed,
-						  String encoderName, double encoderOffset, double encoderVoltage, double[] pid, double PPR ) {
-		motor = hw.get( DcMotorEx.class, motorName );
+						  String encoderName, double encoderOffset, double encoderVoltage, double[] pid, double PPR, double kStatic ) {
+		motor = new CachingDcMotorEX( hw.get( DcMotorEx.class, motorName ) );
 		if( motorReversed ) reverseMotor( );
 
 		motor.setMode( DcMotor.RunMode.RUN_WITHOUT_ENCODER );
 		motor.setZeroPowerBehavior( DcMotor.ZeroPowerBehavior.BRAKE );
 
-		crServo = hw.get( CRServo.class, servoName );
+		crServo = new CachingCRServo( hw.get( CRServo.class, servoName ) );
 		if( servoReversed ) crServo.setDirection( DcMotorSimple.Direction.REVERSE );
 
 		encoder = new AxonAbsolutePositionEncoder( hw, encoderName, encoderOffset, encoderVoltage );
-		controller = new SwervePDController( pid[0], pid[1] );
+		controller = new SwervePDController( pid[0], pid[1], kStatic );
 
 		motorPPR = PPR;
 	}
@@ -86,6 +88,10 @@ public class AxonSwervePod {
 		return motor.getVelocity( );
 	}
 
+	public double getDrivePower( ) {
+		return motor.getPower( );
+	}
+
 	public int getDrivePosition( ) {
 		return motor.getCurrentPosition( );
 	}
@@ -102,11 +108,20 @@ public class AxonSwervePod {
 		controller.setPD( p, d );
 	}
 
+	public void setKs( double s ) {
+		controller.setKs( s );
+	}
+
+	public double getError( ) {
+		return controller.getError( );
+	}
+
 	public void update( ) {
 		double[] results = controller.update( getAngle( ) );
 
 		setRotatePower( results[0] );
 	}
+
 	public void update( double motorPower ) {
 		double[] results = controller.update( getAngle( ) );
 

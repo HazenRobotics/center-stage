@@ -6,19 +6,23 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.drivetrains.CoaxialSwerveDrive;
 import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
 
 import java.util.List;
 
 @Config
 @TeleOp(group = "Test")
+@Disabled
 public class PDSwervePodTuning extends LinearOpMode {
+	CoaxialSwerveDrive drive;
 	AxonSwervePod pod;
 
-	public static double p = 0, d = 0;
+	public static double p = 0, d = 0, s = 0, podNum = 0;
 
 	public static double angle = 0;
 
@@ -30,17 +34,20 @@ public class PDSwervePodTuning extends LinearOpMode {
 		List<LynxModule> hubs = hardwareMap.getAll( LynxModule.class);
 		for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 
-		pod = new AxonSwervePod( hardwareMap, "FLM/perp", false, "FLS", false,
-				"FLE", encoderOffsets[0], 3.3, new double[]{0,0}, 0);
+		drive = new CoaxialSwerveDrive( hardwareMap );
 
 		telemetry = new MultipleTelemetry( telemetry, FtcDashboard.getInstance( ).getTelemetry( ) );
 
 		waitForStart();
 
+
 		while( opModeIsActive() ) {
 
+			pod = drive.swervePods[(int) podNum];
+
 			pod.setPID( p, d );
-			pod.setAngleTarget( angle );
+			pod.setKs( s );
+			pod.setAngleTarget( Math.toRadians( angle ) );
 			pod.update( 0 );
 
 			updateTelemetry( );

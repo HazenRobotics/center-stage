@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 
 @TeleOp
+@Disabled
 public class OuttakeTest extends LinearOpMode {
 	Lift lift;
 	Deposit deposit;
@@ -24,7 +26,7 @@ public class OuttakeTest extends LinearOpMode {
 		waitForStart();
 
 		while( opModeIsActive() ) {
-			liftPos = lift.getMotorPosition();
+			liftPos = lift.getPosition();
 			liftPower = gamepad1.right_trigger - (gamepad1.left_trigger * (0.4 + (((620 - liftPos) / 620) * 0.2)));
 
 			lift.setPower( liftPower );
@@ -38,9 +40,9 @@ public class OuttakeTest extends LinearOpMode {
 			// to go back to bucket, go back up to 9, bucketAngle, go down
 
 			if ( liftPower <= -0.3 && liftPos > 180 || liftPos < 100 )
-				deposit.setAnglePosition( Deposit.AngleStates.GRAB );
+				deposit.setAngleState( Deposit.AngleStates.GRAB );
 			else
-				deposit.setAnglePosition( Deposit.AngleStates.DROP_BACKDROP );
+				deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
 
 			telemetry.addData( "lift pos", liftPos );
 			telemetry.addData( "release pos", deposit.getReleasePosition( ) );

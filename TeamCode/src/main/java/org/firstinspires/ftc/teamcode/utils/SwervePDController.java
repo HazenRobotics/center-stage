@@ -10,19 +10,19 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class SwervePDController {
 
 
-	double Kp, Kd, lastError, error;
-	final double Ks = 0.03;
+	double Kp, Kd, Ks, lastError, error;
 	ElapsedTime timer;
 
 	double targetAngle;
 	double motorDirection;
 
 	public SwervePDController( ) {
-		this( 0, 0 );
+		this( 0, 0, 0 );
 	}
 
-	public SwervePDController( double p, double d ) {
+	public SwervePDController( double p, double d, double ks ) {
 		setPD( p, d );
+		setKs( ks );
 		timer = new ElapsedTime( );
 		targetAngle = 0;
 	}
@@ -30,6 +30,10 @@ public class SwervePDController {
 	public void setPD( double p, double d ) {
 		Kp = p;
 		Kd = d;
+	}
+
+	public void setKs( double s ) {
+		Ks = s;
 	}
 
 	public double[] update( double currentAngle ) {
@@ -44,7 +48,7 @@ public class SwervePDController {
 
 		timer.reset( );
 
-		return new double[]{ (Kp * error) + (Kd * derivative) + (Math.abs(error) < 0.08 ? Ks * signum( error ) : 0 ), motorDirection };
+		return new double[]{ (Kp * error) + (Kd * derivative) + /*(Math.abs(error) < 0.1 ? */Ks * signum( error ) /*: 0 )*/, motorDirection };
 	}
 
 	public void setTargetAngle( double angle ) {
@@ -59,6 +63,11 @@ public class SwervePDController {
 		return ((((targetAngle - currentAngle + PI) % TWO_PI) + TWO_PI) % TWO_PI) - PI;
 	}
 
+	/**
+	 * normalizes an angle to between 0 and 2PI
+	 * @param angle angle in radians
+	 * @return
+	 */
 	public static double normalizeRadians( double angle ) {
 		angle %= TWO_PI;
 

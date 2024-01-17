@@ -1,51 +1,57 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingServo;
+
+@Config
+
 public class Deposit {
     Servo angler, release;
+    public static double dropBackDrop = 0.583;
 
     public enum ReleaseStates {
-        RETRACTED(0.241, 0), EXTENDED(0.4, 1), DROP_ONE(0.306, 2);
+        RETRACTED(0),
+        EXTENDED(0.158),
+        DROP_ONE(0.06),
+        HOLD_ONE(0.14);
         private final double position;
-        private final int index;
-        ReleaseStates (double pos, int ind) {
+        ReleaseStates (double pos) {
             position = pos;
-            index = ind;
         }
         double getPosition() {
             return position;
-        }
-        int getIndex() {
-            return index;
         }
     }
 
     public enum AngleStates {
-        GRAB(0.265 ), DROP_FLOOR(0.363 ), DROP_FLOOR_AUTO( 0.42 ), DROP_BACKDROP( 0.583 );
+        GRAB( 0.423 ),
+        DROP_FLOOR( 0.363 ),
+        DROP_FLOOR_AUTO( 0.42 ),
+        DROP_BACKDROP( 0.741 ),
+        FIX_BUCKET(0.37);
         private final double position;
-        AngleStates (double pos) {
+
+        AngleStates( double pos ) {
             position = pos;
         }
-        double getPosition() {
+
+        double getPosition( ) {
             return position;
         }
     }
 
-    ReleaseStates[] releaseStates;
-    int releaseStateIndex;
-
     AngleStates angleState = AngleStates.GRAB;
+    ReleaseStates releaseState = ReleaseStates.RETRACTED;
 
     public Deposit( HardwareMap hw ) {
         this(hw, "release", "pivot");
     }
     public Deposit( HardwareMap hw, String releaseName, String anglerName) {
-        release = hw.get(Servo.class, releaseName);
-        angler = hw.get(Servo.class, anglerName);
-        releaseStates = ReleaseStates.values();
-        releaseStateIndex = 0;
+        release = new CachingServo( hw.get(Servo.class, releaseName) );
+        angler = new CachingServo( hw.get(Servo.class, anglerName) );
     }
 
     /**
@@ -53,30 +59,41 @@ public class Deposit {
      * Repeats. Not able to go from 2 to none.
      */
     public void releaseToggle() {
-        releaseStateIndex++;
-        releaseStateIndex %= 3;
-        release.setPosition( releaseStates[releaseStateIndex].getPosition());
-    }
-
-    public void angleToggle() {
-        switch( angleState ) {
-            case GRAB:
-            case DROP_FLOOR:
-                angleState = AngleStates.DROP_BACKDROP;
+        switch( releaseState ) {
+            case RETRACTED:
+                setReleaseState( ReleaseStates.EXTENDED );
                 break;
-            case DROP_BACKDROP:
-                angleState = AngleStates.GRAB;
+            case EXTENDED:
+                setReleaseState( ReleaseStates.DROP_ONE );
+                break;
+            case DROP_ONE:
+                setReleaseState( ReleaseStates.RETRACTED );
                 break;
         }
-        setAnglePosition( angleState );
     }
 
-    public void setReleasePosition (ReleaseStates state) {
-        release.setPosition(state.getPosition());
-        releaseStateIndex = state.getIndex();
+    public void setReleaseState( ReleaseStates state) {
+        releaseState = state;
+        setReleasePosition(releaseState.getPosition());
     }
-    public void setAnglePosition (AngleStates state) {
-        angler.setPosition(state.getPosition());
+    public void setReleasePosition (double position) {
+        release.setPosition(position);
+    }
+    public void setAngleState( AngleStates state) {
+        angleState = state;
+        setAnglePosition(angleState.getPosition());
+    }
+
+    public AngleStates getAngleState( ) {
+        return angleState;
+    }
+
+    public ReleaseStates getReleaseState( ) {
+        return releaseState;
+    }
+
+    public void setAnglePosition ( double position) {
+        angler.setPosition(position);
     }
 
     public double getReleasePosition() {

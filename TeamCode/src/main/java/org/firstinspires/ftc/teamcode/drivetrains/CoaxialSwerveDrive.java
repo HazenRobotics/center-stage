@@ -9,6 +9,8 @@ import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
 
 public class CoaxialSwerveDrive {
 
+	public final static double HALF_PI = PI / 2;
+
 	public enum WheelState {
 		DRIVE,
 		DIAMOND,
@@ -16,18 +18,20 @@ public class CoaxialSwerveDrive {
 	}
 
 	WheelState wheelState = WheelState.DRIVE;
-	AxonSwervePod[] swervePods = new AxonSwervePod[4];
-	public static final double[] encoderOffsets = { 4.72, 0.03, 3.20, 2.20 };
+	public AxonSwervePod[] swervePods = new AxonSwervePod[4];
+	public static final double[] encoderOffsets = { 1.15, 3.597, 5.585, 0.003 };
 	double wheelbase;
 	double trackwidth;
 	double[] wheelSpeeds;
 	double[] wheelAngles;
 
+	double maxSpeed = 1;
+
 	public CoaxialSwerveDrive( HardwareMap hw ) {
-		this( hw, new String[]{ "FLM/paraEnc", "BLM/climbEnc", "FRM", "BRM/perpEnc" }, new boolean[]{ false, false, false, false },
+		this( hw, new String[]{ "FLM/paraLEnc", "BLM/perpEnc", "FRM/liftEnc", "BRM/paraREnc" }, new boolean[]{ false, false, false, false },
 				new String[]{ "FLS", "BLS", "FRS", "BRS" }, new boolean[]{ false, false, false, false },
-				new String[]{ "FLE", "BLE", "FRE", "BRE" }, encoderOffsets,
-				3.3, 12.334646, 12.334646, new double[]{ 0.6, 0.0065 }, 28 * 8 );
+				new String[]{ "FLE", "BLE", "FRE", "BRE" }, encoderOffsets, 3.3,
+				12.334646, 12.334646, new double[]{ 0.5, 0.0065 }, 28 * 8, new double[]{0,0,0,0} );
 	}
 
 	/**
@@ -42,10 +46,13 @@ public class CoaxialSwerveDrive {
 	 * @param wheelbase           length of base (distance from front wheels to back wheels)
 	 * @param trackwidth          width of track (distance from left wheels to right wheels)
 	 */
-	public CoaxialSwerveDrive( HardwareMap hw, String[] motorNames, boolean[] motorReverse, String[] servoNames, boolean[] servoReversed, String[] servoEncoderNames, double[] servoEncoderOffsets, double servoEncoderVoltage, double wheelbase, double trackwidth, double[] PID, double wheelPPR ) {
+	public CoaxialSwerveDrive( HardwareMap hw, String[] motorNames, boolean[] motorReverse,
+							   String[] servoNames, boolean[] servoReversed, String[] servoEncoderNames,
+							   double[] servoEncoderOffsets, double servoEncoderVoltage, double wheelbase,
+							   double trackwidth, double[] PID, double wheelPPR, double[] KStatics ) {
 		for( int i = 0; i < swervePods.length; i++ )
 			swervePods[i] = new AxonSwervePod( hw, motorNames[i], motorReverse[i], servoNames[i], servoReversed[i],
-					servoEncoderNames[i], servoEncoderOffsets[i], servoEncoderVoltage, PID, wheelPPR );
+					servoEncoderNames[i], servoEncoderOffsets[i], servoEncoderVoltage, PID, wheelPPR, KStatics[i] );
 
 		this.wheelbase = wheelbase;
 		this.trackwidth = trackwidth;
@@ -109,16 +116,15 @@ public class CoaxialSwerveDrive {
 		for( int i = 0; i < swervePods.length; i++ ) {
 			if( rotatePods )
 				swervePods[i].setAngleTarget( wheelAngles[i] );
-			swervePods[i].update( wheelSpeeds[i] );
+			swervePods[i].update( wheelSpeeds[i] * maxSpeed );
 		}
 	}
 
 	public void fieldCentricDrive( double drivePower, double strafePower, double rotatePower, double heading ) {
-		double strafe = strafePower * Math.cos( -heading ) - drivePower * Math.sin( -heading );
-		double drive = strafePower * Math.sin( -heading ) + drivePower * Math.cos( -heading );
+		double strafe = strafePower * Math.sin( heading ) - drivePower * Math.cos( heading );
+		double drive = strafePower * Math.cos( heading ) + drivePower * Math.sin( heading );
 
-		drive(drive, strafe, rotatePower);
-
+		drive( drive, strafe, rotatePower );
 	}
 
 	public void setWheelState( WheelState state ) {
@@ -137,8 +143,16 @@ public class CoaxialSwerveDrive {
 
 	public void displayWheelAngles( Telemetry t ) {
 		t.addData( "FL", wheelAngles[0] );
+		t.addData( "FL error", swervePods[0].getError() );
 		t.addData( "BL", wheelAngles[1] );
+		t.addData( "FL error", swervePods[1].getError() );
 		t.addData( "FR", wheelAngles[2] );
+		t.addData( "FL error", swervePods[2].getError() );
 		t.addData( "BR", wheelAngles[3] );
+		t.addData( "FL error", swervePods[3].getError() );
+	}
+
+	public void setMaxSpeed( double maxSpeed ) {
+		this.maxSpeed = maxSpeed;
 	}
 }

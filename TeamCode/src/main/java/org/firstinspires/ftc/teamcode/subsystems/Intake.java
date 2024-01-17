@@ -1,30 +1,41 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingCRServo;
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingDcMotorEX;
+import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingServo;
 
-public class Intake {
-
+@Config
+public class Intake{
     Telemetry telemetry;
-    DcMotor intakeMotor;
+    DcMotorEx intakeMotor;
+    CRServo wheelServo;
     Servo deploymentServo;
+
     //    boolean[] sensorDetectArray = {false, false};
     IntakeCapacity intakeCapacity = IntakeCapacity.EMPTY; //default state, nothing inside
-    IntakeBreakBeamSensor breakBeamTop, breakBeamBottom, breakBeamIntake;
     private double adjustIncrement;
     private double servoPos;
-    private double motorPower;
+    private boolean reverse = true;
+    public static double servoPower = 0.8;
+
+    DeploymentState deploymentState = DeploymentState.FOLDED;
 
     public enum IntakeCapacity {
         EMPTY, ONE_PIXEL, FULL, OVERFLOW
     }
     public enum DeploymentState {
-        FOLDED(0.655), TOP_PIXEL(0.235), SECOND_PIXEL(0.185), FULLY_DEPLOYED(0.215);
+        FOLDED(0.655), TOP_TWO(0.334), FULLY_DEPLOYED(0.2);
         public final double position;
         DeploymentState(double pos) {
             position = pos;
@@ -35,17 +46,15 @@ public class Intake {
     }
 
     public Intake(HardwareMap hw, Telemetry t) {
-        this(hw, t, "intake", "deployIntake",
-                "BB-Top", "BB-Bot", "BB-In");
+        this(hw, t, "intake", "deployIntake");
     }
 
-    public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName, String breakBeamTopName, String breakBeamBottomName, String breakBeamIntakeName) {
-        intakeMotor = hw.get(DcMotor.class, motorName);
-        intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
-        deploymentServo = hw.get(Servo.class, deploymentServoName);
-        breakBeamTop = new IntakeBreakBeamSensor(hw, t, breakBeamTopName);
-        breakBeamBottom = new IntakeBreakBeamSensor(hw, t, breakBeamBottomName);
-        breakBeamIntake = new IntakeBreakBeamSensor(hw, t, breakBeamIntakeName);
+    public Intake(HardwareMap hw, Telemetry t, String motorName, String deploymentServoName) {
+        intakeMotor = new CachingDcMotorEX( hw.get(DcMotorEx.class, motorName) );
+//        intakeMotor.setDirection( DcMotorSimple.Direction.REVERSE );
+        deploymentServo = new CachingServo( hw.get(Servo.class, deploymentServoName) );
+        wheelServo = new CachingCRServo( hw.get( CRServo.class, "wheelServo") );
+//        wheelServo.setDirection( DcMotorSimple.Direction.REVERSE );
         telemetry = t;
         adjustIncrement = 0.02;
     }
@@ -54,20 +63,44 @@ public class Intake {
         return intakeCapacity;
     }
 
+    public DeploymentState getDeploymentState() {
+        return deploymentState;
+    }
+
+    public double getAngle() {
+        return deploymentServo.getPosition();
+    }
+
     public void setAdjustIncrement(double increment) {
         adjustIncrement = increment;
+    }
+
+    public void setDeployPos( DeploymentState state ) {
+        servoPos = state.getPosition();
+        deploymentServo.setPosition( servoPos );
     }
     public void setDeployPos( double pos ) {
         servoPos = Range.clip( pos, DeploymentState.FULLY_DEPLOYED.getPosition(), DeploymentState.FOLDED.getPosition());
         deploymentServo.setPosition( servoPos );
     }
     public void foldIntake( ) {
+        deploymentState = DeploymentState.FOLDED;
         setDeployPos( DeploymentState.FOLDED.getPosition() );
+        reverse = false;
         setIntakeMotorPower( 0 );
+        wheelServo.setPower( 0 );
     }
     public void deployIntake( double powerMultiplier ) {
+        if (deploymentState == DeploymentState.FOLDED) deploymentState = DeploymentState.FULLY_DEPLOYED;
+        else reverse = !reverse;
+
         setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
-        setIntakeMotorPower( (motorPower < 0 ? 0.8 : -0.8) * powerMultiplier );
+        setIntakeMotorPower( (reverse ? -0.8 : 0.8) * powerMultiplier );
+        wheelServo.setPower( (reverse ? -1 : servoPower) );
+    }
+
+    public boolean isReversed( ) {
+        return reverse;
     }
 
     public void adjustUp() {
@@ -102,8 +135,11 @@ public class Intake {
 //    }
 //
     public void setIntakeMotorPower(double power) {
-        motorPower = power /* * (intakeCapacity == IntakeCapacity.OVERFLOW ? -1 : 1)*/;
-        intakeMotor.setPower( motorPower );
+        intakeMotor.setPower( power );
+    }
+
+    public void setIntakeServoPower(double power) {
+        wheelServo.setPower( power );
     }
     public void toggleServo(boolean isIntakeServoDisabled, double value)
     {
@@ -120,7 +156,12 @@ public class Intake {
     }
 
     public double getIntakeMotorPower() {
-        return motorPower;
+        return intakeMotor.getPower( );
+    }
+    public double getIntakeServoPower() {return wheelServo.getPower(); }
+
+    public double getMotorCurrent() {
+        return intakeMotor.getCurrent( CurrentUnit.AMPS ) * getIntakeMotorPower();
     }
 
     //retrieves telemetry from sensors, and display current pixel inventory
@@ -130,8 +171,7 @@ public class Intake {
 //        updatePixelColorArray();
 //        telemetry.addData("Pixel Slot 1: ", pixelColorArray[0]);
 //        telemetry.addData("Pixel Slot 2: ", pixelColorArray[1]);
-        telemetry.addData( "intakePower", motorPower );
+        telemetry.addData( "intakePower", getIntakeMotorPower() );
         telemetry.addData( "servoPos", servoPos );
     }
-
 }

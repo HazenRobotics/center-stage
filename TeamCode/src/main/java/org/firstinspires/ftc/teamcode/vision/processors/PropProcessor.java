@@ -17,31 +17,49 @@ public class PropProcessor implements VisionProcessor {
 	public enum PropPosition {
 		LEFT, RIGHT, MIDDLE, NOT_FOUND
 	}
+
 	public enum PropColor {
-		RED, BLUE
+		RED_CLOSE(
+				new Rect( 90, 143, 83, 77 ),
+				new Rect( 290, 150, 67, 63 ),
+				new Rect( 483, 80, 80, 73 )
+		),
+		RED_FAR(
+				new Rect( 183, 140, 87, 77 ),
+				new Rect( 383, 143, 73, 63 ),
+				new Rect( 577, 143, 63, 70 )
+		),
+		BLUE_CLOSE(
+				new Rect( 183, 140, 80, 80 ),
+				new Rect( 387, 150, 70, 63 ),
+				new Rect( 577, 147, 63, 70 )
+		),
+		BLUE_FAR(
+				new Rect( 90, 143, 83, 77 ),
+				new Rect( 290, 150, 67, 63 ),
+				new Rect( 500, 147, 83, 73 )
+		);
+		final Rect leftPos, midPos, rightPos;
+
+		PropColor( Rect left, Rect middle, Rect right ) {
+			leftPos = left;
+			midPos = middle;
+			rightPos = right;
+		}
 	}
-	PropColor propColor = PropColor.RED;
-			;
 	PropPosition propPosition;
+	public static PropColor propColor = PropColor.RED_CLOSE;
 
-	public Rect leftPos = new Rect( 5, 100, 40, 83 );
-	public Rect midPos = new Rect( 325, 120, 42, 63 );
-	public Rect rightPos = new Rect( 600, 100, 32, 80 );
+	public static Rect leftPos, midPos, rightPos;
 
-	private Scalar redLowerBound = new Scalar( 0, 100, 40 );
-	private Scalar redUpperBound = new Scalar( 5, 255, 255 );
-	private Scalar redLowerBound2 = new Scalar( 175, 100, 40 );
-	private Scalar redUpperBound2 = new Scalar( 180, 255, 255 );
-	private Scalar blueLowerBound = new Scalar( 100, 60, 40 );
-	private Scalar blueUpperBound = new Scalar( 130, 255, 255 );
-
-	Mat matRed = new Mat( );
-	Mat matRed2 = new Mat( );
-	Mat matBlue = new Mat( );
-
-	Mat left;
-	Mat middle;
-	Mat right;
+	private final Scalar blueLowerBound = new Scalar( 100, 60, 40 );
+	private final Scalar blueUpperBound = new Scalar( 130, 255, 255 );
+	private final Scalar redLowerBound = new Scalar( 0, 100, 40 );
+	private final Scalar redUpperBound = new Scalar( 5, 255, 255 );
+	private final Scalar redLowerBound2 = new Scalar( 175, 100, 40 );
+	private final Scalar redUpperBound2 = new Scalar( 180, 255, 255 );
+	Mat temp = new Mat(), matRed = new Mat( ), matRed2 = new Mat( );
+	Mat left, middle, right;
 
 	@Override
 	public void init( int width, int height, CameraCalibration calibration ) {
@@ -49,53 +67,29 @@ public class PropProcessor implements VisionProcessor {
 
 	@Override
 	public Object processFrame( Mat frame, long captureTimeNanos ) {
-		Imgproc.cvtColor( frame, frame, Imgproc.COLOR_RGB2HSV );
+		Imgproc.cvtColor( frame, temp, Imgproc.COLOR_RGB2HSV );
 
-		if (propColor == PropColor.BLUE) {
-			Core.inRange( frame, blueLowerBound, blueUpperBound, matBlue );
-			matBlue.copyTo(frame);
-		} else if( propColor == PropColor.RED ) {
-			Core.inRange( frame, redLowerBound, redUpperBound, matRed );
-			Core.inRange( frame, redLowerBound2, redUpperBound2, matRed2 );
-			Core.bitwise_or( matRed, matRed2, matRed );
-			matRed.copyTo(frame);
-		}
+		if (propColor == PropColor.RED_CLOSE || propColor == PropColor.RED_FAR) {
+			Core.inRange( temp, redLowerBound, redUpperBound, matRed );
+			Core.inRange( temp, redLowerBound2, redUpperBound2, matRed2 );
+			Core.bitwise_or( matRed, matRed2, temp );
+		} else Core.inRange( temp, blueLowerBound, blueUpperBound, temp );
 
-		final double percentColorThreshold = 0.02 * 255; //Percent value on left, 255 for max amount of color
+		final double percentColorThreshold = 0.1 * 255; //Percent value on left, 255 for max amount of color
 
-		left = frame.submat( leftPos );
-		middle = frame.submat( midPos );
-		right = frame.submat( rightPos );
+		left = temp.submat( leftPos );
+		middle = temp.submat( midPos  );
+		right = temp.submat( rightPos );
 
 		double leftValue = Core.sumElems( left ).val[0] / leftPos.area( );
-//		if( leftValue > percentColorThreshold ) {
-//			left.release( );
-//			middle.release( );
-//			right.release( );
-//			return PropPosition.LEFT;
-//		}
-
 		double middleValue = Core.sumElems( middle ).val[0] / midPos.area( );
-//		if( middleValue > percentColorThreshold ) {
-//			left.release( );
-//			middle.release( );
-//			right.release( );
-//			return PropPosition.MIDDLE;
-//		}
-
 		double rightValue = Core.sumElems( right ).val[0] / rightPos.area( );
-//		if( rightValue > percentColorThreshold ) {
-//			left.release( );
-//			middle.release( );
-//			right.release( );
-//			return PropPosition.RIGHT;
-//		}
 
-		double maxValue = Math.max( leftValue, Math.max( middleValue, rightValue ) );
+		double maxValue = Math.max( rightValue, Math.max( middleValue, leftValue ) );
 
-		left.release( );
+		left.release();
 		middle.release( );
-		right.release( );
+		right.release();
 
 		if (maxValue > percentColorThreshold) {
 			if( maxValue == leftValue ) return PropPosition.LEFT;
@@ -144,7 +138,6 @@ public class PropProcessor implements VisionProcessor {
 				canvas.drawRect( drawRectangleLeft, nonSelectedPaint );
 				canvas.drawRect( drawRectangleMiddle, nonSelectedPaint );
 				canvas.drawRect( drawRectangleRight, nonSelectedPaint );
-				break;
 		}
 	}
 
@@ -156,12 +149,19 @@ public class PropProcessor implements VisionProcessor {
 
 		return new android.graphics.Rect( left, top, right, bottom );
 	}
-
-	public PropPosition getPiecePosition( ) {
-		return propPosition;
+	public PropProcessor setPropColor( PropColor color ) {
+		propColor = color;
+		leftPos = propColor.leftPos;
+		midPos = propColor.midPos;
+		rightPos = propColor.rightPos;
+		return this;
 	}
 
-	public void setPropColor( PropColor color ) {
-		propColor = color;
+	public PropColor getPropColor( ) {
+		return propColor;
+	}
+
+	public PropPosition getPropPosition( ) {
+		return propPosition;
 	}
 }
