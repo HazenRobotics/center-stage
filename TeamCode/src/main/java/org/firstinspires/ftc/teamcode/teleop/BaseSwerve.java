@@ -107,7 +107,7 @@ public class BaseSwerve extends LinearOpMode {
 
 	public void intakeControl() {
 		if( controller1.right_bumper.onPress( ) ) {
-			robot.intake.deployIntake( KhepriBot.normalizedPowerMultiplier );
+			robot.intake.deployIntake( );
 			robot.deposit.setReleaseState( Deposit.ReleaseStates.RETRACTED );
 			robot.deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
 		} else if( controller1.left_bumper.onPress( ) )
@@ -118,14 +118,6 @@ public class BaseSwerve extends LinearOpMode {
 		}
 		if (controller1.dpad_down.onPress()) {
 			intakeDeployAngle -= 0.03;
-		}
-
-		if (controller1.dpad_up.onPress()) {
-			robot.intake.adjustUp();
-		} else if (controller1.dpad_down.onPress()) {
-			robot.intake.adjustDown();
-		} else if (controller1.dpad_right.onPress()) {
-			robot.intake.setDeployPos( Intake.DeploymentState.TOP_TWO );
 		}
 	}
 }

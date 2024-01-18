@@ -9,8 +9,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.apache.commons.math3.analysis.function.Sin;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.robots.KhepriBot;
 import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingCRServo;
 import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingDcMotorEX;
 import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingServo;
@@ -21,19 +23,6 @@ public class Intake{
     DcMotorEx intakeMotor;
     CRServo wheelServo;
     Servo deploymentServo;
-
-    //    boolean[] sensorDetectArray = {false, false};
-    IntakeCapacity intakeCapacity = IntakeCapacity.EMPTY; //default state, nothing inside
-    private double adjustIncrement;
-    private double servoPos;
-    private boolean reverse = true;
-    public static double servoPower = 0.8;
-
-    DeploymentState deploymentState = DeploymentState.FOLDED;
-
-    public enum IntakeCapacity {
-        EMPTY, ONE_PIXEL, FULL, OVERFLOW
-    }
     public enum DeploymentState {
         FOLDED(0.655), TOP_TWO(0.334), FULLY_DEPLOYED(0.2);
         public final double position;
@@ -44,6 +33,20 @@ public class Intake{
             return position;
         }
     }
+
+    public enum SpinState {
+        IN(0.8), OUT(-1), OFF(0);
+        public final double power;
+        SpinState(double pow) {
+            power = pow;
+        }
+        public double getPower() {
+            return power;
+        }
+    }
+
+    DeploymentState deploymentState = DeploymentState.FOLDED;
+    SpinState spinState = SpinState.OFF;
 
     public Intake(HardwareMap hw, Telemetry t) {
         this(hw, t, "intake", "deployIntake");
@@ -56,11 +59,6 @@ public class Intake{
         wheelServo = new CachingCRServo( hw.get( CRServo.class, "wheelServo") );
 //        wheelServo.setDirection( DcMotorSimple.Direction.REVERSE );
         telemetry = t;
-        adjustIncrement = 0.02;
-    }
-
-    public IntakeCapacity getIntakeState() {
-        return intakeCapacity;
     }
 
     public DeploymentState getDeploymentState() {
@@ -71,71 +69,36 @@ public class Intake{
         return deploymentServo.getPosition();
     }
 
-    public void setAdjustIncrement(double increment) {
-        adjustIncrement = increment;
-    }
-
     public void setDeployPos( DeploymentState state ) {
-        servoPos = state.getPosition();
-        deploymentServo.setPosition( servoPos );
+        deploymentServo.setPosition( state.getPosition() );
     }
     public void setDeployPos( double pos ) {
-        servoPos = Range.clip( pos, DeploymentState.FULLY_DEPLOYED.getPosition(), DeploymentState.FOLDED.getPosition());
-        deploymentServo.setPosition( servoPos );
+        deploymentServo.setPosition(
+                Range.clip( pos, DeploymentState.FULLY_DEPLOYED.getPosition(), DeploymentState.FOLDED.getPosition())
+        );
     }
     public void foldIntake( ) {
         deploymentState = DeploymentState.FOLDED;
-        setDeployPos( DeploymentState.FOLDED.getPosition() );
-        reverse = false;
-        setIntakeMotorPower( 0 );
-        wheelServo.setPower( 0 );
+        spinState = SpinState.OFF;
     }
-    public void deployIntake( double powerMultiplier ) {
-        if (deploymentState == DeploymentState.FOLDED) deploymentState = DeploymentState.FULLY_DEPLOYED;
-        else reverse = !reverse;
-
-        setDeployPos( DeploymentState.FULLY_DEPLOYED.getPosition() );
-        setIntakeMotorPower( (reverse ? -0.8 : 0.8) * powerMultiplier );
-        wheelServo.setPower( (reverse ? -1 : servoPower) );
-    }
-
-    public boolean isReversed( ) {
-        return reverse;
+    public void deployIntake( ) {
+        switch( deploymentState ) {
+            case FOLDED:
+            case TOP_TWO:
+                deploymentState = DeploymentState.FULLY_DEPLOYED;
+                spinState = SpinState.IN;
+                break;
+            case FULLY_DEPLOYED:
+                deploymentState = DeploymentState.TOP_TWO;
+                spinState = SpinState.OUT;
+                break;
+        }
     }
 
-    public void adjustUp() {
-        servoPos += adjustIncrement;
-        setDeployPos( servoPos );
-    }
-
-    public void adjustDown() {
-        servoPos -= adjustIncrement;
-        setDeployPos( servoPos );
-    }
-
-    /**
-     * updates the status of the intakeCapacity variable depending on how many pixels are detected.
-     */
-//    public void updateIntakeCapacity() {
-//        updatePixelColorArray();
-//        breakBeam.updateBeamState();
-//
-//        boolean pixelInSlotOne = cs1.getPixelColour() != Field.Pixel.NONE;
-//        boolean pixelInSlotTwo = cs2.getPixelColour() != Field.Pixel.NONE;
-//        boolean pixelInIntake = breakBeam.getBeamState();
-//
-//        if (pixelInSlotOne && pixelInSlotTwo && pixelInIntake)
-//            intakeCapacity = IntakeCapacity.OVERFLOW;
-//        else if ((pixelInIntake && pixelInSlotOne) || (pixelInSlotOne && pixelInSlotTwo))
-//            intakeCapacity = IntakeCapacity.FULL;
-//        else if (pixelInIntake || pixelInSlotOne)
-//            intakeCapacity = IntakeCapacity.ONE_PIXEL;
-//        else
-//            intakeCapacity = IntakeCapacity.EMPTY;
-//    }
-
-    public void setIntakeMotorPower(double power) {
-        intakeMotor.setPower( power );
+    public void update() {
+        setDeployPos( deploymentState );
+        intakeMotor.setPower( spinState.getPower() * KhepriBot.normalizedPowerMultiplier );
+        wheelServo.setPower( spinState.getPower() );
     }
 
     public void setIntakeServoPower(double power) {
@@ -151,14 +114,7 @@ public class Intake{
         return intakeMotor.getCurrent( CurrentUnit.AMPS ) * getIntakeMotorPower();
     }
 
-    //retrieves telemetry from sensors, and display current pixel inventory
-    public void addTelemetry() {
-//        breakBeam.addTelemetry();
-//        telemetry.addData("Intake: ", getIntakeState());
-//        updatePixelColorArray();
-//        telemetry.addData("Pixel Slot 1: ", pixelColorArray[0]);
-//        telemetry.addData("Pixel Slot 2: ", pixelColorArray[1]);
-        telemetry.addData( "intakePower", getIntakeMotorPower() );
-        telemetry.addData( "servoPos", servoPos );
+    public boolean isReversed() {
+        return spinState == SpinState.OUT;
     }
 }

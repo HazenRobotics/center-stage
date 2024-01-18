@@ -259,6 +259,7 @@ public class KhepriBot {
 		updateTracker( );
 		calculateHz();
 		rgbController.update();
+		intake.update();
 //		telemetry.update();
 	}
 

@@ -122,7 +122,7 @@ public class KhepriTeleOp extends LinearOpMode {
 
 	public void intakeControl() {
 		if( controller1.right_bumper.onPress( ) ) {
-			robot.intake.deployIntake( KhepriBot.normalizedPowerMultiplier );
+			robot.intake.deployIntake( );
 			robot.deposit.setReleaseState( Deposit.ReleaseStates.RETRACTED );
 			robot.deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
 		} else if( controller1.left_bumper.onPress( ) ) robot.intake.foldIntake( );
