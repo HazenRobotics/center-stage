@@ -260,8 +260,8 @@ public class AprilTagUtil {
         AprilTagPoseFtc robotPose = detection.ftcPose;
         Point3 tagpos = getTagPosition(detection.id);
 
-        double x = tagpos.x - (tagpos.x > 0 ? robotPose.x : -robotPose.x);
-        double y = tagpos.y - (tagpos.y > 0 ? robotPose.y : -robotPose.y);
+        double x = tagpos.y - (tagpos.x > 0 ? robotPose.x : -robotPose.x);
+        double y = tagpos.x - (tagpos.y > 0 ? robotPose.y : -robotPose.y);
         double yaw = robotPose.yaw;
 
         if (detection.id < 7) {
