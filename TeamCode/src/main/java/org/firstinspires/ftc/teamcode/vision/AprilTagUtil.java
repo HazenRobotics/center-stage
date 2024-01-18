@@ -236,33 +236,51 @@ public class AprilTagUtil {
         else {
             double x = 0;
             double y = 0;
+            double yaw = 0;
+
 
             for (int i = 0; i < detections.size(); i++) {
-                AprilTagPoseFtc pose = detections.get(i).ftcPose;
-                Point3 tagpos = getTagPosition(detections.get(i).id);
-
-                x += tagpos.x + (tagpos.x > 0 ? -pose.y : pose.y);
-                y += tagpos.y + (tagpos.y > 0 ? -pose.x : pose.x);
-
-//7r                if(detections.get(i).id < 7) x -= TAG_ANGLE_OFFSET;
+                Point3 curPose = getPositionBasedOnTag(detections.get(i));
+                x += curPose.x;
+                y += curPose.y;
+                yaw += curPose.z;
             }
 
             x /= detections.size();
             y /= detections.size();
+            yaw /= detections.size();
 
-            return new Point3(x + xOffset, y + yOffset, 0);
+            return new Point3(x + xOffset, y + yOffset, yaw);
         }
 
     }
-    public void setLensIntrinsics(boolean isFront,double fx,double fy,double cx,double cy) {
-        if(isFront) {
-            frontATP =new AprilTagProcessor.Builder().setDrawAxes(true)
+
+    public Point3 getPositionBasedOnTag(AprilTagDetection detection) {
+
+        AprilTagPoseFtc robotPose = detection.ftcPose;
+        Point3 tagpos = getTagPosition(detection.id);
+
+        double x = tagpos.x - (tagpos.x > 0 ? robotPose.x : -robotPose.x);
+        double y = tagpos.y - (tagpos.y > 0 ? robotPose.y : -robotPose.y);
+        double yaw = robotPose.yaw;
+
+        if (detection.id < 7) {
+            x += TAG_ANGLE_OFFSET;
+            yaw = robotPose.yaw + Math.PI;
+        }
+        return new Point3(x, y, yaw);
+
+    }
+
+    public void setLensIntrinsics(boolean isFront, double fx, double fy, double cx, double cy) {
+        if (isFront) {
+            frontATP = new AprilTagProcessor.Builder().setDrawAxes(true)
                     .setDrawCubeProjection(true)
                     .setDrawTagOutline(true)
                     .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
                     .setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
                     .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-                    .setLensIntrinsics(fx,fy,cx,cy)
+                    .setLensIntrinsics(fx, fy, cx, cy)
                     .build();
         }
 //        else {
@@ -277,15 +295,16 @@ public class AprilTagUtil {
 //        }
 
     }
-    public void setLensIntrinsics(boolean isFront,double[] config) {
-        if(isFront) {
-            frontATP =new AprilTagProcessor.Builder().setDrawAxes(true)
+
+    public void setLensIntrinsics(boolean isFront, double[] config) {
+        if (isFront) {
+            frontATP = new AprilTagProcessor.Builder().setDrawAxes(true)
                     .setDrawCubeProjection(true)
                     .setDrawTagOutline(true)
                     .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
                     .setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
                     .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-                    .setLensIntrinsics(config[0],config[1],config[2],config[3])
+                    .setLensIntrinsics(config[0], config[1], config[2], config[3])
                     .build();
         }
 //        else {
