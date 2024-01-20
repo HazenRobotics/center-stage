@@ -35,11 +35,14 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -62,8 +65,8 @@ import java.util.ArrayList;
 //@Disabled
 public class AprilTagUtil {
     private AprilTagProcessor frontATP;
-//    private AprilTagProcessor backATP;
-//    public VisionPortal backVP;
+    private AprilTagProcessor backATP;
+    public VisionPortal backVP;
     public VisionPortal frontVP;
     private final double TAG_ANGLE_OFFSET =1.59807621135;
 
@@ -72,20 +75,20 @@ public class AprilTagUtil {
     public static double BACK_X_OFFSET = /*7*/ 0;
     public static double BACK_Y_OFFSET = /*-5.5*/ 0;
 
-    final static Point3[] APRIL_TAG_BOARD_POSTIONS = {
-            new Point3(60.25f, 41.41f, 4f),
-            new Point3(60.25f, 35.41f, 4f),
-            new Point3(60.25f, 29.41f, 4f),
-            new Point3(60.25f, -29.41f, 4f),
-            new Point3(60.25f, -35.41f, 4f),
-            new Point3(60.25f, -41.41f, 4f),
+    final static VectorF[] APRIL_TAG_BOARD_POSTIONS = {
+            new VectorF(60.25f, 41.41f, 4f),
+            new VectorF(60.25f, 35.41f, 4f),
+            new VectorF(60.25f, 29.41f, 4f),
+            new VectorF(60.25f, -29.41f, 4f),
+            new VectorF(60.25f, -35.41f, 4f),
+            new VectorF(60.25f, -41.41f, 4f),
     };
     //Bigs are the 5.5s and 4s are the small
-    final static Point3[] APRIL_TAG_WALL_POSTIONS = {
-            new Point3(-70.25f, -40.625f, 5.5f),
-            new Point3(-70.25f, -35.125f, 4f),
-            new Point3(-70.25f, 35.125f, 4f),
-            new Point3(-70.25f, 40.625f, 5.5f),
+    final static VectorF[] APRIL_TAG_WALL_POSTIONS = {
+            new VectorF(-70.25f, -40.625f, 5.5f),
+            new VectorF(-70.25f, -35.125f, 4f),
+            new VectorF(-70.25f, 35.125f, 4f),
+            new VectorF(-70.25f, 40.625f, 5.5f),
     };
 
 
@@ -96,7 +99,7 @@ public class AprilTagUtil {
     /**
      * Initialize the AprilTag processor.
      */
-    public static Point3 getTagPosition(int i) {
+    public static VectorF getTagPosition(int i) {
         if (i > APRIL_TAG_BOARD_POSTIONS.length ) {
             i = i - APRIL_TAG_BOARD_POSTIONS.length;
             return APRIL_TAG_WALL_POSTIONS[i - 1];
@@ -126,22 +129,24 @@ public class AprilTagUtil {
 
                 .build();
 
-//        backATP = new AprilTagProcessor.Builder()
-//                .setDrawAxes(true)
-//                .setDrawCubeProjection(true)
-//                .setDrawTagOutline(true)
-//                .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-//                .setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
-//                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-//
-//                // == CAMERA CALIBRATION ==
-//                // If you do not manually specify calibration parameters, the SDK will attempt
-//                // to load a predefined calibration for your camera.
-//                //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
-//
-//                // ... these parameters are fx, fy, cx, cy.
-//
-//                .build();
+        backATP = new AprilTagProcessor.Builder()
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagOutline(true)
+                .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+                .setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+                .setLensIntrinsics(1408.62944919, 1408.62944919, 638.937533548, 355.471434301 )
+
+
+                // == CAMERA CALIBRATION ==
+                // If you do not manually specify calibration parameters, the SDK will attempt
+                // to load a predefined calibration for your camera.
+                //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
+
+                // ... these parameters are fx, fy, cx, cy.
+
+                .build();
 
         // Create the vision portal by using a builder
 
@@ -163,14 +168,14 @@ public class AprilTagUtil {
 
         // Set and enable the processor.
 
-//        backVP = new VisionPortal.Builder()
-//                .setCamera(hw.get(WebcamName.class, "back"))
-//                .addProcessor(backATP)
-//                .setCameraResolution(new Size(640, 480))
-//                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-//                .setAutoStopLiveView(true)
-//                .enableLiveView( false )
-//                .build();
+        backVP = new VisionPortal.Builder()
+                .setCamera(hw.get(WebcamName.class, "back"))
+                .addProcessor(backATP)
+                .setCameraResolution(new Size(640, 480))
+                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+                .setAutoStopLiveView(true)
+                .enableLiveView( false )
+                .build();
 
         frontVP = new VisionPortal.Builder()
                 .setCamera(hw.get(WebcamName.class, "front"))
@@ -215,17 +220,17 @@ public class AprilTagUtil {
 
     }   // end method telemetryAprilTag()
 
-    public Point3 getPositionBasedOnTag() {
+    public Point3 getPositionBasedOnTag(double botHeading) {
         ArrayList<AprilTagDetection> detections = new ArrayList<>();
 
         double xOffset = 0;
         double yOffset = 0;
 
-//        if (backVP.getProcessorEnabled(backATP)) {
-//            detections.addAll(backATP.getDetections());
-//            xOffset = BACK_X_OFFSET;
-//            yOffset = BACK_Y_OFFSET;
-//        }
+        if (backVP.getProcessorEnabled(backATP)) {
+            detections.addAll(backATP.getDetections());
+            xOffset = BACK_X_OFFSET;
+            yOffset = BACK_Y_OFFSET;
+        }
         if (frontVP.getProcessorEnabled(frontATP)) {
             detections.addAll(frontATP.getDetections());
             xOffset = FRONT_X_OFFSET;
@@ -238,13 +243,10 @@ public class AprilTagUtil {
             double y = 0;
 
             for( int i = 0; i < detections.size(); i++ ) {
-                AprilTagPoseFtc pose = detections.get( i ).ftcPose;
-                Point3 tagpos = getTagPosition( detections.get( i ).id );
+                Point3 pose = getFCPosition(detections.get(i),botHeading);
 
-                x += tagpos.x + (tagpos.x > 0 ? -pose.y : pose.y );
-                y += tagpos.y + (tagpos.y > 0 ? -pose.x : pose.x );
-
-//                if(detections.get(i).id < 7) x -= TAG_ANGLE_OFFSET;
+                x += pose.x;
+                y += pose.y;
             }
 
             x /= detections.size();
@@ -253,5 +255,29 @@ public class AprilTagUtil {
             return new Point3(x + xOffset, y + yOffset, 0);
         }
 
+
+
+
+
+
+
+
+
+
+    }
+    public Point3 getFCPosition(AprilTagDetection detection, double botheading) {
+        // get coordinates of the robot in RC coordinates
+        // ensure offsets are RC
+        double x = detection.ftcPose.x-FRONT_X_OFFSET;
+        double y = detection.ftcPose.y-FRONT_Y_OFFSET;
+        // invert heading to correct properly
+        botheading = -botheading;
+        // rotate RC coordinates to be field-centric
+        double x2 = x*Math.cos(botheading)+y*Math.sin(botheading);
+        double y2 = x*-Math.sin(botheading)+y*Math.cos(botheading);
+        // add FC coordinates to apriltag position
+        // tags is just the CS apriltag library
+        VectorF tagpose = getTagPosition(detection.id);
+        return new Point3(tagpose.get(0)+y2,tagpose.get(1)-x2,botheading);
     }
 }   // end class
