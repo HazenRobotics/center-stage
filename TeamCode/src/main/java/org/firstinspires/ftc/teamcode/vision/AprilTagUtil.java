@@ -174,7 +174,7 @@ public class AprilTagUtil {
                 .setCameraResolution(new Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                 .setAutoStopLiveView(true)
-                .enableLiveView( false )
+                .enableLiveView( true )
                 .build();
 
         frontVP = new VisionPortal.Builder()
