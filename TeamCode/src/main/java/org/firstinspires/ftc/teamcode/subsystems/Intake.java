@@ -97,14 +97,15 @@ public class Intake{
 
     public void update() {
         setDeployPos( deploymentState );
-        intakeMotor.setPower( spinState.getPower() * KhepriBot.normalizedPowerMultiplier );
-        wheelServo.setPower( spinState.getPower() );
+        setIntakeMotorPower( spinState.getPower() * KhepriBot.normalizedPowerMultiplier );
+        setIntakeServoPower( spinState.getPower() );
     }
-
+    public void setIntakeMotorPower( double power ) {
+        intakeMotor.setPower( power );
+    }
     public void setIntakeServoPower(double power) {
         wheelServo.setPower( power );
     }
-
     public double getIntakeMotorPower() {
         return intakeMotor.getPower( );
     }

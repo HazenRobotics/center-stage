@@ -23,7 +23,6 @@ public class IntakeTest extends LinearOpMode {
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
-		robot.intake.setAdjustIncrement( 0.005 );
 		controller = new GamepadEvents( gamepad1 );
 		timer = new ElapsedTime( );
 
@@ -33,11 +32,6 @@ public class IntakeTest extends LinearOpMode {
 
 			// 0.235 top pixel
 			// 0.185 bottom pixel
-
-			if( controller.left_bumper.onPress() )
-				robot.intake.adjustUp( );
-			else if( controller.right_bumper.onPress() )
-				robot.intake.adjustDown( );
 
 			if (controller.a.onPress())
 				robot.intake.setDeployPos( Intake.DeploymentState.TOP_TWO.getPosition() );
