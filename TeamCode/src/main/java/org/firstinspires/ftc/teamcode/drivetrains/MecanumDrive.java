@@ -15,7 +15,7 @@ public class MecanumDrive {
 	IMU imu;
 
 	public MecanumDrive( HardwareMap hw ) {
-		this(hw, new String[]{"FLM", "BLM", "FRM", "BRM" }, new boolean[]{true, true, false, false});
+		this(hw, new String[]{"FLM", "BLM", "FRM", "BRM" }, new boolean[]{false, false, true, true});
 	}
 	public MecanumDrive( HardwareMap hw, String[] motorNames, boolean[] motorsReversed ) {
 		for( int i = 0; i < motors.length; i++ ) {
