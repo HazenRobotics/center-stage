@@ -102,6 +102,7 @@ public class AprilTagUtilTester extends OpMode {
 //        double x2 = x + arrowX, y2 = y + arrowY;
 //        field.strokeLine(x1, y1, x2, y2);
         FtcDashboard.getInstance().sendTelemetryPacket(packet);
+        khepriBot.update();
 
     }
 
