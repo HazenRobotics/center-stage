@@ -213,6 +213,19 @@ public class BackdropProcessor implements VisionProcessor {
         return grid(pixelArrayList);
     }
 
+    public ArrayList<DeciderPixel.Color[]> getColorGrid() {
+        ArrayList<Pixel[]> temp = getGrid();
+        ArrayList<DeciderPixel.Color[]> out = new ArrayList<>();
+
+        for (int i = 0; i < temp.size(); i++) {
+            DeciderPixel.Color[] cTemp = new DeciderPixel.Color[temp.get(i).length]; //yes i know this is really shit code
+            for (int j = 0; j < temp.get(i).length; i++) {
+                cTemp[j] = temp.get(i)[j].color;
+            }
+            out.add(cTemp);
+        }
+        return out;
+    }
 
     public ArrayList<Pixel[]> grid(ArrayList<Pixel> pixels) {
         ArrayList<ArrayList<Pixel>> arr1 = new ArrayList<>();
@@ -220,11 +233,8 @@ public class BackdropProcessor implements VisionProcessor {
         while (!pixels.isEmpty()) {
             ArrayList<Pixel> neighbors = pixels.get(0).rowNeighbors(pixels);
             neighbors.add(pixels.get(0));
-
-
             pixels.sort(Comparator.comparingDouble(p -> -p.getRect().x));
             maxItems = (maxItems == 6) ? 7 : 6;
-
             if (neighbors.size() > maxItems) {
                 neighbors.subList(maxItems, neighbors.size()).clear(); // Ensure neighbors does not exceed maxItems
             }
@@ -232,15 +242,15 @@ public class BackdropProcessor implements VisionProcessor {
             arr1.add(neighbors);
             pixels.removeAll(neighbors);
         }
-        return  positionGird(arr1);
+        return positionGird(arr1);
     }
 
     public ArrayList<Pixel[]> positionGird(ArrayList<ArrayList<Pixel>> grid) {
-        ArrayList<Pixel[]> pixels =new ArrayList<>();
+        ArrayList<Pixel[]> pixels = new ArrayList<>();
         int maxItems = 7;
         for (int i = 0; i < grid.size(); i++) {
             maxItems = (maxItems == 6) ? 7 : 6;
-            for (int j = 0; j < grid.get(i).size() && !(grid.get(i).size()== maxItems); j++) {
+            for (int j = 0; j < grid.get(i).size() && !(grid.get(i).size() == maxItems); j++) {
                 int realPostion = 0;
                 if (maxItems == 6) {
                     int segmentsize = (zoneRect.width - 40) / 6;
@@ -252,16 +262,16 @@ public class BackdropProcessor implements VisionProcessor {
                     while (grid.get(i).get(j).getRect().x < zoneRect.x + (segmentsize * realPostion))
                         realPostion++;
                 }
-                while (realPostion>j) {
-                    grid.get(i).add(new Pixel(new Rect(0,0,10,10), DeciderPixel.Color.NO_PIXEL));
+                while (realPostion > j) {
+                    grid.get(i).add(new Pixel(new Rect(0, 0, 10, 10), DeciderPixel.Color.NO_PIXEL));
                     i++;
                 }
             }
         }
-        for(int i=0; i<grid.size(); i++) {
+        for (int i = 0; i < grid.size(); i++) {
             pixels.add((Pixel[]) grid.stream().toArray());
         }
-        return  pixels;
+        return pixels;
     }
 
 

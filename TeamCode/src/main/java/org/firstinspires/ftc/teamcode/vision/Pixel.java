@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class Pixel {
     private Rect rect;
-    private DeciderPixel.Color color;
+    public DeciderPixel.Color color;
 
     public Pixel(Rect r, DeciderPixel.Color c) {
         rect = r;
