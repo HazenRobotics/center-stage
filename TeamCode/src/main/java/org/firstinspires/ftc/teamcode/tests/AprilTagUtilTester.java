@@ -42,6 +42,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.robots.KhepriBot;
+import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
+import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleDegrees;
 import org.firstinspires.ftc.teamcode.vision.AprilTagUtil;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -65,19 +68,22 @@ import java.util.ArrayList;
 public class AprilTagUtilTester extends OpMode {
 
     AprilTagUtil util;
+    KhepriBot khepriBot;
     @Override
     public void init() {
         util = new AprilTagUtil( hardwareMap );
 
         telemetry.addLine( "done" );
         telemetry.update();
+        khepriBot = new KhepriBot(hardwareMap,telemetry);
+        khepriBot.setupAutoTracker( new Pose2D( 0, 0, new AngleDegrees( 90 ).getTheta( ) ) );
     }
 
     @Override
     public void loop() {
         // Push telemetry to the Driver Station.
         // Save CPU resources; can resume streaming when needed.
-        Point3 point = util.getPositionBasedOnTag();
+        Point3 point = util.getPositionBasedOnTag(khepriBot.getPose().getTheta().getRadians());
 
         TelemetryPacket packet = new TelemetryPacket();
         Canvas field = packet.fieldOverlay( )
