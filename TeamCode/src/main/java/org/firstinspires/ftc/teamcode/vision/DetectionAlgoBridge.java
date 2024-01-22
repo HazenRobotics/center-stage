@@ -12,7 +12,7 @@ public class DetectionAlgoBridge {
     public DeciderPixel[] outputColors() {
         DeciderPixel[] output = new DeciderPixel[2];
         output[0] = decide.decidePixel(b.getColorGrid(), 0, b.getColorGrid().size() - 1);
-
+        return null;
     }
 
 }
