@@ -58,7 +58,7 @@ public class BaseSwerve extends LinearOpMode {
 			strafe = gamepad1.left_stick_x * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.STRAFE.getFast( ) : KhepriBot.DriveSpeeds.STRAFE.getNorm( ));
 			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( ));
 
-			robot.drive.fieldCentricDrive( drive, strafe, rotate, heading);
+			robot.drive.drive( drive, strafe, rotate );
 
 
 			displayTelemetry();

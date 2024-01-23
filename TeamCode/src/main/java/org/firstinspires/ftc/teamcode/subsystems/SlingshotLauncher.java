@@ -15,7 +15,7 @@ public class SlingshotLauncher {
 	}
 
 	public void prime() {
-		servo.setPosition( 0.52 );
+		servo.setPosition( 0.555 );
 	}
 
 	public void release() {

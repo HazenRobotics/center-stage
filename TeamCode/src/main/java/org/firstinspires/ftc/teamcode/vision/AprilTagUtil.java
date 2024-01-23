@@ -31,14 +31,7 @@ package org.firstinspires.ftc.teamcode.vision;
 
 import android.util.Size;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.arcrobotics.ftclib.geometry.Rotation2d;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -48,7 +41,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
-import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.opencv.core.Point3;
 
@@ -75,7 +67,7 @@ public class AprilTagUtil {
     public static double BACK_X_OFFSET = /*7*/ 0;
     public static double BACK_Y_OFFSET = /*-5.5*/ 0;
 
-    final static VectorF[] APRIL_TAG_BOARD_POSTIONS = {
+    final static VectorF[] APRIL_TAG_BOARD_POSITIONS = {
             new VectorF(60.25f, 41.41f, 4f),
             new VectorF(60.25f, 35.41f, 4f),
             new VectorF(60.25f, 29.41f, 4f),
@@ -84,7 +76,7 @@ public class AprilTagUtil {
             new VectorF(60.25f, -41.41f, 4f),
     };
     //Bigs are the 5.5s and 4s are the small
-    final static VectorF[] APRIL_TAG_WALL_POSTIONS = {
+    final static VectorF[] APRIL_TAG_WALL_POSITIONS = {
             new VectorF(-70.25f, -40.625f, 5.5f),
             new VectorF(-70.25f, -35.125f, 4f),
             new VectorF(-70.25f, 35.125f, 4f),
@@ -100,10 +92,10 @@ public class AprilTagUtil {
      * Initialize the AprilTag processor.
      */
     public static VectorF getTagPosition(int i) {
-        if (i > APRIL_TAG_BOARD_POSTIONS.length ) {
-            i = i - APRIL_TAG_BOARD_POSTIONS.length;
-            return APRIL_TAG_WALL_POSTIONS[i - 1];
-        } else return APRIL_TAG_BOARD_POSTIONS[i - 1];
+        if (i > APRIL_TAG_BOARD_POSITIONS.length ) {
+            i = i - APRIL_TAG_BOARD_POSITIONS.length;
+            return APRIL_TAG_WALL_POSITIONS[i - 1];
+        } else return APRIL_TAG_BOARD_POSITIONS[i - 1];
     }
 
 

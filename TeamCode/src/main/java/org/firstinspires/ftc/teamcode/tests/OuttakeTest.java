@@ -9,29 +9,29 @@ import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.utils.GamepadEvents;
 
 @TeleOp
-@Disabled
+//@Disabled
 public class OuttakeTest extends LinearOpMode {
 	Lift lift;
 	Deposit deposit;
 	GamepadEvents controller1;
 
 	double liftPos, liftPower;
-	boolean safeToFold = false;
 	@Override
 	public void runOpMode( ) throws InterruptedException {
-		lift = new Lift( hardwareMap );
-		deposit = new Deposit( hardwareMap, "release", "angler" );
+		deposit = new Deposit( hardwareMap );
 		controller1 = new GamepadEvents( gamepad1 );
 
 		waitForStart();
 
 		while( opModeIsActive() ) {
-			liftPos = lift.getPosition();
-			liftPower = gamepad1.right_trigger - (gamepad1.left_trigger * (0.4 + (((620 - liftPos) / 620) * 0.2)));
+//			liftPos = lift.getPosition();
+//			liftPower = gamepad1.right_trigger - (gamepad1.left_trigger * (0.4 + (((620 - liftPos) / 620) * 0.2)));
 
-			lift.setPower( liftPower );
-			if( controller1.a.onPress( ) )
-				deposit.releaseToggle( );
+//			lift.setPower( liftPower );
+			if( controller1.a.onPress( ) ) deposit.releaseToggle( );
+
+			if (controller1.dpad_up.onPress()) deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
+			if (controller1.dpad_down.onPress()) deposit.setAngleState( Deposit.AngleStates.GRAB );
 
 //			if( deposit.getAnglePosition() == )
 
@@ -39,10 +39,7 @@ public class OuttakeTest extends LinearOpMode {
 			// to continue scoring, go down
 			// to go back to bucket, go back up to 9, bucketAngle, go down
 
-			if ( liftPower <= -0.3 && liftPos > 180 || liftPos < 100 )
-				deposit.setAngleState( Deposit.AngleStates.GRAB );
-			else
-				deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
+//			if ( liftPower <= -0.3 && liftPos > 180 || liftPos < 100 )
 
 			telemetry.addData( "lift pos", liftPos );
 			telemetry.addData( "release pos", deposit.getReleasePosition( ) );
