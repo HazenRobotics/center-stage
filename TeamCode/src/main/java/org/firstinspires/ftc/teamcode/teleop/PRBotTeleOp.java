@@ -49,7 +49,7 @@ public class PRBotTeleOp extends OpMode {
 
         if( controller.start.onPress() ) robot.drive.resetIMU();
 
-        if( controller.x.onPress() ) fieldCentric = !fieldCentric;
+        if( controller.dpad_up.onPress() ) fieldCentric = !fieldCentric;
 
         if( controller.y.onPress() ) {
             flywheelToggle = !flywheelToggle;
