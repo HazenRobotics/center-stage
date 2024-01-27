@@ -13,17 +13,20 @@ import java.util.ArrayList;
 //@Disabled
 public class DigitalLidarSensorTest extends LinearOpMode {
 
-    DigitalLidarSensor sensor1, sensor2;
+    ArrayList<DigitalLidarSensor> list = new ArrayList<>();
     @Override
     public void runOpMode() throws InterruptedException {
-        sensor1 = new DigitalLidarSensor( hardwareMap, "sensor1" );
-        sensor2 = new DigitalLidarSensor( hardwareMap, "sensor2" );
+        list.add( new DigitalLidarSensor( hardwareMap, "sensor1" ) );
+        list.add( new DigitalLidarSensor( hardwareMap, "sensor2" ) );
+        list.add( new DigitalLidarSensor( hardwareMap, "sensor3" ) );
+        list.add( new DigitalLidarSensor( hardwareMap, "sensor4" ) );
+        list.add( new DigitalLidarSensor( hardwareMap, "sensor5" ) );
+        list.add( new DigitalLidarSensor( hardwareMap, "sensor6" ) );
 
         waitForStart();
 
         while (opModeIsActive()) {
-            telemetry.addData( "1 blocked?", sensor1.isBlocked() );
-            telemetry.addData( "2 blocked?", sensor2.isBlocked() );
+            for( int i = 0; i < list.size(); i++ ) telemetry.addData( "" + i, "" + list.get( i ).isBlocked() );
             telemetry.update();
         }
     }

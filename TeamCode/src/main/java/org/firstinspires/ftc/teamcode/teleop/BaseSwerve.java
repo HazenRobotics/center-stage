@@ -26,8 +26,6 @@ public class BaseSwerve extends LinearOpMode {
 	GamepadEvents controller1;
 	PIDController headingController;
 
-	AprilTagUtil aprilTagUtil;
-
 	double drive, strafe, rotate, loop, prevTime, heading, error, intakeDeployAngle = 0.215;
 	public static double target, startHeading = 90;
 	Pose2D poseEstimate;
@@ -38,7 +36,7 @@ public class BaseSwerve extends LinearOpMode {
 		robot = new KhepriBot( hardwareMap, telemetry );
 		Pose2D startPose = new Pose2D(0, 0 , new AngleDegrees( 90 ) );
 
-		aprilTagUtil = new AprilTagUtil( hardwareMap );
+//		aprilTagUtil = new AprilTagUtil( hardwareMap );
 
 		robot.setupTeleOpTracker( startPose ); // sets up perfectly
 //		robot.setupAutoTracker( startPose ); // offset by like 85 degrees somehow
@@ -56,7 +54,7 @@ public class BaseSwerve extends LinearOpMode {
 
 			drive = -gamepad1.left_stick_y * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.DRIVE.getFast( ) : KhepriBot.DriveSpeeds.DRIVE.getNorm( ));
 			strafe = gamepad1.left_stick_x * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.STRAFE.getFast( ) : KhepriBot.DriveSpeeds.STRAFE.getNorm( ));
-			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( ));
+			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( )) + 0.03;
 
 			robot.drive.drive( drive, strafe, rotate );
 
@@ -81,11 +79,11 @@ public class BaseSwerve extends LinearOpMode {
 		prevTime = loop;
 
 
-		double x = poseEstimate.getX();
-		double y = poseEstimate.getY();
-		double heading = poseEstimate.getTheta().getRadians();
+		double x = poseEstimate.getX( );
+		double y = poseEstimate.getY( );
+		double heading = poseEstimate.getTheta( ).getRadians( );
 
-		TelemetryPacket packet = new TelemetryPacket();
+		TelemetryPacket packet = new TelemetryPacket( );
 		Canvas field = packet.fieldOverlay( )
 				.drawImage( "/dash/centerstage.webp", 0, 0, 144, 144, Math.toRadians( 180 ), 72, 72, false )
 				.setAlpha( 1.0 )
@@ -93,31 +91,15 @@ public class BaseSwerve extends LinearOpMode {
 				.setRotation( Math.toRadians( 270 ) );
 
 		int robotRadius = 8;
-		field.strokeCircle(x, y, robotRadius);
-		double arrowX = new Rotation2d(heading).getCos() * robotRadius, arrowY = new Rotation2d(heading).getSin() * robotRadius;
+		field.strokeCircle( x, y, robotRadius );
+		double arrowX = new Rotation2d( heading ).getCos( ) * robotRadius, arrowY = new Rotation2d( heading ).getSin( ) * robotRadius;
 		double x1 = x, y1 = y;
 		double x2 = x + arrowX, y2 = y + arrowY;
-		field.strokeLine(x1, y1, x2, y2);
+		field.strokeLine( x1, y1, x2, y2 );
 
 		packet.put( "heading lock", headingLock );
 		packet.put( "pose", poseEstimate );
 
-		FtcDashboard.getInstance().sendTelemetryPacket(packet);
-	}
-
-	public void intakeControl() {
-		if( controller1.right_bumper.onPress( ) ) {
-			robot.intake.deployIntake( );
-			robot.deposit.setReleaseState( Deposit.ReleaseStates.RETRACTED );
-			robot.deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
-		} else if( controller1.left_bumper.onPress( ) )
-			robot.intake.foldIntake( );
-
-		if (controller1.dpad_up.onPress()) {
-			intakeDeployAngle += 0.03;
-		}
-		if (controller1.dpad_down.onPress()) {
-			intakeDeployAngle -= 0.03;
-		}
+		FtcDashboard.getInstance( ).sendTelemetryPacket( packet );
 	}
 }

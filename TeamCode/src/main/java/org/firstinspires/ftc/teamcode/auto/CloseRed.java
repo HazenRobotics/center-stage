@@ -267,7 +267,7 @@ public class CloseRed extends LinearOpMode {
 							}
 							break;
 						case PICKUP_PIXEL_FROM_GROUND:
-							robot.goToPoint( pickupFromGroundPoint, 0.5, 1 );
+							robot.goToPoint( pickupFromGroundPoint );
 							if( robot.getPose( ).getX( ) > -54 ) robot.intake.setDeployPos( Intake.DeploymentState.FULLY_DEPLOYED );
 
 							if( timer.seconds( ) > 2.5 ) {
@@ -281,7 +281,7 @@ public class CloseRed extends LinearOpMode {
 							}
 							break;
 						case DRIVE_AWAY_AND_EJECT:
-							robot.goToPoint( ejectPoint, 0.5, 1 );
+							robot.goToPoint( ejectPoint );
 							if( timer.seconds( ) > 0.1 ) {
 								robot.intake.setIntakeMotorPower( -1 );
 								robot.intake.setIntakeServoPower( -1 );

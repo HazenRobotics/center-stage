@@ -61,8 +61,6 @@ public class KhepriTeleOp extends LinearOpMode {
 			launcherControl();
 			ledControl();
 
-			if(controller1.start.onPress()) robot.tracker.resetHeading( );
-
 			controller1.update( );
 			controller2.update( );
 			robot.update();
@@ -80,6 +78,11 @@ public class KhepriTeleOp extends LinearOpMode {
 
 		headingLock = Math.abs(rotate) < CONTROLLER_TOLERANCE;
 		positionLock = Math.abs(drive) + Math.abs(strafe) < CONTROLLER_TOLERANCE && headingLock;
+
+		if(controller1.start.onPress()) {
+			robot.tracker.resetHeading( );
+			headingLock = false;
+		}
 
 		if( headingLock ) {
 			if (!wasHeadingLocked) targetHeading = heading;
@@ -125,7 +128,7 @@ public class KhepriTeleOp extends LinearOpMode {
 			robot.intake.deployIntake( );
 			robot.deposit.setReleaseState( Deposit.ReleaseStates.RETRACTED );
 			robot.deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
-		} else if( controller1.left_bumper.onPress( ) ) robot.intake.foldIntake( );
+		} else if( controller1.left_bumper.onPress( ) || robot.deposit.getReleaseState() == Deposit.ReleaseStates.EXTENDED ) robot.intake.foldIntake( );
 
 		if (robot.intake.isReversed()) gamepad1.rumble( 100 );
 	}
@@ -141,7 +144,7 @@ public class KhepriTeleOp extends LinearOpMode {
 		}
 
 		if (releaseAutoControl) {
-			if( liftPos < 50 && liftPower < 0 && robot.deposit.getReleaseState() == Deposit.ReleaseStates.RETRACTED ) robot.deposit.setAngleState( Deposit.AngleStates.GRAB );
+			if( liftPos < 50 && liftPower < -0.3 && robot.deposit.getReleaseState() == Deposit.ReleaseStates.RETRACTED ) robot.deposit.setAngleState( Deposit.AngleStates.GRAB );
 			else if( liftPower > 0 && liftPos > 90 ) robot.deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
 		}
 	}
@@ -159,6 +162,13 @@ public class KhepriTeleOp extends LinearOpMode {
 		liftPos = robot.lift.getPosition();
 		liftPower = (gamepad1.right_trigger - (gamepad1.left_trigger * 0.7));
 		usingLiftPID = Math.abs(liftPower) < CONTROLLER_TOLERANCE;
+
+		if (controller1.y.onPress() && robot.deposit.getReleaseState() == Deposit.ReleaseStates.RETRACTED) {
+			robot.deposit.setAngleState( Deposit.AngleStates.GRAB );
+			robot.lift.setTarget( 0 );
+			usingLiftPID = true;
+			wasUsingPID = true;
+		}
 
 		if (usingLiftPID && liftPos > 10) {
 			if (!wasUsingPID) robot.lift.setTarget( (int) liftPos );

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.scarabtuning;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -9,8 +10,8 @@ import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleDegrees;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.AngleRadians;
 
-@TeleOp
-@Disabled
+@Autonomous(group = "Mercurial")
+//@Disabled
 public class TrackWidthTuning extends LinearOpMode {
 	KhepriBot robot;
 	AngleDegrees currentHeading, lastHeading;
@@ -20,7 +21,7 @@ public class TrackWidthTuning extends LinearOpMode {
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
-		robot.setupAutoTracker( new Pose2D(0, 0 , Math.toRadians( 90 )) );
+		robot.setupTeleOpTracker( new Pose2D(0, 0 , Math.toRadians( 90 )) );
 
 		currentHeading = robot.tracker.getPose2D().getTheta().toAngleDegrees();
 		lastHeading = currentHeading;

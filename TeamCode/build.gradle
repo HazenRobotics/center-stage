@@ -60,5 +60,5 @@ dependencies {
     implementation 'org.tomlj:tomlj:1.1.0'
     implementation 'com.github.Eeshwar-Krishnan:PhotonFTC:v3.0.1-ALPHA'
 //    implementation 'org.team11260:fast-load:0.1.2'
-//    implementation 'com.github.StateFactory-Dev:StateFactory:v0.3.3'
+    implementation 'com.github.StateFactory-Dev:StateFactory:v0.3.5'
 }

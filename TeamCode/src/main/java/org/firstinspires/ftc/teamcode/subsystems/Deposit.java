@@ -13,10 +13,10 @@ public class Deposit {
     public static double dropBackDrop = 0.583;
 
     public enum ReleaseStates {
-        RETRACTED(0),
-        EXTENDED(0.158),
-        DROP_ONE(0.06),
-        HOLD_ONE(0.14);
+        RETRACTED(0.31),
+        EXTENDED(0.547),
+        DROP_ONE(0.389),
+        HOLD_ONE(0.5);
         private final double position;
         ReleaseStates (double pos) {
             position = pos;

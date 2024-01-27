@@ -95,11 +95,11 @@ public class FarBlueStandard extends LinearOpMode {
 					switch( spikeState ) {
 						case DRIVE_TO_SCORING_POS:
 							if (isRight)
-								robot.goToPoint( -46, 18, 270, 1, 1 );
+								robot.goToPoint( -46, 18, 270);
 							else if (isMiddle)
-								robot.goToPoint( -36, 14, 270, 1, 1 );
+								robot.goToPoint( -36, 14, 270 );
 							else if (isLeft)
-								robot.goToPoint( -36, 36, 270, 1, 1 );
+								robot.goToPoint( -36, 36, 270 );
 							if( timer.seconds( ) > 4 ) {
 								timer.reset( );
 								spikeState = SpikeMarkScoringStates.ROTATE_TO_SCORE;
@@ -109,7 +109,7 @@ public class FarBlueStandard extends LinearOpMode {
 							if (isRight || isMiddle)
 								spikeState = SpikeMarkScoringStates.SCORE;
 							else if( isLeft )
-								robot.goToPoint( -36, 36, 180, 1, 1 );
+								robot.goToPoint( -36, 36, 180 );
 							if( timer.seconds( ) > 2 ) {
 								timer.reset( );
 								spikeState = SpikeMarkScoringStates.SCORE;
@@ -134,9 +134,9 @@ public class FarBlueStandard extends LinearOpMode {
 					break;
 				case DRIVE_TO_COMMON_POINT:
 					if (isRight || isMiddle)
-						robot.goToPoint( -40, 12, 270, 1, 1 );
+						robot.goToPoint( -40, 12, 270 );
 					else if( isLeft )
-						robot.goToPoint( -40, 12, 180, 1, 1 );
+						robot.goToPoint( -40, 12, 180 );
 
 					if( timer.seconds( ) > 3 ) {
 						timer.reset( );
@@ -144,7 +144,7 @@ public class FarBlueStandard extends LinearOpMode {
 					}
 					break;
 				case ROTATE_TOWARDS_BACKDROP:
-					robot.goToPoint( -40, 12, 0, 1, 1 );
+					robot.goToPoint( -40, 12, 0 );
 
 					if( timer.seconds( ) > 2 ) {
 						timer.reset( );

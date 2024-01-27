@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "ServoTester", group = "TeleOp")
-@Disabled
+//@Disabled
 public class ServoTester extends OpMode {
 
     Servo servo;
@@ -16,7 +16,7 @@ public class ServoTester extends OpMode {
 
     @Override
     public void init( ) {
-        servo = hardwareMap.servo.get( "droneLaunch");
+        servo = hardwareMap.servo.get( "release");
     }
 
     @Override

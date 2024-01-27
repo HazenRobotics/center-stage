@@ -63,7 +63,7 @@ public class KhepriBot {
 	public ElapsedTime voltagePollTimer;
 //	PhotonLynxVoltageSensor photonVoltageSensor;
 	public GVFPath currentPath;
-	public Vector2 currentPointTarget;
+	public Pose2D currentPoseTarget;
 
 	static double loop, loopTime, currentHz, prevTime;
 
@@ -138,14 +138,14 @@ public class KhepriBot {
 		tracker = new InsistentThreeWheelTracker(
 				startPose.subtract( 0, 0, new AngleDegrees( 90 ) ),
 				new WheeledTrackerConstants.ThreeWheeledTrackerConstants(
-						new Vector2D( 1.2745623, -0.2857706 ),
-						0.996350989966,
-						0.998798735882,
-						new EncoderTicksConverter(1769.9, Units.MILLIMETER),
-						new EncoderTicksConverter(1768.22592593, Units.MILLIMETER),
-						new EncoderTicksConverter( 1742.38148148, Units.MILLIMETER ),
-						11.144846156),
-				new Encoder( hw.get( DcMotorEx.class, "FLM/paraLEnc" ) ).setDirection( Encoder.Direction.FORWARD ),
+						new Vector2D( -0.913302375, -0.165635625 ),
+						1,
+						1,
+						new EncoderTicksConverter(948.369444444, Units.MILLIMETER),
+						new EncoderTicksConverter(947.166666667, Units.MILLIMETER),
+						new EncoderTicksConverter( 948.219444444, Units.MILLIMETER ),
+						13.7633126736),
+				new Encoder( hw.get( DcMotorEx.class, "FLM/paraLEnc" ) ).setDirection( Encoder.Direction.REVERSE ),
 				new Encoder( hw.get( DcMotorEx.class, "BRM/paraREnc" ) ).setDirection( Encoder.Direction.FORWARD ),
 				new Encoder( hw.get( DcMotorEx.class, "BLM/perpEnc" ) ).setDirection( Encoder.Direction.FORWARD ),
 				imu,
@@ -159,17 +159,16 @@ public class KhepriBot {
 		tracker = new ThreeWheelTracker(
 				startPose.subtract( 0, 0, new AngleDegrees( 90 ) ),
 				new WheeledTrackerConstants.ThreeWheeledTrackerConstants(
-						new Vector2D( 1.2745623, -0.2857706 ),
-						0.996350989966,
-						0.998798735882,
-						new EncoderTicksConverter(1769.9, Units.MILLIMETER),
-						new EncoderTicksConverter(1768.22592593, Units.MILLIMETER),
-						new EncoderTicksConverter( 1742.38148148, Units.MILLIMETER ),
-						11.144846156),
-				new Encoder( hw.get( DcMotorEx.class, "FLM/paraLEnc" ) ).setDirection( Encoder.Direction.FORWARD ),
+						new Vector2D( -0.913302375, -0.165635625 ),
+						1,
+						1,
+						new EncoderTicksConverter(948.369444444, Units.MILLIMETER),
+						new EncoderTicksConverter(947.166666667, Units.MILLIMETER),
+						new EncoderTicksConverter( 948.219444444, Units.MILLIMETER ),
+						13.7633126736),
+				new Encoder( hw.get( DcMotorEx.class, "FLM/paraLEnc" ) ).setDirection( Encoder.Direction.REVERSE ),
 				new Encoder( hw.get( DcMotorEx.class, "BRM/paraREnc" ) ).setDirection( Encoder.Direction.FORWARD ),
 				new Encoder( hw.get( DcMotorEx.class, "BLM/perpEnc" ) ).setDirection( Encoder.Direction.FORWARD )
-
 		);
 		updateTracker();
 	}
@@ -183,41 +182,13 @@ public class KhepriBot {
 		poseEstimate = tracker.getPose2D().add( 0, 0, new AngleDegrees( 90 ) );
 	}
 
-	public void goToPoint( double x, double y, double heading, double travelMultiplier, double rotationMultiplier ) {
-		driveControlState = DriveControlState.P2P;
-		currentPointTarget = new Vector2( x, y );
-		telemetry.addData( "pose", poseEstimate );
-		telemetry.addData( "target", "X: " + x + " Y: " + y + " heading: " + heading );
-		double headingError = findShortestAngularTravel( Math.toRadians( heading ), poseEstimate.getTheta().getRadians() );
-		telemetry.addData( "heading error", headingError );
-
-		double yPow = YController.calculate(poseEstimate.getY(), y);
-		double xPow = XController.calculate(poseEstimate.getX(), x);
-
-		if (Math.hypot( YController.getPositionError(), XController.getPositionError() ) > 1) drive.setMaxSpeed( 0.65 );
-		else drive.setMaxSpeed( 1 );
-
-
-		drive.fieldCentricDrive(
-				yPow * normalizedPowerMultiplier,
-				xPow * normalizedPowerMultiplier,
-				autoHeadingController.calculate( headingError, 0 ) * normalizedPowerMultiplier,
-				poseEstimate.getTheta().getRadians()
-		);
-	}
-
 	public void goToPoint( double x, double y, double heading ) {
-		goToPoint( x, y, heading, 1, 1 );
+		driveControlState = DriveControlState.P2P;
+		currentPoseTarget = new Pose2D( x, y, heading );
 	}
-
 	public void goToPoint( Pose2D pose ) {
-		goToPoint( pose.getX(), pose.getY(), pose.getTheta().getDegrees(), 1, 1 );
+		goToPoint( pose.getX(), pose.getY(), pose.getTheta().getDegrees() );
 	}
-
-	public void goToPoint( Pose2D pose, double travelMultiplier, double rotationMultiplier ) {
-		goToPoint( pose.getX(), pose.getY(), pose.getTheta().getDegrees(), travelMultiplier, rotationMultiplier );
-	}
-
 	public void followPath( GVFPath path, double targetHeading ) {
 		driveControlState = DriveControlState.GVF;
 		currentPath = path;
@@ -248,10 +219,35 @@ public class KhepriBot {
 		return currentPath;
 	}
 
-	public Vector2 getCurrentPointTarget( ) {
-		return currentPointTarget;
+	public Pose2D getCurrentPoseTarget( ) {
+		return currentPoseTarget;
 	}
 
+	public void updateDrive() {
+		switch( driveControlState ) {
+			case P2P:
+				double headingError = findShortestAngularTravel( Math.toRadians( currentPoseTarget.getTheta().getDegrees() ), poseEstimate.getTheta().getRadians() );
+
+				double yPow = YController.calculate(poseEstimate.getY(), currentPoseTarget.getY());
+				double xPow = XController.calculate(poseEstimate.getX(), currentPoseTarget.getX());
+
+				if (Math.hypot( YController.getPositionError(), XController.getPositionError() ) > 1) drive.setMaxSpeed( 0.65 );
+				else drive.setMaxSpeed( 1 );
+
+
+				drive.fieldCentricDrive(
+						yPow * normalizedPowerMultiplier,
+						xPow * normalizedPowerMultiplier,
+						autoHeadingController.calculate( headingError, 0 ) * normalizedPowerMultiplier,
+						poseEstimate.getTheta().getRadians()
+				);
+				break;
+			case GVF:
+				break;
+			case MANUAL:
+				break;
+		}
+	}
 	public void update() {
 		pollNormalizedPowerMultiplier();
 //		normalizedPowerMultiplier = 12.0 / photonVoltageSensor.getCachedVoltage();
