@@ -46,15 +46,17 @@ public class BaseSwerve extends LinearOpMode {
 
 		headingController = new PIDController( 1, 0, 0.1 );
 
+		while( opModeInInit() ) robot.tracker.reset();
+
 		waitForStart( );
 
 		while( opModeIsActive( ) ) {
 			poseEstimate = robot.getPose();
 			heading = poseEstimate.getTheta().getRadians();
 
-			drive = -gamepad1.left_stick_y * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.DRIVE.getFast( ) : KhepriBot.DriveSpeeds.DRIVE.getNorm( ));
+			drive = -gamepad1.left_stick_y * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.DRIVE.getFast( ) : KhepriBot.DriveSpeeds.DRIVE.getNorm( )) + 0.03;
 			strafe = gamepad1.left_stick_x * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.STRAFE.getFast( ) : KhepriBot.DriveSpeeds.STRAFE.getNorm( ));
-			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( )) + 0.03;
+			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( ));
 
 			robot.drive.drive( drive, strafe, rotate );
 

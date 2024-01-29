@@ -35,7 +35,7 @@ public class Intake{
     }
 
     public enum SpinState {
-        IN(0.8), OUT(-1), OFF(0);
+        IN(0.8), OUT(-1), OFF(0), SPIKE_SCORE(-0.5);
         public final double power;
         SpinState(double pow) {
             power = pow;
@@ -61,8 +61,15 @@ public class Intake{
         telemetry = t;
     }
 
+    public void setDeploymentState( DeploymentState state ) {
+        deploymentState = state;
+    }
     public DeploymentState getDeploymentState() {
         return deploymentState;
+    }
+
+    public void setSpinState( SpinState state ) {
+        spinState = state;
     }
 
     public double getAngle() {

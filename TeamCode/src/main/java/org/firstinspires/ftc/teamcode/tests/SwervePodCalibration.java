@@ -20,7 +20,7 @@ import java.util.List;
 
 @Config
 @TeleOp
-@Disabled
+//@Disabled
 public class SwervePodCalibration extends LinearOpMode {
 
     AxonSwervePod[] pods;

@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.robots;
 
 import static org.firstinspires.ftc.teamcode.utils.SwervePDController.findShortestAngularTravel;
 
+import android.util.Size;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -14,6 +16,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
@@ -36,6 +39,8 @@ import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.Encoder;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.tracker.InsistentThreeWheelTracker;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.tracker.ThreeWheelTracker;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.tracker.WheeledTrackerConstants;
+import org.firstinspires.ftc.teamcode.vision.processors.PropProcessor;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.List;
 
@@ -63,11 +68,16 @@ public class KhepriBot {
 	public ElapsedTime voltagePollTimer;
 //	PhotonLynxVoltageSensor photonVoltageSensor;
 	public GVFPath currentPath;
+	public double targetHeading;
 	public Pose2D currentPoseTarget;
+
+	public double maxAutoDriveSpeed = 0.75;
 
 	static double loop, loopTime, currentHz, prevTime;
 
 	public static final double robotMass = 34.1;
+
+	public VisionPortal propStream;
 
 	public enum DriveSpeeds {
 		DRIVE(0.7, 1), STRAFE(0.7, 1), ROTATE(0.5, 1);
@@ -114,7 +124,7 @@ public class KhepriBot {
 
 		XController = new PIDController( 0.2, 0 , 0.03 );
 		YController = new PIDController( 0.2, 0 , 0.03 );
-		autoHeadingController = new PIDController( 5, 0, 0.4 );
+		autoHeadingController = new PIDController( 5, 0, 0.5 );
 		teleOpHeadingController = new PIDController( 1, 0, 0.1 );
 
 		voltagePollTimer = new ElapsedTime();
@@ -123,6 +133,16 @@ public class KhepriBot {
 //		normalizedPowerMultiplier = 12.0 / photonVoltageSensor.getCachedVoltage();
 	}
 
+	public void setupPropProcessor( PropProcessor.PropColor color ) {
+		propStream = new VisionPortal.Builder()
+				.setCamera(hw.get( WebcamName.class, "front"))
+				.addProcessor( new PropProcessor().setPropColor( color ) )
+				.setCameraResolution(new Size(640, 360))
+				.setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+				.enableLiveView( true )
+				.setAutoStopLiveView(true)
+				.build();
+	}
 
 	public void setupIMU( RevHubOrientationOnRobot.LogoFacingDirection logoDir, RevHubOrientationOnRobot.UsbFacingDirection usbDir ) {
 		imu = new IMU_EX(hw.get(IMU.class, "imu"), AngleUnit.RADIANS);
@@ -176,8 +196,11 @@ public class KhepriBot {
 	public Pose2D getPose() {
 		return poseEstimate;
 	}
+	public Vector2 getVector2() {
+		return new Vector2( poseEstimate.getX(), poseEstimate.getY() );
+	}
 
-	public void updateTracker () {
+	public void updateTracker() {
 		tracker.updatePose();
 		poseEstimate = tracker.getPose2D().add( 0, 0, new AngleDegrees( 90 ) );
 	}
@@ -186,33 +209,26 @@ public class KhepriBot {
 		driveControlState = DriveControlState.P2P;
 		currentPoseTarget = new Pose2D( x, y, heading );
 	}
+
+	public double distanceToTarget() {
+		switch( driveControlState ) {
+			case P2P:
+				return Math.hypot( currentPoseTarget.getX() - poseEstimate.getX(),
+						currentPoseTarget.getY() - poseEstimate.getY() );
+			case GVF:
+				return currentPath.getDistanceFromEnd( getVector2() );
+			case MANUAL:
+			default:
+				return 0;
+		}
+	}
 	public void goToPoint( Pose2D pose ) {
 		goToPoint( pose.getX(), pose.getY(), pose.getTheta().getDegrees() );
 	}
 	public void followPath( GVFPath path, double targetHeading ) {
-		driveControlState = DriveControlState.GVF;
+		setDriveControlState( DriveControlState.GVF );
 		currentPath = path;
-		Vector2 currentPos = new Vector2( poseEstimate.getX( ), poseEstimate.getY( ) );
-		double headingError = findShortestAngularTravel( Math.toRadians( targetHeading ), poseEstimate.getTheta( ).getRadians( ) );
-
-		if (path.getDistanceFromEnd( currentPos ) > 1) drive.setMaxSpeed( 0.65 );
-		else drive.setMaxSpeed( 1 );
-
-		switch( path.evaluateState( currentPos ) ) {
-			case FOLLOW_PATH:
-				Vector2 powerVector = path.calculateGuidanceVector( currentPos );
-				drive.fieldCentricDrive(
-						powerVector.getY( ) * normalizedPowerMultiplier,
-						powerVector.getX( ) * normalizedPowerMultiplier,
-						teleOpHeadingController.calculate( headingError, 0 ),
-						poseEstimate.getTheta( ).getRadians( )
-				);
-				break;
-			case USE_PID:
-			case DONE:
-				goToPoint( path.getEndPoint( ).getX( ), path.getEndPoint( ).getY( ), targetHeading );
-				break;
-		}
+		this.targetHeading = targetHeading;
 	}
 
 	public GVFPath getCurrentPath( ) {
@@ -224,16 +240,16 @@ public class KhepriBot {
 	}
 
 	public void updateDrive() {
+		double headingError;
 		switch( driveControlState ) {
 			case P2P:
-				double headingError = findShortestAngularTravel( Math.toRadians( currentPoseTarget.getTheta().getDegrees() ), poseEstimate.getTheta().getRadians() );
+				headingError = findShortestAngularTravel( Math.toRadians( currentPoseTarget.getTheta().getDegrees() ), poseEstimate.getTheta().getRadians() );
 
 				double yPow = YController.calculate(poseEstimate.getY(), currentPoseTarget.getY());
 				double xPow = XController.calculate(poseEstimate.getX(), currentPoseTarget.getX());
 
-				if (Math.hypot( YController.getPositionError(), XController.getPositionError() ) > 1) drive.setMaxSpeed( 0.65 );
+				if (Math.hypot( YController.getPositionError(), XController.getPositionError() ) > 1) drive.setMaxSpeed( maxAutoDriveSpeed );
 				else drive.setMaxSpeed( 1 );
-
 
 				drive.fieldCentricDrive(
 						yPow * normalizedPowerMultiplier,
@@ -243,6 +259,28 @@ public class KhepriBot {
 				);
 				break;
 			case GVF:
+				Vector2 currentPos = new Vector2( poseEstimate.getX( ), poseEstimate.getY( ) );
+				headingError = findShortestAngularTravel( Math.toRadians( targetHeading ), poseEstimate.getTheta( ).getRadians( ) );
+
+				if (currentPath.getDistanceFromEnd( currentPos ) > 1) drive.setMaxSpeed( maxAutoDriveSpeed );
+				else drive.setMaxSpeed( 1 );
+
+				switch( currentPath.evaluateState( currentPos ) ) {
+					case FOLLOW_PATH:
+						Vector2 powerVector = currentPath.calculateGuidanceVector( currentPos );
+						drive.fieldCentricDrive(
+								powerVector.getY( ) * normalizedPowerMultiplier,
+								powerVector.getX( ) * normalizedPowerMultiplier,
+								teleOpHeadingController.calculate( headingError, 0 ),
+								poseEstimate.getTheta( ).getRadians( )
+						);
+						break;
+					case USE_PID:
+					case DONE:
+						goToPoint( currentPath.getEndPoint( ).getX( ), currentPath.getEndPoint( ).getY( ), targetHeading );
+						break;
+				}
+
 				break;
 			case MANUAL:
 				break;
@@ -256,6 +294,7 @@ public class KhepriBot {
 		calculateHz();
 		rgbController.update();
 		intake.update();
+		updateDrive();
 //		telemetry.update();
 	}
 
@@ -292,6 +331,14 @@ public class KhepriBot {
 		Vector2D velocityVector = tracker.getDeltaPositionVector().scalarMultiply( currentHz );
 
 		return velocityVector.vectorMultiply( velocityVector ).scalarMultiply( robotMass ).scalarMultiply( curvature );
+	}
+
+	public void setDriveControlState( DriveControlState driveControlState ) {
+		this.driveControlState = driveControlState;
+	}
+
+	public void setMaxAutoDriveSpeed( double maxAutoDriveSpeed ) {
+		this.maxAutoDriveSpeed = maxAutoDriveSpeed;
 	}
 
 	public DriveControlState getDriveControlState( ) {

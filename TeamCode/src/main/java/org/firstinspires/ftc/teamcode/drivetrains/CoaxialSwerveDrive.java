@@ -19,7 +19,7 @@ public class CoaxialSwerveDrive {
 
 	WheelState wheelState = WheelState.DRIVE;
 	public AxonSwervePod[] swervePods = new AxonSwervePod[4];
-	public static final double[] encoderOffsets = { 4.29 , 0.456, 2.443, 3.145 };
+	public static final double[] encoderOffsets = { 4.36 , 0.416, 2.417, 3.104 };
 	double wheelbase;
 	double trackwidth;
 	double[] wheelSpeeds;

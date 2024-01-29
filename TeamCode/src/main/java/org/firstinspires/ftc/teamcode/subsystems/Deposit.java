@@ -15,7 +15,7 @@ public class Deposit {
     public enum ReleaseStates {
         RETRACTED(0.31),
         EXTENDED(0.547),
-        DROP_ONE(0.389),
+        DROP_ONE(0.375),
         HOLD_ONE(0.5);
         private final double position;
         ReleaseStates (double pos) {
@@ -28,10 +28,9 @@ public class Deposit {
 
     public enum AngleStates {
         GRAB( 0.423 ),
-        DROP_FLOOR( 0.363 ),
-        DROP_FLOOR_AUTO( 0.42 ),
         DROP_BACKDROP( 0.741 ),
-        FIX_BUCKET(0.37);
+        FIX_BUCKET(0.37),
+        STRAIGHT_DOWN( 0.529 );
         private final double position;
 
         AngleStates( double pos ) {

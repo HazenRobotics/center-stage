@@ -22,7 +22,7 @@ public class PropProcessor implements VisionProcessor {
 		RED_CLOSE(
 				new Rect( 90, 143, 83, 77 ),
 				new Rect( 290, 150, 67, 63 ),
-				new Rect( 483, 80, 80, 73 )
+				new Rect( 483, 143, 80, 73 )
 		),
 		RED_FAR(
 				new Rect( 183, 140, 87, 77 ),
@@ -47,8 +47,8 @@ public class PropProcessor implements VisionProcessor {
 			rightPos = right;
 		}
 	}
-	PropPosition propPosition;
-	public static PropColor propColor = PropColor.RED_CLOSE;
+	static PropPosition propPosition = PropPosition.NOT_FOUND;
+	static PropColor propColor = PropColor.RED_CLOSE;
 
 	public static Rect leftPos, midPos, rightPos;
 
@@ -161,7 +161,7 @@ public class PropProcessor implements VisionProcessor {
 		return propColor;
 	}
 
-	public PropPosition getPropPosition( ) {
+	public static PropPosition getPropPosition( ) {
 		return propPosition;
 	}
 }
