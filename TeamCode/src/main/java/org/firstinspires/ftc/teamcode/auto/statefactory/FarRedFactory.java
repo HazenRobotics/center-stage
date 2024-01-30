@@ -40,6 +40,7 @@ public class FarRedFactory extends LinearOpMode {
 		robot = new KhepriBot( hardwareMap, telemetry );
 		robot.setupAutoTracker( new Pose2D( -38, -61.125, new AngleDegrees( 90 ) ) );
 		robot.setupPropProcessor( PropProcessor.PropColor.RED_FAR );
+		robot.setMaxAutoDriveSpeed( 0.5 );
 
 		robot.deposit.setReleaseState( Deposit.ReleaseStates.EXTENDED );
 		robot.deposit.setAngleState( Deposit.AngleStates.STRAIGHT_DOWN );
@@ -50,12 +51,12 @@ public class FarRedFactory extends LinearOpMode {
 		Pose2D rightSpike = new Pose2D( -36, -32, 180 );
 		Pose2D selectedSpike;
 
-		Pose2D beforeTruss = new Pose2D( -38, -57, 180 );
-		Pose2D afterTruss = new Pose2D( 36, -57, 180 );
+		Pose2D beforeTruss = new Pose2D( -40, -58, 0 );
+		Pose2D afterTruss = new Pose2D( 36, -57, 0 );
 
-		Pose2D leftBackDrop = new Pose2D( 50, -28, 0 );
-		Pose2D middleBackDrop = new Pose2D( 50, -34, 0 );
-		Pose2D rightBackDrop = new Pose2D( 50, -42, 0 );
+		Pose2D leftBackDrop = new Pose2D( 48, -28, 0 );
+		Pose2D middleBackDrop = new Pose2D( 48, -34, 0 );
+		Pose2D rightBackDrop = new Pose2D( 48, -42, 0 );
 		Pose2D selectedBackDrop;
 
 		Pose2D park = new Pose2D( 44, -60, 0 );
@@ -94,7 +95,7 @@ public class FarRedFactory extends LinearOpMode {
 					robot.intake.setDeploymentState( Intake.DeploymentState.TOP_TWO );
 					robot.intake.setSpinState( Intake.SpinState.SPIKE_SCORE );
 				} )
-				.transition( () -> robot.distanceToTarget() < 1 )
+				.transition( () -> robot.distanceToTarget() < 0.5 )
 
 				.state( AutoStates.SCORE_SPIKE )
 				.onExit( () -> robot.intake.foldIntake())
@@ -102,7 +103,6 @@ public class FarRedFactory extends LinearOpMode {
 
 				.state( AutoStates.DRIVE_BEFORE_TRUSS )
 				.onEnter( () -> robot.goToPoint( beforeTruss ) )
-				.onExit( () -> robot.setMaxAutoDriveSpeed( 0.5 ) )
 				.transition( () -> robot.distanceToTarget() < 1 )
 
 				.state( AutoStates.DRIVE_UNDER_TRUSS )

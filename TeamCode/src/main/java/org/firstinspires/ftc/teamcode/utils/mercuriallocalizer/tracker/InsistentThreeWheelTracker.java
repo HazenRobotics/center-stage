@@ -4,14 +4,13 @@ import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.Angle;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.Encoder;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.IMU_EX;
-import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.ScheduledIMU_EX;
 
 @SuppressWarnings("unused")
 public class InsistentThreeWheelTracker extends ThreeWheelTracker {
 	private final HeadingSupplier headingSupplier;
 
 	/**
-	 * @param headingSupplier Either {@link IMU_EX} (recommended for if the IMU isn't being used for anything else, will save on loop time) or {@link ScheduledIMU_EX} (will read from the IMU every loop)
+	 * @param headingSupplier Either {@link IMU_EX} (recommended for if the IMU isn't being used for anything else, will save on loop time)
 	 * @param insistFrequency how often the heading supplier is cross-checked to keep the heading accurate
 	 */
 	public InsistentThreeWheelTracker( Pose2D initialPose, WheeledTrackerConstants.ThreeWheeledTrackerConstants trackerConstants, Encoder left, Encoder right, Encoder middle, HeadingSupplier headingSupplier, int insistFrequency) {
@@ -25,7 +24,7 @@ public class InsistentThreeWheelTracker extends ThreeWheelTracker {
 	/**
 	 * constructs an InsistentThreeWheelTracker with an insist frequency of 10
 	 *
-	 * @param headingSupplier Either {@link IMU_EX} (recommended for if the IMU isn't being used for anything else, will save on loop time) or {@link ScheduledIMU_EX} (will read from the IMU every loop)
+	 * @param headingSupplier Either {@link IMU_EX} (recommended for if the IMU isn't being used for anything else, will save on loop time)
 	 */
 	public InsistentThreeWheelTracker( Pose2D initialPose, WheeledTrackerConstants.ThreeWheeledTrackerConstants trackerConstants, Encoder left, Encoder right, Encoder middle, HeadingSupplier headingSupplier) {
 		this(initialPose, trackerConstants, left, right, middle, headingSupplier, 10);

@@ -7,7 +7,7 @@ import android.util.Size;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.outoftheboxrobotics.photoncore.hardware.PhotonLynxVoltageSensor;
+//import com.outoftheboxrobotics.photoncore.hardware.PhotonLynxVoltageSensor;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -248,7 +248,7 @@ public class KhepriBot {
 				double yPow = YController.calculate(poseEstimate.getY(), currentPoseTarget.getY());
 				double xPow = XController.calculate(poseEstimate.getX(), currentPoseTarget.getX());
 
-				if (Math.hypot( YController.getPositionError(), XController.getPositionError() ) > 1) drive.setMaxSpeed( maxAutoDriveSpeed );
+				if (Math.hypot( YController.getPositionError(), XController.getPositionError() ) > 2) drive.setMaxSpeed( maxAutoDriveSpeed );
 				else drive.setMaxSpeed( 1 );
 
 				drive.fieldCentricDrive(
@@ -262,7 +262,7 @@ public class KhepriBot {
 				Vector2 currentPos = new Vector2( poseEstimate.getX( ), poseEstimate.getY( ) );
 				headingError = findShortestAngularTravel( Math.toRadians( targetHeading ), poseEstimate.getTheta( ).getRadians( ) );
 
-				if (currentPath.getDistanceFromEnd( currentPos ) > 1) drive.setMaxSpeed( maxAutoDriveSpeed );
+				if (currentPath.getDistanceFromEnd( currentPos ) > 2) drive.setMaxSpeed( maxAutoDriveSpeed );
 				else drive.setMaxSpeed( 1 );
 
 				switch( currentPath.evaluateState( currentPos ) ) {
@@ -327,8 +327,15 @@ public class KhepriBot {
 		return currentHz;
 	}
 
+	public Vector2D getVelocityVector() {
+		return tracker.getDeltaPositionVector().scalarMultiply( currentHz );
+	}
+
+	public double getVelocity() {
+		return getVelocityVector().getMagnitude();
+	}
 	public Vector2D getCentripetalForceVector( double curvature ) {
-		Vector2D velocityVector = tracker.getDeltaPositionVector().scalarMultiply( currentHz );
+		Vector2D velocityVector = getVelocityVector();
 
 		return velocityVector.vectorMultiply( velocityVector ).scalarMultiply( robotMass ).scalarMultiply( curvature );
 	}

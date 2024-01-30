@@ -236,8 +236,10 @@ public class KhepriTeleOp extends LinearOpMode {
 		telemetry.addData( "rgbcontrollerTimer seconds", robot.rgbController.getTimer().seconds() );
 		telemetry.addData( "rgbcontrollerTimer updateRotation", robot.rgbController.getUpdateRotation() );
 
+		telemetry.addData( "velocity", robot.getVelocity() );
+
 //		robot.drive.displayWheelAngles( telemetry );
-		for( int i = 0; i < 4; i++ ) telemetry.addData( "motor " + i, robot.drive.swervePods[i].getDrivePower());
+//		for( int i = 0; i < 4; i++ ) telemetry.addData( "motor " + i, robot.drive.swervePods[i].getDrivePower());
 		telemetry.update( );
 	}
 }
