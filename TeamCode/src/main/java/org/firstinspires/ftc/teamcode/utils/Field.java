@@ -1,7 +1,13 @@
 package org.firstinspires.ftc.teamcode.utils;
 
+
+import org.opencv.core.Point3;
+
 public class Field {
     //in
+    //left to right
+
+
     final static double TILE_SIZE = 24;
     final static double TILE_CONNECTOR_SIZE = 1;
     final static double TILE_SIZE_EDGE = 24.375;
@@ -28,6 +34,7 @@ public class Field {
     }
     //not offset
     static Pixel[][] pixels = new Pixel[PIXEL_COLUMN][PIXEL_ROW];
+
 
 
 }

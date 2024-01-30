@@ -31,4 +31,9 @@ public class BlueFarSidePark extends LinearOpMode {
 				.splineToConstantHeading( new Vector2d( 59, 10 ), 0 )
 				.build());
 	}
+	public void waitRobot(long millis) {
+		long currentTime = System.currentTimeMillis();
+		while (currentTime+millis>System.currentTimeMillis() && opModeIsActive() );
+
+	}
 }
