@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingDcMotorEX;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.hardware.Encoder;
 
@@ -44,5 +45,9 @@ public class Climber {
 
 	public DcMotorSimple.Direction getDirection() {
 		return motor.getDirection();
+	}
+
+	public double getCurrent() {
+		return motor.getCurrent( CurrentUnit.AMPS );
 	}
 }

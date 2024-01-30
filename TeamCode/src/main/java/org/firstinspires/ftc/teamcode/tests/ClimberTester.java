@@ -21,6 +21,7 @@ public class ClimberTester extends LinearOpMode {
 
 			telemetry.addData( "power that's supposed to be set", gamepad1.right_trigger - gamepad1.left_trigger );
 			telemetry.addData( "power that's being set", climb.getPower() );
+			telemetry.addData( "current", climb.getCurrent() );
 			telemetry.update();
 		}
 	}

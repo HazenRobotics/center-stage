@@ -35,7 +35,7 @@ public class ThreeWheelOdoEncoderTuner extends LinearOpMode {
 		waitForStart();
 
 		while( opModeIsActive() ) {
-			drive.drive( 0.03,0,0 );
+			drive.drive( 0,0.03,0 );
 			telemetry.addData( "left pos", left.getCurrentPosition() * LMult );
 			telemetry.addData( "right pos", right.getCurrentPosition()  * RMult );
 			telemetry.addData( "perp pos", perp.getCurrentPosition() * PMult);

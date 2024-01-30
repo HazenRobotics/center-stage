@@ -50,8 +50,8 @@ public class FarRedFactory extends LinearOpMode {
 		Pose2D rightSpike = new Pose2D( -36, -32, 180 );
 		Pose2D selectedSpike;
 
-		Pose2D beforeTruss = new Pose2D( -38, -58, 180 );
-		Pose2D afterTruss = new Pose2D( 36, -58, 180 );
+		Pose2D beforeTruss = new Pose2D( -38, -57, 180 );
+		Pose2D afterTruss = new Pose2D( 36, -57, 180 );
 
 		Pose2D leftBackDrop = new Pose2D( 50, -28, 0 );
 		Pose2D middleBackDrop = new Pose2D( 50, -34, 0 );
