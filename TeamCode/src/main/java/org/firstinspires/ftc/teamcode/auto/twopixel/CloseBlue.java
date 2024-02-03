@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.statefactory;
+package org.firstinspires.ftc.teamcode.auto.twopixel;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
@@ -12,6 +12,7 @@ import com.sfdev.assembly.state.StateMachineBuilder;
 import org.firstinspires.ftc.teamcode.robots.KhepriBot;
 import org.firstinspires.ftc.teamcode.subsystems.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.utils.GVF.CubicBezierCurve;
 import org.firstinspires.ftc.teamcode.utils.GVF.GVFPath;
 import org.firstinspires.ftc.teamcode.utils.GVF.Vector2;
 import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.Pose2D;
@@ -19,52 +20,68 @@ import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.An
 import org.firstinspires.ftc.teamcode.vision.processors.PropProcessor;
 
 @Autonomous
-public class FarRedFactory extends LinearOpMode {
+public class CloseBlue extends LinearOpMode {
 
 	KhepriBot robot;
 	StateMachine autoMachine;
 
 	public enum AutoStates {
-		DRIVE_TO_SPIKE,
-		SCORE_SPIKE,
-		DRIVE_BEFORE_TRUSS,
-		DRIVE_UNDER_TRUSS,
 		DRIVE_TO_BACKDROP,
 		SCORE_ON_BACKDROP,
-		PARK
+		DRIVE_TO_SPIKE,
+		SCORE_SPIKE,
+		PARK,
+		SHUTDOWN
 	}
 
 
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
-		robot.setupAutoTracker( new Pose2D( -38, -61.125, new AngleDegrees( 90 ) ) );
-		robot.setupPropProcessor( PropProcessor.PropColor.RED_FAR );
-		robot.setMaxAutoDriveSpeed( 0.5 );
+		robot.setupAutoTracker( new Pose2D( 15, 61.125, new AngleDegrees( 270 ) ) );
+		robot.setupPropProcessor( PropProcessor.PropColor.BLUE_CLOSE );
 
-		robot.deposit.setReleaseState( Deposit.ReleaseStates.EXTENDED );
+		robot.deposit.setReleaseState( Deposit.ReleaseStates.HOLD_ONE );
 		robot.deposit.setAngleState( Deposit.AngleStates.STRAIGHT_DOWN );
-		robot.lift.setTarget( 0 );
+		robot.lift.setTarget( 80 );
 
-		Pose2D leftSpike = new Pose2D( -48, -44, 270 );
-		Pose2D middleSpike = new Pose2D( -40, -32, 270 );
-		Pose2D rightSpike = new Pose2D( -36, -32, 180 );
+		GVFPath rightBackDrop = new GVFPath(
+				new CubicBezierCurve(
+						new Vector2( 15, 61.125 ),
+						new Vector2( 20, 42 ),
+						new Vector2( 33, 45 ),
+						new Vector2( 49, 28)
+				)
+		);
+		GVFPath middleBackDrop = new GVFPath(
+				new CubicBezierCurve(
+						new Vector2( 15, 61.125 ),
+						new Vector2( 18, 41 ),
+						new Vector2( 18, 29 ),
+						new Vector2( 49, 34)
+				)
+		);
+		GVFPath leftBackDrop = new GVFPath(
+				new CubicBezierCurve(
+						new Vector2( 15, 61.125 ),
+						new Vector2( 20, 42 ),
+						new Vector2( 33, 45 ),
+						new Vector2( 49, 42)
+				)
+		);
+		GVFPath selectedBackDrop;
+
+		Pose2D rightSpike = new Pose2D( 12, 36, 0 );
+		Pose2D middleSpike = new Pose2D( 24, 24, 0 );
+		Pose2D leftSpike = new Pose2D( 19, 37, 90 );
 		Pose2D selectedSpike;
 
-		Pose2D beforeTruss = new Pose2D( -40, -58, 0 );
-		Pose2D afterTruss = new Pose2D( 36, -57, 0 );
-
-		Pose2D leftBackDrop = new Pose2D( 48, -28, 0 );
-		Pose2D middleBackDrop = new Pose2D( 48, -34, 0 );
-		Pose2D rightBackDrop = new Pose2D( 48, -42, 0 );
-		Pose2D selectedBackDrop;
-
-		Pose2D park = new Pose2D( 44, -60, 0 );
+		Pose2D park = new Pose2D( 44, 60, 0 );
 
 		while( opModeInInit( ) && !opModeIsActive( ) ) {
 			robot.drive.drive( 0.03, 0, 0 );
 			telemetry.addData( "position", PropProcessor.getPropPosition() );
-			displayTelemetry();
+			telemetry.update();
 			robot.update();
 		}
 
@@ -89,31 +106,10 @@ public class FarRedFactory extends LinearOpMode {
 		}
 
 		autoMachine = new StateMachineBuilder()
-				.state( AutoStates.DRIVE_TO_SPIKE )
-				.onEnter( () -> robot.goToPoint( selectedSpike ) )
-				.onExit( () -> {
-					robot.intake.setDeploymentState( Intake.DeploymentState.TOP_TWO );
-					robot.intake.setSpinState( Intake.SpinState.SPIKE_SCORE );
-				} )
-				.transition( () -> robot.distanceToTarget() < 0.5 )
-
-				.state( AutoStates.SCORE_SPIKE )
-				.onExit( () -> robot.intake.foldIntake())
-				.transitionTimed( 0.75 )
-
-				.state( AutoStates.DRIVE_BEFORE_TRUSS )
-				.onEnter( () -> robot.goToPoint( beforeTruss ) )
-				.transition( () -> robot.distanceToTarget() < 1 )
-
-				.state( AutoStates.DRIVE_UNDER_TRUSS )
-				.onEnter( () -> robot.goToPoint( afterTruss ) )
-				.transition( () -> robot.distanceToTarget() < 1 )
-
 				.state( AutoStates.DRIVE_TO_BACKDROP )
 				.onEnter( () -> {
-					robot.goToPoint( selectedBackDrop );
+					robot.followPath( selectedBackDrop, 0 );
 					robot.deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
-					robot.lift.setTarget( 80 );
 				})
 				.transition( () -> robot.distanceToTarget() < 1 )
 
@@ -123,10 +119,32 @@ public class FarRedFactory extends LinearOpMode {
 				.onEnter( () -> robot.deposit.setReleaseState( Deposit.ReleaseStates.RETRACTED ) )
 				.transitionTimed( 0.75 )
 
+				.state( AutoStates.DRIVE_TO_SPIKE )
+				.onEnter( () -> {
+					robot.goToPoint( selectedSpike );
+					robot.deposit.setAngleState( Deposit.AngleStates.GRAB );
+					robot.lift.setTarget( 0 );
+				}  )
+				.onExit( () -> {
+					robot.intake.setDeploymentState( Intake.DeploymentState.TOP_TWO );
+					robot.intake.setSpinState( Intake.SpinState.SPIKE_SCORE );
+				} )
+				.transition( () -> robot.distanceToTarget() < 1 )
+
+				.state( AutoStates.SCORE_SPIKE )
+				.onExit( () -> robot.intake.foldIntake())
+				.transitionTimed( 0.75 )
+
 				.state( AutoStates.PARK )
 				.onEnter( () -> robot.goToPoint( park ) )
+				.transitionTimed( 4 )
+
+				.state( AutoStates.SHUTDOWN )
+				.onEnter( () -> requestOpModeStop() )
 
 				.build();
+
+		waitForStart();
 
 		autoMachine.start();
 
@@ -159,30 +177,28 @@ public class FarRedFactory extends LinearOpMode {
 		double x1 = x, y1 = y;
 		double x2 = x + arrowX, y2 = y + arrowY;
 		field.strokeLine(x1, y1, x2, y2);
+			switch( robot.getDriveControlState() ) {
+				case GVF:
+					GVFPath path = robot.getCurrentPath();
+					if (path != null) {
+						Vector2 firstPoint = path.getCurve( ).getP0( );
 
-
-		switch( robot.getDriveControlState() ) {
-			case GVF:
-				GVFPath path = robot.getCurrentPath();
-				if (path != null) {
-					Vector2 firstPoint = path.getCurve( ).getP0( );
-
-					for( double i = 0; i <= 1; i += 0.1 ) {
-						Vector2 secondPoint = path.getCurve( ).calculate( i );
-						field.strokeLine( firstPoint.getX( ), firstPoint.getY( ), secondPoint.getX( ), secondPoint.getY( ) );
-						firstPoint = secondPoint;
+						for( double i = 0; i <= 1; i += 0.1 ) {
+							Vector2 secondPoint = path.getCurve( ).calculate( i );
+							field.strokeLine( firstPoint.getX( ), firstPoint.getY( ), secondPoint.getX( ), secondPoint.getY( ) );
+							firstPoint = secondPoint;
+						}
 					}
-				}
-				break;
-			case P2P:
-				Pose2D targetPoint = robot.getCurrentPoseTarget();
-				if (targetPoint != null) field.strokeLine( robot.getPose().getX( ), robot.getPose().getY( ), targetPoint.getX( ), targetPoint.getY( ) );
-				break;
-		}
+					break;
+				case P2P:
+					Pose2D targetPoint = robot.getCurrentPoseTarget();
+					if (targetPoint != null) field.strokeLine( robot.getPose().getX( ), robot.getPose().getY( ), targetPoint.getX( ), targetPoint.getY( ) );
+					break;
+			}
 
 		FtcDashboard.getInstance().sendTelemetryPacket(packet);
 
-		if (autoMachine != null) telemetry.addData( "state", autoMachine.getState() );
+		telemetry.addData( "state", autoMachine.getState() );
 		telemetry.addData( "dist from target", robot.distanceToTarget() );
 		telemetry.update();
 	}

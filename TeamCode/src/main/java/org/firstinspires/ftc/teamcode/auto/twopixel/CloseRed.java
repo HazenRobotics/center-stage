@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.statefactory;
+package org.firstinspires.ftc.teamcode.auto.twopixel;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.utils.mercuriallocalizer.geometry.angle.An
 import org.firstinspires.ftc.teamcode.vision.processors.PropProcessor;
 
 @Autonomous
-public class CloseRedFactory extends LinearOpMode {
+public class CloseRed extends LinearOpMode {
 
 	KhepriBot robot;
 	StateMachine autoMachine;
@@ -40,18 +40,39 @@ public class CloseRedFactory extends LinearOpMode {
 		robot.setupAutoTracker( new Pose2D( 15, -61.125, new AngleDegrees( 90 ) ) );
 		robot.setupPropProcessor( PropProcessor.PropColor.RED_CLOSE );
 
-		robot.deposit.setReleaseState( Deposit.ReleaseStates.EXTENDED );
+		robot.deposit.setReleaseState( Deposit.ReleaseStates.HOLD_ONE );
 		robot.deposit.setAngleState( Deposit.AngleStates.STRAIGHT_DOWN );
 		robot.lift.setTarget( 80 );
 
-		Pose2D leftBackDrop = new Pose2D( 49, -28, 0 );
-		Pose2D middleBackDrop = new Pose2D( 49, -34, 0 );
-		Pose2D rightBackDrop = new Pose2D( 49, -42, 0 );
-		Pose2D selectedBackDrop;
+		GVFPath leftBackDrop = new GVFPath(
+				new CubicBezierCurve(
+						new Vector2( 15, -61.125 ),
+						new Vector2( 20, -42 ),
+						new Vector2( 33, -45 ),
+						new Vector2( 49, -28)
+				)
+		);
+		GVFPath middleBackDrop = new GVFPath(
+				new CubicBezierCurve(
+						new Vector2( 15, -61.125 ),
+						new Vector2( 18, -41 ),
+						new Vector2( 18, -29 ),
+						new Vector2( 49, -34)
+				)
+		);
+		GVFPath rightBackDrop = new GVFPath(
+				new CubicBezierCurve(
+						new Vector2( 15, -61.125 ),
+						new Vector2( 20, -42 ),
+						new Vector2( 33, -45 ),
+						new Vector2( 49, -42)
+				)
+		);
+		GVFPath selectedBackDrop;
 
 		Pose2D leftSpike = new Pose2D( 12, -36, 0 );
 		Pose2D middleSpike = new Pose2D( 24, -24, 0 );
-		Pose2D rightSpike = new Pose2D( 22, -40, 270 );
+		Pose2D rightSpike = new Pose2D( 19, -37, 270 );
 		Pose2D selectedSpike;
 
 		Pose2D park = new Pose2D( 44, -60, 0 );
@@ -86,7 +107,7 @@ public class CloseRedFactory extends LinearOpMode {
 		autoMachine = new StateMachineBuilder()
 				.state( AutoStates.DRIVE_TO_BACKDROP )
 				.onEnter( () -> {
-					robot.goToPoint( selectedBackDrop );
+					robot.followPath( selectedBackDrop, 0 );
 					robot.deposit.setAngleState( Deposit.AngleStates.DROP_BACKDROP );
 				})
 				.transition( () -> robot.distanceToTarget() < 1 )
@@ -151,8 +172,6 @@ public class CloseRedFactory extends LinearOpMode {
 		double x1 = x, y1 = y;
 		double x2 = x + arrowX, y2 = y + arrowY;
 		field.strokeLine(x1, y1, x2, y2);
-
-
 			switch( robot.getDriveControlState() ) {
 				case GVF:
 					GVFPath path = robot.getCurrentPath();

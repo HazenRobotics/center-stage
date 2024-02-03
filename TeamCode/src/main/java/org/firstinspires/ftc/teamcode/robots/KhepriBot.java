@@ -58,6 +58,16 @@ public class KhepriBot {
 
 	public RGBController rgbController;
 	public IMU_EX imu;
+
+	WheeledTrackerConstants.ThreeWheeledTrackerConstants trackerConstants =
+			new WheeledTrackerConstants.ThreeWheeledTrackerConstants(
+					new Vector2D( 1.154248, -0.279480875 ),
+					1,
+					1,
+					new EncoderTicksConverter(1778.36481481, Units.MILLIMETER),
+					new EncoderTicksConverter(1775.43777778, Units.MILLIMETER),
+					new EncoderTicksConverter( 1760.31111111, Units.MILLIMETER ),
+					11.2044472058);
 	public PIDController XController;
 	public PIDController YController;
 	public PIDController autoHeadingController;
@@ -157,15 +167,8 @@ public class KhepriBot {
 	public void setupAutoTracker( Pose2D startPose ) {
 		tracker = new InsistentThreeWheelTracker(
 				startPose.subtract( 0, 0, new AngleDegrees( 90 ) ),
-				new WheeledTrackerConstants.ThreeWheeledTrackerConstants(
-						new Vector2D( -0.8912765, 0.096239 ),
-						1.00036903243,
-						0.999100313868,
-						new EncoderTicksConverter(947.073015873, Units.MILLIMETER),
-						new EncoderTicksConverter(945.244444444, Units.MILLIMETER),
-						new EncoderTicksConverter( 947.382222222, Units.MILLIMETER ),
-						13.7633126736),
-				new Encoder( hw.get( DcMotorEx.class, "FLM/paraLEnc" ) ).setDirection( Encoder.Direction.REVERSE ),
+				trackerConstants,
+				new Encoder( hw.get( DcMotorEx.class, "FLM/paraLEnc" ) ).setDirection( Encoder.Direction.FORWARD ),
 				new Encoder( hw.get( DcMotorEx.class, "BRM/paraREnc" ) ).setDirection( Encoder.Direction.FORWARD ),
 				new Encoder( hw.get( DcMotorEx.class, "BLM/perpEnc" ) ).setDirection( Encoder.Direction.FORWARD ),
 				imu,
@@ -178,15 +181,8 @@ public class KhepriBot {
 	public void setupTeleOpTracker( Pose2D startPose ) {
 		tracker = new ThreeWheelTracker(
 				startPose.subtract( 0, 0, new AngleDegrees( 90 ) ),
-				new WheeledTrackerConstants.ThreeWheeledTrackerConstants(
-						new Vector2D( -0.8912765, 0.096239 ),
-						1.00036903243,
-						0.999100313868,
-						new EncoderTicksConverter(947.073015873, Units.MILLIMETER),
-						new EncoderTicksConverter(945.244444444, Units.MILLIMETER),
-						new EncoderTicksConverter( 947.382222222, Units.MILLIMETER ),
-						13.7633126736),
-				new Encoder( hw.get( DcMotorEx.class, "FLM/paraLEnc" ) ).setDirection( Encoder.Direction.REVERSE ),
+				trackerConstants,
+				new Encoder( hw.get( DcMotorEx.class, "FLM/paraLEnc" ) ).setDirection( Encoder.Direction.FORWARD ),
 				new Encoder( hw.get( DcMotorEx.class, "BRM/paraREnc" ) ).setDirection( Encoder.Direction.FORWARD ),
 				new Encoder( hw.get( DcMotorEx.class, "BLM/perpEnc" ) ).setDirection( Encoder.Direction.FORWARD )
 		);
@@ -222,12 +218,21 @@ public class KhepriBot {
 				return 0;
 		}
 	}
+
+	public void goToPoint( Vector2 pos ) {
+		goToPoint( pos.getX(), pos.getY(), targetHeading );
+	}
 	public void goToPoint( Pose2D pose ) {
+		targetHeading = pose.getTheta().getDegrees();
 		goToPoint( pose.getX(), pose.getY(), pose.getTheta().getDegrees() );
 	}
 	public void followPath( GVFPath path, double targetHeading ) {
 		setDriveControlState( DriveControlState.GVF );
 		currentPath = path;
+		this.targetHeading = targetHeading;
+	}
+
+	public void setTargetHeading(double targetHeading) {
 		this.targetHeading = targetHeading;
 	}
 
@@ -243,7 +248,7 @@ public class KhepriBot {
 		double headingError;
 		switch( driveControlState ) {
 			case P2P:
-				headingError = findShortestAngularTravel( Math.toRadians( currentPoseTarget.getTheta().getDegrees() ), poseEstimate.getTheta().getRadians() );
+				headingError = findShortestAngularTravel( Math.toRadians( targetHeading ), poseEstimate.getTheta().getRadians() );
 
 				double yPow = YController.calculate(poseEstimate.getY(), currentPoseTarget.getY());
 				double xPow = XController.calculate(poseEstimate.getX(), currentPoseTarget.getX());
@@ -327,6 +332,7 @@ public class KhepriBot {
 		return currentHz;
 	}
 
+	// this isn't a great way to do this, but it's good enough for my purposes
 	public Vector2D getVelocityVector() {
 		return tracker.getDeltaPositionVector().scalarMultiply( currentHz );
 	}

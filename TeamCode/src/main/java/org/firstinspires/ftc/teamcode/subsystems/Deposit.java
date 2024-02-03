@@ -16,7 +16,7 @@ public class Deposit {
         RETRACTED(0.31),
         EXTENDED(0.547),
         DROP_ONE(0.375),
-        HOLD_ONE(0.5);
+        HOLD_ONE(0.45);
         private final double position;
         ReleaseStates (double pos) {
             position = pos;

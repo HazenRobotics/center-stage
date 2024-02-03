@@ -13,11 +13,11 @@ public class EncoderTest extends LinearOpMode {
 
 	@Override
 	public void runOpMode( ) throws InterruptedException {
-		encoders.add( hardwareMap.get( DcMotorEx.class, "FLM/paraLEnc" ) );
-		encoders.add( hardwareMap.get( DcMotorEx.class, "BLM/perpEnc" ) );
-		encoders.add( hardwareMap.get( DcMotorEx.class, "FRM/liftEnc" ) );
-		encoders.add( hardwareMap.get( DcMotorEx.class, "BRM/paraREnc" ) );
-		encoders.add( hardwareMap.get( DcMotorEx.class, "climb" ) );
+		encoders.add( hardwareMap.get( DcMotorEx.class, "encoder" ) );
+//		encoders.add( hardwareMap.get( DcMotorEx.class, "BLM/perpEnc" ) );
+//		encoders.add( hardwareMap.get( DcMotorEx.class, "FRM/liftEnc" ) );
+//		encoders.add( hardwareMap.get( DcMotorEx.class, "BRM/paraREnc" ) );
+//		encoders.add( hardwareMap.get( DcMotorEx.class, "climb" ) );
 
 		waitForStart();
 

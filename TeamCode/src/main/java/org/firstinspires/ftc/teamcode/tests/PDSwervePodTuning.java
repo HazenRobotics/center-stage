@@ -17,7 +17,7 @@ import java.util.List;
 
 @Config
 @TeleOp(group = "Test")
-@Disabled
+//@Disabled
 public class PDSwervePodTuning extends LinearOpMode {
 	CoaxialSwerveDrive drive;
 	AxonSwervePod pod;

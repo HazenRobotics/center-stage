@@ -21,7 +21,7 @@ public class TrackWidthTuning extends LinearOpMode {
 	@Override
 	public void runOpMode( ) throws InterruptedException {
 		robot = new KhepriBot( hardwareMap, telemetry );
-		robot.setupTeleOpTracker( new Pose2D(0, 0 , Math.toRadians( 90 )) );
+		robot.setupTeleOpTracker( new Pose2D(0, 0 , new AngleDegrees( 90 ) ));
 
 		currentHeading = robot.tracker.getPose2D().getTheta().toAngleDegrees();
 		lastHeading = currentHeading;
@@ -31,7 +31,7 @@ public class TrackWidthTuning extends LinearOpMode {
 		while(opModeIsActive()) {
 			drive = -gamepad1.left_stick_y * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.DRIVE.getFast( ) : KhepriBot.DriveSpeeds.DRIVE.getNorm( ));
 			strafe = gamepad1.left_stick_x * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.STRAFE.getFast( ) : KhepriBot.DriveSpeeds.STRAFE.getNorm( ));
-			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( ));
+			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( )) + 0.03 * Math.signum( gamepad1.right_stick_x );
 
 			robot.drive.drive( drive, strafe, rotate );
 

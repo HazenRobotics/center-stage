@@ -35,7 +35,9 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -64,46 +66,54 @@ import java.util.ArrayList;
  */
 @Config
 @TeleOp
-@Disabled
-public class AprilTagUtilTester extends OpMode {
+//@Disabled
+public class AprilTagUtilTester extends LinearOpMode {
 
     AprilTagUtil util;
     KhepriBot khepriBot;
+
     @Override
-    public void init() {
+    public void runOpMode( ) throws InterruptedException {
         util = new AprilTagUtil( hardwareMap );
 
         telemetry.addLine( "done" );
-        telemetry.update();
-        khepriBot = new KhepriBot(hardwareMap,telemetry);
-        khepriBot.setupAutoTracker( new Pose2D( 0, 0, new AngleDegrees( 90 ).getTheta( ) ) );
-    }
+        telemetry.update( );
+        khepriBot = new KhepriBot( hardwareMap, telemetry );
+        khepriBot.setupAutoTracker( new Pose2D( 0, 0, new AngleDegrees( 0 ) ) );
 
-    @Override
-    public void loop() {
-        // Push telemetry to the Driver Station.
-        // Save CPU resources; can resume streaming when needed.
-        Point3 point = util.getPositionBasedOnTag(khepriBot.getPose().getTheta().getRadians());
+        while (opModeInInit()) {
+            Point3 point = util.getPositionBasedOnTag( khepriBot.getPose( ).getTheta( ).getRadians( ) );
 
-        TelemetryPacket packet = new TelemetryPacket();
-        Canvas field = packet.fieldOverlay( )
-                .drawImage( "/dash/centerstage.webp", 0, 0, 144, 144, Math.toRadians( 180 ), 72, 72, false )
-                .setAlpha( 1.0 )
-                .drawGrid( 0, 0, 144, 144, 7, 7 )
-                .setRotation( Math.toRadians( 270 ) );
+            TelemetryPacket packet = new TelemetryPacket( );
+            Canvas field = packet.fieldOverlay( )
+                    .drawImage( "/dash/centerstage.webp", 0, 0, 144, 144, Math.toRadians( 180 ), 72, 72, false )
+                    .setAlpha( 1.0 )
+                    .drawGrid( 0, 0, 144, 144, 7, 7 )
+                    .setRotation( Math.toRadians( 270 ) );
 
-        double x = point.x;
-        double y = point.y;
 
-        int robotRadius = 8;
-        field.strokeCircle(x, y, robotRadius);
-//        double arrowX = new Rotation2d(heading).getCos() * robotRadius, arrowY = new Rotation2d(heading).getSin() * robotRadius;
-//        double x1 = x, y1 = y;
-//        double x2 = x + arrowX, y2 = y + arrowY;
-//        field.strokeLine(x1, y1, x2, y2);
-        FtcDashboard.getInstance().sendTelemetryPacket(packet);
-        khepriBot.update();
+            if( !point.equals( new Point3( 0, 0, 0 ) ) ) khepriBot.tracker.setPose2D( new Pose2D( point.x, point.y, point.z ) );
 
+            double x = khepriBot.tracker.getPose2D( ).getX( );
+            double y = khepriBot.tracker.getPose2D( ).getY( );
+            double heading = khepriBot.tracker.getPose2D( ).getTheta( ).getRadians( );
+
+            int robotRadius = 8;
+            field.strokeCircle( x, y, robotRadius );
+            double arrowX = new Rotation2d( heading ).getCos( ) * robotRadius, arrowY = new Rotation2d( heading ).getSin( ) * robotRadius;
+            double x1 = x, y1 = y;
+            double x2 = x + arrowX, y2 = y + arrowY;
+            field.strokeLine( x1, y1, x2, y2 );
+
+            ArrayList<AprilTagDetection> arr = util.getDetections();
+
+            for( int i = 0; i < arr.size(); i++ ) packet.put( "detection " + i, arr.get( i ).ftcPose );
+
+            FtcDashboard.getInstance( ).sendTelemetryPacket( packet );
+            khepriBot.update( );
+        }
+
+        waitForStart();
     }
 
 }   // end class

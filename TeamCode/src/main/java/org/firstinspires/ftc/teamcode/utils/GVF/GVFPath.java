@@ -156,7 +156,7 @@ public class GVFPath {
 
         if (robotToEndDist < 1) return pathState = PathState.DONE;
         else if (isContinuous) return pathState = PathState.FOLLOW_PATH;
-        else if (robotToEndDist < 15) return pathState = PathState.USE_PID;
+        else if (robotToEndDist < 10) return pathState = PathState.USE_PID;
         else return pathState = PathState.FOLLOW_PATH;
     }
 

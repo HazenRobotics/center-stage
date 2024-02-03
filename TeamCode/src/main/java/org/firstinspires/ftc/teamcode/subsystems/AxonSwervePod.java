@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.utils.cachinghardwaredevice.CachingDcMotor
 public class AxonSwervePod {
 
 	public DcMotorEx motor;
-	CRServo crServo;
+	public CRServo crServo;
 	AxonAbsolutePositionEncoder encoder;
 	SwervePDController controller;
 

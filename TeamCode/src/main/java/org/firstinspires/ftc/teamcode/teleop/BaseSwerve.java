@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import static org.firstinspires.ftc.teamcode.utils.SwervePDController.findShortestAngularTravel;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
@@ -26,10 +28,10 @@ public class BaseSwerve extends LinearOpMode {
 	GamepadEvents controller1;
 	PIDController headingController;
 
-	double drive, strafe, rotate, loop, prevTime, heading, error, intakeDeployAngle = 0.215;
-	public static double target, startHeading = 90;
+	double drive, strafe, rotate, loop, prevTime, heading, targetHeading, error, intakeDeployAngle = 0.215;
+	public static double target, startHeading = 90, d = 0, s = 0, r = 0;;
 	Pose2D poseEstimate;
-	boolean headingLock = false;
+	boolean headingLock = false, wasHeadingLocked = false;
 
 	@Override
 	public void runOpMode( ) throws InterruptedException {
@@ -51,15 +53,29 @@ public class BaseSwerve extends LinearOpMode {
 		waitForStart( );
 
 		while( opModeIsActive( ) ) {
-			poseEstimate = robot.getPose();
-			heading = poseEstimate.getTheta().getRadians();
+			poseEstimate = robot.getPose( );
+			heading = poseEstimate.getTheta( ).getRadians( );
 
 			drive = -gamepad1.left_stick_y * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.DRIVE.getFast( ) : KhepriBot.DriveSpeeds.DRIVE.getNorm( ));
 			strafe = gamepad1.left_stick_x * (gamepad1.left_stick_button ? KhepriBot.DriveSpeeds.STRAFE.getFast( ) : KhepriBot.DriveSpeeds.STRAFE.getNorm( ));
-			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( )) + 0.03;
+			rotate = gamepad1.right_stick_x * (gamepad1.right_stick_button ? KhepriBot.DriveSpeeds.ROTATE.getFast( ) : KhepriBot.DriveSpeeds.ROTATE.getNorm( ));
 
-			robot.drive.drive( drive, strafe, rotate );
+			headingLock = Math.abs(rotate) < 0.02;
 
+			if(controller1.start.onPress()) {
+				robot.tracker.resetHeading( );
+				headingLock = false;
+			}
+
+//			if( headingLock ) {
+//				if (!wasHeadingLocked) targetHeading = heading;
+//				error = findShortestAngularTravel( targetHeading, heading );
+//				rotate += robot.teleOpHeadingController.calculate( error, 0 );
+//			}
+
+			wasHeadingLocked = headingLock;
+
+			robot.drive.drive( drive + 0.03, strafe, rotate );
 
 			displayTelemetry();
 			robot.update();
@@ -99,9 +115,10 @@ public class BaseSwerve extends LinearOpMode {
 		double x2 = x + arrowX, y2 = y + arrowY;
 		field.strokeLine( x1, y1, x2, y2 );
 
-		packet.put( "heading lock", headingLock );
-		packet.put( "pose", poseEstimate );
+		telemetry.addData( "heading lock", headingLock );
+		telemetry.addData( "pose", poseEstimate );
 
-		FtcDashboard.getInstance( ).sendTelemetryPacket( packet );
+//		FtcDashboard.getInstance( ).sendTelemetryPacket( packet );
+		telemetry.update();
 	}
 }

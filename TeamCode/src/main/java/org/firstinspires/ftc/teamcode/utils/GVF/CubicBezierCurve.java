@@ -2,6 +2,14 @@ package org.firstinspires.ftc.teamcode.utils.GVF;
 
 public class CubicBezierCurve {
 
+	public Vector2 getP0( ) {
+		return p0;
+	}
+
+	public void setP0( Vector2 p0 ) {
+		this.p0 = p0;
+	}
+
 	private Vector2 p0, p1, p2, p3;
 	double curveLength;
 
@@ -12,14 +20,6 @@ public class CubicBezierCurve {
 		this.p3 = p3;
 
 		curveLength = getCurveLength( 0, 1 );
-	}
-
-	public Vector2 getP0( ) {
-		return p0;
-	}
-
-	public void setP0( Vector2 p0 ) {
-		this.p0 = p0;
 	}
 
 	public Vector2 getP1( ) {
@@ -56,9 +56,9 @@ public class CubicBezierCurve {
 		return new CubicBezierCurve( p3, c1, newP2, newP3 );
 	}
 
-	public CubicBezierCurve createReversedCurve( ) {
+	public CubicBezierCurve reverse( ) {
 		// Return same curve but with swapped starting and ending points
-		return new CubicBezierCurve( p3, p1, p2, p3 );
+		return new CubicBezierCurve( p3, p2, p1, p0 );
 	}
 
 	public Vector2 calculate( double t ) {

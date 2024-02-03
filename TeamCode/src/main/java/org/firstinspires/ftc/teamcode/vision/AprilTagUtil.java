@@ -83,14 +83,8 @@ public class AprilTagUtil {
             new VectorF(-70.25f, 40.625f, 5.5f),
     };
 
+    ArrayList<AprilTagDetection> detections;
 
-    /**
-     * The variable to store our instance of the vision portal.
-     **/
-
-    /**
-     * Initialize the AprilTag processor.
-     */
     public static VectorF getTagPosition(int i) {
         if (i > APRIL_TAG_BOARD_POSITIONS.length ) {
             i = i - APRIL_TAG_BOARD_POSITIONS.length;
@@ -160,14 +154,14 @@ public class AprilTagUtil {
 
         // Set and enable the processor.
 
-        backVP = new VisionPortal.Builder()
-                .setCamera(hw.get(WebcamName.class, "back"))
-                .addProcessor(backATP)
-                .setCameraResolution(new Size(640, 480))
-                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
-                .setAutoStopLiveView(true)
-                .enableLiveView( true )
-                .build();
+//        backVP = new VisionPortal.Builder()
+//                .setCamera(hw.get(WebcamName.class, "back"))
+//                .addProcessor(backATP)
+//                .setCameraResolution(new Size(640, 480))
+//                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
+//                .setAutoStopLiveView(true)
+//                .enableLiveView( true )
+//                .build();
 
         frontVP = new VisionPortal.Builder()
                 .setCamera(hw.get(WebcamName.class, "front"))
@@ -213,21 +207,11 @@ public class AprilTagUtil {
     }   // end method telemetryAprilTag()
 
     public Point3 getPositionBasedOnTag(double botHeading) {
+
         ArrayList<AprilTagDetection> detections = new ArrayList<>();
 
-        double xOffset = 0;
-        double yOffset = 0;
-
-        if (backVP.getProcessorEnabled(backATP)) {
-            detections.addAll(backATP.getDetections());
-            xOffset = BACK_X_OFFSET;
-            yOffset = BACK_Y_OFFSET;
-        }
-        if (frontVP.getProcessorEnabled(frontATP)) {
-            detections.addAll(frontATP.getDetections());
-            xOffset = FRONT_X_OFFSET;
-            yOffset = FRONT_Y_OFFSET;
-        }
+        if (backVP.getProcessorEnabled(backATP)) detections.addAll(backATP.getDetections());
+        if (frontVP.getProcessorEnabled(frontATP)) detections.addAll(frontATP.getDetections());
 
         if (detections.isEmpty()) return new Point3(0, 0, 0);
         else {
@@ -244,32 +228,38 @@ public class AprilTagUtil {
             x /= detections.size();
             y /= detections.size();
 
-            return new Point3(x + xOffset, y + yOffset, 0);
+            return new Point3(x, y, botHeading);
         }
-
-
-
-
-
-
-
-
-
-
     }
     public Point3 getFCPosition(AprilTagDetection detection, double botheading) {
+        double xOffset, yOffset;
+
+        if (detection.id <= 6 ) {
+            xOffset = FRONT_X_OFFSET;
+            yOffset = FRONT_Y_OFFSET;
+        } else {
+            xOffset = BACK_X_OFFSET;
+            yOffset = BACK_Y_OFFSET;
+        }
+
         // get coordinates of the robot in RC coordinates
         // ensure offsets are RC
-        double x = detection.ftcPose.x-FRONT_X_OFFSET;
-        double y = detection.ftcPose.y-FRONT_Y_OFFSET;
+        double x = detection.ftcPose.x-xOffset;
+        double y = detection.ftcPose.y-yOffset;
         // invert heading to correct properly
         botheading = -botheading;
         // rotate RC coordinates to be field-centric
-        double x2 = x*Math.cos(botheading)+y*Math.sin(botheading);
-        double y2 = x*-Math.sin(botheading)+y*Math.cos(botheading);
+//        double x2 = x*Math.cos(botheading)+y*Math.sin(botheading);
+//        double y2 = x*-Math.sin(botheading)+y*Math.cos(botheading);
+        double x2 = x * Math.sin(botheading) - y * Math.cos(botheading);
+        double y2 = x * Math.cos(botheading) + y * Math.sin(botheading);
         // add FC coordinates to apriltag position
         // tags is just the CS apriltag library
         VectorF tagpose = getTagPosition(detection.id);
-        return new Point3(tagpose.get(0)+y2,tagpose.get(1)-x2,botheading);
+        return new Point3(tagpose.get(0)+x2,tagpose.get(1)+y2,botheading);
+    }
+
+    public ArrayList<AprilTagDetection> getDetections() {
+        return detections;
     }
 }   // end class
