@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode.drivetrains;
 import static java.lang.Math.PI;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robots.KhepriBot;
 import org.firstinspires.ftc.teamcode.subsystems.AxonSwervePod;
 
 public class CoaxialSwerveDrive {
@@ -116,7 +118,7 @@ public class CoaxialSwerveDrive {
 		for( int i = 0; i < swervePods.length; i++ ) {
 			if( rotatePods )
 				swervePods[i].setAngleTarget( wheelAngles[i] );
-			swervePods[i].update( wheelSpeeds[i] * maxSpeed );
+			swervePods[i].update( Range.clip( wheelSpeeds[i], 0, maxSpeed * KhepriBot.normalizedPowerMultiplier ));
 		}
 	}
 

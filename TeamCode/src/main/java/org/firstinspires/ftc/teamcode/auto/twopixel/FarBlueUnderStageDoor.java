@@ -65,7 +65,7 @@ public class FarBlueUnderStageDoor extends LinearOpMode {
 						new Vector2( -38, 61.125 ),
 						new Vector2( -43, 49 ),
 						new Vector2( -42.5, 50 ),
-						new Vector2( -47, 18 )
+						new Vector2( -46.5, 23 )
 				)
 		);
 
@@ -90,7 +90,7 @@ public class FarBlueUnderStageDoor extends LinearOpMode {
 
 		GVFPath selectedSpike;
 
-		Vector2 beforeTruss = new Vector2( -40, 12 );
+		Vector2 beforeTruss = new Vector2( -40, 11 );
 		GVFPath afterTruss = new GVFPath(
 				new CubicBezierCurve(
 						new Vector2( -40, 12 ),
@@ -105,7 +105,7 @@ public class FarBlueUnderStageDoor extends LinearOpMode {
 						new Vector2( 24, 12 ),
 						new Vector2( 45, 13 ),
 						new Vector2( 38, 29.5 ),
-						new Vector2( 49.5, 30 )
+						new Vector2( 50, 29 )
 				)
 		);
 
@@ -114,7 +114,7 @@ public class FarBlueUnderStageDoor extends LinearOpMode {
 						new Vector2( 24, 12 ),
 						new Vector2( 44, 12 ),
 						new Vector2( 33, 36 ),
-						new Vector2( 49.5, 36 )
+						new Vector2( 50, 35 )
 				)
 		);
 
@@ -123,7 +123,7 @@ public class FarBlueUnderStageDoor extends LinearOpMode {
 						new Vector2( 24, 12 ),
 						new Vector2( 49.5, 20 ),
 						new Vector2( 34, 43 ),
-						new Vector2( 49.5, 44 )
+						new Vector2( 50, 43 )
 				)
 		);
 
@@ -185,12 +185,12 @@ public class FarBlueUnderStageDoor extends LinearOpMode {
 				.transitionTimed( 1 )
 
 				.state( AutoStates.SCORE_SPIKE )
-				.transitionTimed( 0.75 )
+				.transitionTimed( 5 )
 
 				.state( AutoStates.DRIVE_BEFORE_BACKDROP )
 				.onEnter( () -> robot.goToPoint( beforeTruss ) )
 				.loop( () -> {
-					if (robot.getPose().getY() < 15) robot.setTargetHeading( 0 );
+					if (robot.getPose().getY() < -12.1) robot.setTargetHeading( 0 );
 				} )
 				.transition( () -> robot.distanceToTarget() < 1 )
 
@@ -215,7 +215,7 @@ public class FarBlueUnderStageDoor extends LinearOpMode {
 				.transitionTimed( 0.75 )
 
 				.state( AutoStates.BACKUP )
-				.onEnter( () -> robot.goToPoint( new Vector2( robot.tracker.getPose2D().getX() - 2, robot.tracker.getPose2D().getY() ) ) )
+				.onEnter( () -> robot.goToPoint( new Vector2( robot.tracker.getPose2D().getX() - 2.5, robot.tracker.getPose2D().getY() ) ) )
 				.transitionTimed( 1 )
 
 				.state( AutoStates.PARK )

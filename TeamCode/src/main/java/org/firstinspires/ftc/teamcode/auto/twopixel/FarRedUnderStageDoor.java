@@ -65,7 +65,7 @@ public class FarRedUnderStageDoor extends LinearOpMode {
 						new Vector2( -38, -61.125 ),
 						new Vector2( -43, -49 ),
 						new Vector2( -42.5, -50 ),
-						new Vector2( -47, -16 )
+						new Vector2( -46.5, -23 )
 				)
 		);
 
@@ -90,7 +90,7 @@ public class FarRedUnderStageDoor extends LinearOpMode {
 
 		GVFPath selectedSpike;
 
-		Vector2 beforeTruss = new Vector2( -40, -12 );
+		Vector2 beforeTruss = new Vector2( -40, -11 );
 		GVFPath afterTruss = new GVFPath(
 				new CubicBezierCurve(
 						new Vector2( -40, -12 ),
@@ -105,7 +105,7 @@ public class FarRedUnderStageDoor extends LinearOpMode {
 						new Vector2( 24, -12 ),
 						new Vector2( 45, -13 ),
 						new Vector2( 38, -29.5 ),
-						new Vector2( 49.5, -28 )
+						new Vector2( 50, -29 )
 				)
 		);
 
@@ -114,7 +114,7 @@ public class FarRedUnderStageDoor extends LinearOpMode {
 						new Vector2( 24, -12 ),
 						new Vector2( 44, -12 ),
 						new Vector2( 33, -36 ),
-						new Vector2( 49.5, -34 )
+						new Vector2( 	50, -34 )
 				)
 		);
 
@@ -123,14 +123,14 @@ public class FarRedUnderStageDoor extends LinearOpMode {
 						new Vector2( 24, -12 ),
 						new Vector2( 49.5, -20 ),
 						new Vector2( 34, -43 ),
-						new Vector2( 49.5, -42 )
+						new Vector2( 50, -42 )
 				)
 		);
 
 		GVFPath selectedBackDrop;
 
-//		Pose2D park = new Pose2D( 44, -12, 0 ); // left
-		Pose2D park = new Pose2D( 44, -60, 0 ); //right
+		Pose2D park = new Pose2D( 44, -12, 0 ); // left
+//		Pose2D park = new Pose2D( 44, -60, 0 ); //right
 
 		while( opModeInInit( ) && !opModeIsActive( ) ) {
 			robot.drive.drive( 0.03, 0, 0 );
@@ -190,12 +190,18 @@ public class FarRedUnderStageDoor extends LinearOpMode {
 				.state( AutoStates.DRIVE_BEFORE_BACKDROP )
 				.onEnter( () -> robot.goToPoint( beforeTruss ) )
 				.loop( () -> {
-					if (robot.getPose().getY() > -15) robot.setTargetHeading( 0 );
+					if (robot.getPose().getY() > -12.1) robot.setTargetHeading( 0 );
 				} )
 				.transition( () -> robot.distanceToTarget() < 1 )
+				.transitionTimed( 3 )
+
+//				.waitState( 4 )
 
 				.state( AutoStates.DRIVE_UNDER_BACKDROP )
-				.onEnter( () -> robot.followPath( afterTruss, 0 ) )
+				.onEnter( () -> {
+					robot.followPath( afterTruss, 0 );
+					robot.setTargetHeading( 0 );
+				})
 				.transition( () -> robot.distanceToTarget() < 1 )
 //				.transition( () -> robot.getVelocity() < 1 && robot.getPose().getX() < -24, AutoStates.TRUSS_FALLBACK1 )
 //				.transition( () -> robot.getVelocity() < 1 && robot.getPose().getX() < 0, AutoStates.TRUSS_FALLBACK2 )
@@ -207,6 +213,7 @@ public class FarRedUnderStageDoor extends LinearOpMode {
 					robot.lift.setTarget( 125 );
 				})
 				.transition( () -> robot.distanceToTarget() < 1 )
+				.transitionTimed( 3 )
 
 				.waitState(0.5)
 
@@ -215,8 +222,8 @@ public class FarRedUnderStageDoor extends LinearOpMode {
 				.transitionTimed( 0.75 )
 
 				.state( AutoStates.BACKUP )
-				.onEnter( () -> robot.goToPoint( new Vector2( robot.tracker.getPose2D().getX() - 2, robot.tracker.getPose2D().getY() ) ) )
-				.transitionTimed( 1 )
+				.onEnter( () -> robot.goToPoint( new Vector2( robot.tracker.getPose2D().getX() - 2.5, robot.tracker.getPose2D().getY() ) ) )
+				.transitionTimed( 2 )
 
 				.state( AutoStates.PARK )
 				.onEnter( () -> robot.goToPoint( park ) )
@@ -224,14 +231,14 @@ public class FarRedUnderStageDoor extends LinearOpMode {
 
 				.state( AutoStates.RESET_DEPOSIT )
 				.onEnter( () -> robot.deposit.setAngleState( Deposit.AngleStates.GRAB ) )
-				.transitionTimed( 1 )
+				.transitionTimed( 0.5 )
 
 				.state( AutoStates.RESET_LIFT )
 				.onEnter( () -> robot.lift.setTarget( 0 ) )
-				.transitionTimed( 2 )
+//				.transitionTimed( 2 )
 
-				.state( AutoStates.SHUTDOWN )
-				.onEnter( () -> requestOpModeStop() )
+//				.state( AutoStates.SHUTDOWN )
+//				.onEnter( () -> requestOpModeStop() )
 
 				.build();
 
@@ -271,6 +278,7 @@ public class FarRedUnderStageDoor extends LinearOpMode {
 		switch( robot.getDriveControlState() ) {
 			case GVF:
 				GVFPath path = robot.getCurrentPath();
+				telemetry.addData( "endpoint", path.getCurve().getP3() );
 				if (path != null) {
 					Vector2 firstPoint = path.getCurve( ).getP0( );
 
@@ -283,6 +291,7 @@ public class FarRedUnderStageDoor extends LinearOpMode {
 				break;
 			case P2P:
 				Pose2D targetPoint = robot.getCurrentPoseTarget();
+				telemetry.addData( "targetPoint", targetPoint );
 				if (targetPoint != null) field.strokeLine( robot.getPose().getX( ), robot.getPose().getY( ), targetPoint.getX( ), targetPoint.getY( ) );
 				break;
 		}

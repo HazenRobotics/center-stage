@@ -90,13 +90,13 @@ public class FarBlueUnderTruss extends LinearOpMode {
 
 		GVFPath selectedSpike;
 
-		Vector2 beforeTruss = new Vector2( -40, 59 );
+		Vector2 beforeTruss = new Vector2( -40, 57 );
 		GVFPath afterTruss = new GVFPath(
 				new CubicBezierCurve(
-						new Vector2( -38, 59 ),
-						new Vector2( -15, 59 ),
-						new Vector2( -8, 59 ),
-						new Vector2( 34, 59 )
+						new Vector2( -38, 56.5 ),
+						new Vector2( -15, 56.5 ),
+						new Vector2( -8, 56.5 ),
+						new Vector2( 34, 56.5 )
 				)
 		);
 
@@ -107,7 +107,7 @@ public class FarBlueUnderTruss extends LinearOpMode {
 						new Vector2( 24, 57 ),
 						new Vector2( 48, 52 ),
 						new Vector2( 30, 30 ),
-						new Vector2( 49.5, 28 )
+						new Vector2( 50, 28 )
 				)
 		);
 
@@ -116,7 +116,7 @@ public class FarBlueUnderTruss extends LinearOpMode {
 						new Vector2( 24, 57 ),
 						new Vector2( 44, 52 ),
 						new Vector2( 30, 40 ),
-						new Vector2( 49.5, 36 )
+						new Vector2( 50, 36 )
 				)
 		);
 
@@ -125,7 +125,7 @@ public class FarBlueUnderTruss extends LinearOpMode {
 						new Vector2( 24, 57 ),
 						new Vector2( 44, 52 ),
 						new Vector2( 30, 40 ),
-						new Vector2( 49.5, 42 )
+						new Vector2( 50, 42 )
 				)
 		);
 
@@ -187,7 +187,7 @@ public class FarBlueUnderTruss extends LinearOpMode {
 				.transitionTimed( 1 )
 
 				.state( AutoStates.SCORE_SPIKE )
-				.transitionTimed( 0.75 )
+				.transitionTimed( 10 )
 
 				.state( AutoStates.DRIVE_BEFORE_TRUSS )
 				.onEnter( () -> robot.goToPoint( beforeTruss ) )
