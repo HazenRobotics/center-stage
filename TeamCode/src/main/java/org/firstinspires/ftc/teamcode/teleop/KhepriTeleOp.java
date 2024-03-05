@@ -30,7 +30,7 @@ public class KhepriTeleOp extends LinearOpMode {
 	ElapsedTime positionLockSettlingTimer;
 	Pose2D poseEstimate;
 	boolean headingLock, wasHeadingLocked, positionLock, positionSettling, climbAboveHeight = false, climbBelowHeight = false,
-			endGame = false, releaseAutoControl = true, usingLiftPID, wasUsingPID;
+			endGame = false, releaseAutoControl = true, usingLiftPID, wasUsingPID, fieldCentric = true;
 	final double MAX_CLIMB_HEIGHT = 14384, CONTROLLER_TOLERANCE = 0.01;
 
 	RevBlinkinLedDriver.BlinkinPattern[] signallingColors = new RevBlinkinLedDriver.BlinkinPattern[2];
@@ -101,19 +101,26 @@ public class KhepriTeleOp extends LinearOpMode {
 				strafe += robot.XController.calculate( poseEstimate.getX( ), targetX );
 			}
 		} else positionLockSettlingTimer.reset( );
-
+//
 		wasHeadingLocked = headingLock;
 
-		robot.drive.fieldCentricDrive( drive, strafe, rotate, heading );
+		if (controller1.b.onPress()) fieldCentric = !fieldCentric;
+
+		if (fieldCentric) robot.drive.fieldCentricDrive( drive, strafe, rotate, heading );
+//		else robot.drive.drive( drive, strafe, rotate );
+
+
 	}
 
 	public void climbControl() {
-		if( controller2.dpad_up.onPress( ) && !climbAboveHeight ) {
-			endGame = true;
+		if( controller1.dpad_up.onPress( ) /*&& !climbAboveHeight*/ ) {
+//			endGame = true;
 			robot.climber.goUp( );
-		} else if( controller2.dpad_down.onPress( ) && !climbBelowHeight ) {
-			endGame = true;
+//			robot.climber.setPower( 1 );
+		} else if( controller1.dpad_down.onPress( ) /*&& !climbBelowHeight*/ ) {
+//			endGame = true;
 			robot.climber.goDown( );
+//			robot.climber.setPower( -1 );
 		}
 
 		if( (climbAboveHeight && climbPower > 0) || (climbBelowHeight && climbPower < 0) ) robot.climber.setPower( 0 );
@@ -135,7 +142,7 @@ public class KhepriTeleOp extends LinearOpMode {
 
 	public void depositControl() {
 		if( controller1.a.onPress( ) ) robot.deposit.releaseToggle( );
-		if( controller1.b.onPress( ) ) robot.deposit.setReleaseState( Deposit.ReleaseStates.RETRACTED );
+//		if( controller1.b.onPress( ) ) robot.deposit.setReleaseState( Deposit.ReleaseStates.RETRACTED );
 
 		if( controller1.x.onPress( ) ) {
 			releaseAutoControl = !releaseAutoControl;
@@ -237,6 +244,7 @@ public class KhepriTeleOp extends LinearOpMode {
 		telemetry.addData( "rgbcontrollerTimer updateRotation", robot.rgbController.getUpdateRotation() );
 
 		telemetry.addData( "velocity", robot.getVelocity() );
+		telemetry.addData( "fieldCentric", fieldCentric );
 
 //		robot.drive.displayWheelAngles( telemetry );
 //		for( int i = 0; i < 4; i++ ) telemetry.addData( "motor " + i, robot.drive.swervePods[i].getDrivePower());
