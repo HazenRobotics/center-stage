@@ -52,7 +52,7 @@ public class MecanumDrive {
 
 	public void fieldCentricDrive(double drive, double strafe, double rotate) {
 
-		double botHeading = imu.getRobotYawPitchRollAngles().getYaw( AngleUnit.RADIANS);
+		double botHeading = -imu.getRobotYawPitchRollAngles().getYaw( AngleUnit.RADIANS);
 
 		double adjustedStrafe = strafe * Math.cos(-botHeading) - drive * Math.sin(-botHeading);
 		double adjustedDrive = strafe * Math.sin(-botHeading) + drive * Math.cos(-botHeading);
